@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Institutos Pro - Wikis</title>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; padding: 20px; display: flex; justify-content: center; }
+        .contenedor { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 550px; }
+        h2 { color: #1a73e8; text-align: center; margin-top: 0; }
+        .seccion { margin-bottom: 20px; padding: 15px; border: 1px solid #e8eaed; border-radius: 8px; background-color: #fafafa; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #5f6368; }
+        input[type="text"] { width: 70%; padding: 12px; border: 2px solid #dfe1e5; border-radius: 6px; outline: none; transition: border 0.3s; }
+        input[type="text"]:focus { border-color: #1a73e8; }
+        .btn-buscar { padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-buscar:hover { background: #1557b0; }
+        
+        .btn-wiki { 
+            display: inline-block; margin-top: 15px; padding: 12px 20px; 
+            background-color: #ff4757; color: white; text-decoration: none; 
+            border-radius: 6px; font-weight: bold; text-align: center;
+            box-shadow: 0 4px 6px rgba(255, 71, 87, 0.3); transition: transform 0.2s, background 0.3s;
+        }
+        .btn-wiki:hover { background-color: #ff6b81; transform: translateY(-2px); }
+
+        #resultado { margin-top: 20px; min-height: 100px; }
+        .result-card { background: white; padding: 20px; border-left: 6px solid #1a73e8; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .status-ok { color: #188038; font-weight: bold; font-size: 0.9em; margin-top: 10px; display: block; }
+        
+        .caja-precios { margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; }
+        .caja-alerta { margin-top: 15px; padding: 10px; background-color: #fce8e6; color: #d93025; border-radius: 6px; border: 1px solid #fad2cf; font-weight: bold; }
+        .grid-precios { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 0.95em; }
+        
+        /* Estilo para info de Franquicia sin alterar el diseño global */
+        .caja-franquicia { margin-top: 15px; padding: 15px; background-color: #fff9eb; border-radius: 8px; border: 1px solid #ffeeba; border-left: 4px solid #ffc107; }
+    </style>
+</head>
+<body>
+
+<div class="contenedor">
+    <h2>Buscador de Institutos</h2>
+
+    <div class="seccion">
+        <label>1. Selecciona tus archivos Excel:</label>
+        <input type="file" id="archivosExcel" accept=".xlsx, .xls" multiple>
+        <span id="statusCarga" class="status-ok"></span>
+    </div>
+
+    <div class="seccion">
+        <label>2. Nombre del Instituto:</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="textoBusqueda" placeholder="Ej: Instituto San Martín...">
+            <button class="btn-buscar" onclick="buscarInstituto()">Buscar</button>
+        </div>
+    </div>
+
+    <div id="resultado">
+        <p style="color: #70757a; text-align: center;">Primero carga los archivos para activar el sistema.</p>
+    </div>
+</div>
+
+<script>
+    let todosLosDatos = [];
+
+    document.getElementById('archivosExcel').addEventListener('change', function(e) {
+        const archivos = e.target.files;
+        if (archivos.length === 0) return;
+
+        todosLosDatos = [];
+        let procesados = 0;
+        document.getElementById('statusCarga').innerText = "Leyendo archivos...";
+
+        Array.from(archivos).forEach(archivo => {
+            const lector = new FileReader();
+            lector.onload = function(evento) {
+                const data = new Uint8Array(evento.target.result);
+                const libro = XLSX.read(data, {type: 'array'});
+                const nombreHoja = libro.SheetNames[0];
+                const hoja = libro.Sheets[nombreHoja];
+                const json = XLSX.utils.sheet_to_json(hoja);
+                
+                todosLosDatos = todosLosDatos.concat(json);
+                procesados++;
+
+                if (procesados === archivos.length) {
+                    document.getElementById('statusCarga').innerHTML = "✅ " + todosLosDatos.length + " registros cargados.";
+                    document.getElementById('resultado').innerHTML = "<p style='text-align:center;'>Listo para buscar.</p>";
+                }
+            };
+            lector.readAsArrayBuffer(archivo);
+        });
+    });
+
+    function buscarInstituto() {
+        const busqueda = document.getElementById('textoBusqueda').value.toLowerCase().trim();
+        const caja = document.getElementById('resultado');
+
+        if (todosLosDatos.length === 0) {
+            alert("Sube los archivos primero.");
+            return;
+        }
+
+        const resultados = todosLosDatos.filter(fila => 
+            fila.Nombre && fila.Nombre.toString().toLowerCase().includes(busqueda)
+        );
+
+        if (resultados.length > 0) {
+            let htmlTotal = "";
+
+            resultados.forEach(encontrado => {
+                let linkWiki = null;
+                
+                Object.keys(encontrado).forEach(columna => {
+                    if (columna.toLowerCase().trim().includes("wiki") || columna.toLowerCase().trim().includes("link")) {
+                        linkWiki = encontrado[columna];
+                    }
+                });
+
+                const nombreReal = encontrado.Nombre;
+                const tipoReal = (encontrado.Tipo || "No definido").toString();
+                const tipoLimpio = tipoReal.toLowerCase();
+                
+                const zona = encontrado.Zona ? encontrado.Zona.toString().trim() : "";
+                const inscripcion = encontrado.Inscripcion ? encontrado.Inscripcion.toString().trim() : "";
+                const precioFF = encontrado.Precio_FF ? encontrado.Precio_FF.toString().trim() : "";
+                const precioSA = encontrado.Precio_SA ? encontrado.Precio_SA.toString().trim() : "";
+
+                // Datos adicionales para Franquicia
+                const telFranquicia = encontrado.TELÉFONOS || "";
+                const nombreFranquicia = encontrado.NOMBRE2 || "";
+                const emailFranquicia = encontrado.EMAIL3 || "";
+
+                let colorTipo = "#1a73e8"; 
+                if (tipoLimpio.includes("propia")) colorTipo = "#1e8e3e";
+                if (tipoLimpio.includes("consolidado")) colorTipo = "#a142f4";
+                if (tipoLimpio.includes("franquicia")) colorTipo = "#e67c73";
+
+                let htmlResultado = `
+                    <div class="result-card" style="border-left-color: ${colorTipo}">
+                        <small>Instituto:</small><br>
+                        <strong>${nombreReal}</strong><br><br>
+                        <strong>Categoría:</strong> <span style="color:${colorTipo}">${tipoReal}</span>
+                `;
+
+                // Mostrar Info de Coordinador si es Franquicia
+                if (tipoLimpio.includes("franquicia")) {
+                    htmlResultado += `
+                        <div class="caja-franquicia">
+                            <strong style="color: #856404; font-size: 0.95em;">📞 Info del Coordinador:</strong><br>
+                            <div style="font-size: 0.9em; margin-top:5px;">
+                                <strong>Nombre:</strong> ${nombreFranquicia || "No disponible"}<br>
+                                <strong>Tel:</strong> ${telFranquicia || "No disponible"}<br>
+                                <strong>Email:</strong> ${emailFranquicia || "No disponible"}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (!zona || !inscripcion || !precioFF || !precioSA) {
+                    htmlResultado += `
+                        <div class="caja-alerta">
+                            ⚠️ Zona no confirmada, valida la información
+                        </div>
+                    `;
+                } else {
+                    htmlResultado += `
+                        <div class="caja-precios">
+                            <strong style="color: #343a40; font-size: 1.1em;"> Zona ${zona}</strong>
+                            <div class="grid-precios">
+                                <div><strong>Inscripción:</strong> $${inscripcion}</div>
+                                <div><strong>Free Friday:</strong> $${precioFF}</div>
+                                <div><strong>Sabatina:</strong> $${precioSA}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (linkWiki && linkWiki.toString().trim() !== "") {
+                    let urlFinal = linkWiki.toString().trim();
+                    if (!urlFinal.startsWith('http')) {
+                        urlFinal = 'https://' + urlFinal;
+                    }
+
+                    htmlResultado += `
+                        <br>
+                        <a href="${urlFinal}" target="_blank" class="btn-wiki">
+                            📄 Abrir Wiki del Instituto
+                        </a>
+                    `;
+                } else {
+                    htmlResultado += `<br><br><em style="color:#1a73e8; font-size:0.85em;">Sin Wiki Disponible.</em>`;
+                }
+
+                htmlResultado += `</div>`;
+                htmlTotal += htmlResultado;
+            });
+
+            caja.innerHTML = htmlTotal;
+
+        } else {
+            caja.innerHTML = `<p style="color:red; text-align:center;">No se encontró nada para "${busqueda}".</p>`;
+        }
+    }
+
+    document.getElementById('textoBusqueda').addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarInstituto(); });
+</script>
+
+</body>
+</html>

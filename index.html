@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Institutos Pro - Wikis</title>
+    <title>Buscador de Institutos Pro - Automático</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; padding: 20px; display: flex; justify-content: center; }
@@ -32,7 +32,6 @@
         .caja-alerta { margin-top: 15px; padding: 10px; background-color: #fce8e6; color: #d93025; border-radius: 6px; border: 1px solid #fad2cf; font-weight: bold; }
         .grid-precios { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 0.95em; }
         
-        /* Estilo para info de Franquicia sin alterar el diseño global */
         .caja-franquicia { margin-top: 15px; padding: 15px; background-color: #fff9eb; border-radius: 8px; border: 1px solid #ffeeba; border-left: 4px solid #ffc107; }
     </style>
 </head>
@@ -42,13 +41,12 @@
     <h2>Buscador de Institutos</h2>
 
     <div class="seccion">
-        <label>1. Selecciona tus archivos Excel:</label>
-        <input type="file" id="archivosExcel" accept=".xlsx, .xls" multiple>
-        <span id="statusCarga" class="status-ok"></span>
+        <label>Estado del Sistema:</label>
+        <span id="statusCarga" class="status-ok">Descargando bases de datos en vivo... ⏳</span>
     </div>
 
     <div class="seccion">
-        <label>2. Nombre del Instituto:</label>
+        <label>Nombre del Instituto:</label>
         <div style="display: flex; gap: 10px;">
             <input type="text" id="textoBusqueda" placeholder="Ej: Instituto San Martín...">
             <button class="btn-buscar" onclick="buscarInstituto()">Buscar</button>
@@ -56,25 +54,23 @@
     </div>
 
     <div id="resultado">
-        <p style="color: #70757a; text-align: center;">Primero carga los archivos para activar el sistema.</p>
+        <p style="color: #70757a; text-align: center;">El sistema se está preparando...</p>
     </div>
 </div>
 
 <script>
     let todosLosDatos = [];
+    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx']; 
 
-    document.getElementById('archivosExcel').addEventListener('change', function(e) {
-        const archivos = e.target.files;
-        if (archivos.length === 0) return;
-
-        todosLosDatos = [];
+    window.onload = async function() {
         let procesados = 0;
-        document.getElementById('statusCarga').innerText = "Leyendo archivos...";
-
-        Array.from(archivos).forEach(archivo => {
-            const lector = new FileReader();
-            lector.onload = function(evento) {
-                const data = new Uint8Array(evento.target.result);
+        for (const nombreArchivo of archivosA_Cargar) {
+            try {
+                const response = await fetch(nombreArchivo);
+                if (!response.ok) throw new Error("Archivo no encontrado");
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
                 const libro = XLSX.read(data, {type: 'array'});
                 const nombreHoja = libro.SheetNames[0];
                 const hoja = libro.Sheets[nombreHoja];
@@ -82,22 +78,26 @@
                 
                 todosLosDatos = todosLosDatos.concat(json);
                 procesados++;
-
-                if (procesados === archivos.length) {
-                    document.getElementById('statusCarga').innerHTML = "✅ " + todosLosDatos.length + " registros cargados.";
-                    document.getElementById('resultado').innerHTML = "<p style='text-align:center;'>Listo para buscar.</p>";
-                }
-            };
-            lector.readAsArrayBuffer(archivo);
-        });
-    });
+            } catch (error) {
+                console.error("No se pudo cargar: " + nombreArchivo, error);
+            }
+        }
+        
+        if (procesados > 0) {
+            document.getElementById('statusCarga').innerHTML = "✅ " + todosLosDatos.length + " institutos listos y actualizados.";
+            document.getElementById('resultado').innerHTML = "<p style='text-align:center; color: #188038;'><strong>¡Listo para buscar!</strong></p>";
+        } else {
+            document.getElementById('statusCarga').innerHTML = "❌ Error: No se encontraron los archivos Excel en GitHub.";
+            document.getElementById('statusCarga').style.color = "red";
+        }
+    };
 
     function buscarInstituto() {
         const busqueda = document.getElementById('textoBusqueda').value.toLowerCase().trim();
         const caja = document.getElementById('resultado');
 
         if (todosLosDatos.length === 0) {
-            alert("Sube los archivos primero.");
+            alert("Aún estamos descargando la base de datos, espera un segundo por favor.");
             return;
         }
 
@@ -126,7 +126,6 @@
                 const precioFF = encontrado.Precio_FF ? encontrado.Precio_FF.toString().trim() : "";
                 const precioSA = encontrado.Precio_SA ? encontrado.Precio_SA.toString().trim() : "";
 
-                // Datos adicionales para Franquicia
                 const telFranquicia = encontrado.TELÉFONOS || "";
                 const nombreFranquicia = encontrado.NOMBRE2 || "";
                 const emailFranquicia = encontrado.EMAIL3 || "";
@@ -143,7 +142,6 @@
                         <strong>Categoría:</strong> <span style="color:${colorTipo}">${tipoReal}</span>
                 `;
 
-                // Mostrar Info de Coordinador si es Franquicia
                 if (tipoLimpio.includes("franquicia")) {
                     htmlResultado += `
                         <div class="caja-franquicia">

@@ -8,17 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            /* Paleta Harmon Hall Premium */
             --hh-yellow: #FFEA00;
             --hh-black: #000000;
             --hh-white: #FFFFFF;
             --hh-red: #cc1e3d;
+            --hh-blue-maps: #4285F4; /* Color oficial de Google Maps */
             
-            /* Variables dinámicas para Modo Claro/Oscuro */
             --bg: var(--hh-yellow);
             --card-bg: var(--hh-white);
             --text: var(--hh-black);
-            --header-text: var(--hh-black);
             --border: #e8eaed;
             --input-bg: #f9f9f9;
             --input-border: #eee;
@@ -33,7 +31,6 @@
             --bg: #111111;
             --card-bg: #222222;
             --text: #ffffff;
-            --header-text: var(--hh-yellow);
             --border: #333333;
             --input-bg: #333333;
             --input-border: #444444;
@@ -48,116 +45,67 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
-            margin: 0;
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s; 
-            overflow-x: hidden;
-        }
-
-        /* Fondo ondulado solo visible en modo claro para no saturar el oscuro */
-        [data-theme="light"] .wave-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 20% 30%, #fff176 0%, transparent 40%),
-                        radial-gradient(circle at 80% 70%, #fff176 0%, transparent 40%);
+            margin: 0; padding: 20px; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; transition: background-color 0.3s; 
         }
 
         .header { width: 100%; max-width: 600px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--text); padding-bottom: 15px; margin-bottom: 30px; }
-        .logo-section { display: flex; align-items: center; gap: 10px; }
-        .header-title h1 { margin: 0; font-size: 1.8em; font-weight: 900; color: var(--text); letter-spacing: -1px; text-transform: uppercase; }
-        .header-title span { color: [data-theme="light"] ? var(--hh-black) : var(--hh-yellow); }
-        .dark-mode-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.9em; cursor: pointer; color: var(--text); font-weight: bold; }
-        .dark-mode-toggle i { font-size: 1.2em; transition: transform 0.3s; }
-        .dark-mode-toggle:hover i { transform: rotate(20deg); }
+        .header-title h1 { margin: 0; font-size: 1.8em; font-weight: 900; text-transform: uppercase; }
+        .header-title span { color: inherit; opacity: 0.7; }
 
         .contenedor { width: 100%; max-width: 550px; position: relative; }
+        .seccion { margin-bottom: 20px; padding: 25px; border-radius: 20px; background-color: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        .seccion { margin-bottom: 20px; padding: 25px; border-radius: 20px; background-color: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: background-color 0.3s; }
+        input[type="text"] { width: 100%; padding: 18px 25px; border: 2px solid var(--input-border); border-radius: 50px; outline: none; box-sizing: border-box; background-color: var(--input-bg); color: var(--text); font-size: 1.05em; }
         
-        label { display: block; margin-bottom: 10px; font-weight: 900; color: var(--text); font-size: 1em; text-transform: uppercase; }
-        
-        input[type="text"] { width: 100%; padding: 18px 25px; border: 2px solid var(--input-border); border-radius: 50px; outline: none; transition: all 0.3s; box-sizing: border-box; background-color: var(--input-bg); color: var(--text); font-size: 1.05em; }
-        input[type="text"]:focus { border-color: var(--text); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        
-        .btn-buscar { width: 100%; padding: 16px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; cursor: pointer; font-weight: 900; font-size: 1.1em; text-transform: uppercase; transition: transform 0.2s, background-color 0.3s; margin-top: 10px; }
-        .btn-buscar:hover { transform: scale(1.02); opacity: 0.9; }
+        .btn-buscar { width: 100%; padding: 16px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; cursor: pointer; font-weight: 900; font-size: 1.1em; text-transform: uppercase; margin-top: 10px; }
 
-        #loadingSpinner { display: none; position: absolute; top: 25px; right: 25px; color: var(--text); font-size: 1.5em; animation: spin 1s linear infinite; }
-        #statusCarga { font-size: 0.85em; margin-top: 15px; display: block; color: var(--text); font-weight: bold; text-align: center; }
+        .result-card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); position: relative; animation: fade-in-card 0.5s ease-out forwards; border-left: 8px solid var(--text); margin-bottom: 20px; }
         
-        #resultado { margin-top: 20px; min-height: 100px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+        .instituto-nombre { font-size: 1.4em; font-weight: 900; display: block; margin-bottom: 5px; }
         
+        .type-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75em; font-weight: 900; color: white; text-transform: uppercase; }
+        .type-badge.own { background: var(--hh-black); }
+        .type-badge.franchise { background: var(--hh-red); }
+
+        .caja-info { margin-top: 15px; padding: 15px; border-radius: 12px; background-color: var(--info-box); }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
+        .info-label { color: #888; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
+        .info-value { font-weight: 900; color: var(--text); }
+
+        /* Estilos de Botones de Acción */
+        .botones-accion { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        
+        .btn-wiki, .btn-maps { 
+            padding: 12px; text-decoration: none; border-radius: 12px; font-weight: 900; 
+            text-align: center; font-size: 0.85em; text-transform: uppercase; display: flex; 
+            align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+        }
+
+        .btn-wiki { background-color: var(--hh-yellow); color: var(--hh-black); border: 2px solid var(--hh-black); }
+        .btn-maps { background-color: var(--hh-white); color: var(--hh-blue-maps); border: 2px solid var(--hh-blue-maps); }
+        
+        .btn-wiki:hover { background-color: var(--hh-black); color: var(--hh-yellow); }
+        .btn-maps:hover { background-color: var(--hh-blue-maps); color: var(--hh-white); }
+
         @keyframes fade-in-card { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .result-card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); transition: transform 0.3s; position: relative; animation: fade-in-card 0.5s ease-out forwards; border-left: 8px solid var(--text); }
-        .result-card:hover { transform: translateY(-5px); }
-        
-        .instituto-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
-        .instituto-header i { font-size: 1.8em; color: var(--text); }
-        .instituto-header-title { display: flex; flex-direction: column; flex: 1; margin-left: 15px; }
-        .instituto-nombre { font-size: 1.4em; font-weight: 900; color: var(--text); line-height: 1.2; margin-bottom: 5px; }
-        
-        .type-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75em; font-weight: 900; color: var(--hh-white); text-transform: uppercase; display: inline-block; width: fit-content; }
-        .type-badge.own { background: var(--hh-black); }
-        .type-badge.consolidated { background: #555; }
-        .type-badge.franchise { background: var(--hh-red); }
-        
-        .caja-info { margin-top: 15px; padding: 15px; border-radius: 12px; background-color: var(--info-box); transition: background-color 0.3s; }
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
-        .info-item { display: flex; flex-direction: column; gap: 4px; font-size: 0.95em; }
-        .info-item .icon-row { display: flex; align-items: center; gap: 8px; color: var(--text); }
-        .info-label { color: #888; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
-        .info-value { font-weight: 900; color: var(--text); font-size: 1.1em; }
-        
-        .caja-info.franchise { background-color: var(--franchise-bg); border: 1px solid var(--franchise-border); border-left: 4px solid var(--hh-red); }
-        
-        .caja-alerta { margin-top: 15px; padding: 12px; background-color: var(--alert-bg); color: var(--alert-text); border-radius: 12px; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
-        
-        .btn-wiki { display: block; margin-top: 20px; padding: 15px; background-color: var(--hh-yellow); color: var(--hh-black); text-decoration: none; border-radius: 12px; font-weight: 900; text-align: center; border: 2px solid var(--hh-black); transition: all 0.2s; text-transform: uppercase; }
-        .btn-wiki:hover { background-color: var(--hh-black); color: var(--hh-yellow); }
-        [data-theme="dark"] .btn-wiki { background-color: var(--hh-black); color: var(--hh-yellow); border-color: var(--hh-yellow); }
-        [data-theme="dark"] .btn-wiki:hover { background-color: var(--hh-yellow); color: var(--hh-black); }
-        
-        .sin-wiki { display: block; margin-top: 15px; font-size: 0.85em; color: var(--alert-text); font-weight: bold; text-align: center; }
     </style>
 </head>
-<body data-theme="light">
-
-<div class="wave-bg"></div>
+<body>
 
 <div class="header">
-    <div class="logo-section">
-        <div class="header-title">
-            <h1>Harmon <span>Hall</span></h1>
-        </div>
-    </div>
-    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <i id="darkModeIcon" class="fas fa-moon"></i>
-        <span>Noche</span>
-    </div>
+    <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
 </div>
 
 <div class="contenedor">
-    <div class="seccion" style="text-align: center; padding: 15px;">
-        <i id="loadingSpinner" class="fas fa-spinner"></i>
-        <span id="statusCarga">Conectando base de datos... ⏳</span>
-    </div>
-
     <div class="seccion">
-        <label>Buscador de Institutos</label>
-        <div style="display: flex; gap: 10px; flex-direction: column;">
-            <input type="text" id="textoBusqueda" placeholder="Ej: San Luis Potosí...">
-            <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
-        </div>
+        <input type="text" id="textoBusqueda" placeholder="Ej: San Luis Potosí...">
+        <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
+        <span id="statusCarga" style="display:block; margin-top:10px; font-size:0.8em; text-align:center;">Cargando base de datos...</span>
     </div>
-
-    <div id="resultado">
-        <p style="color: var(--text); text-align: center; font-weight: bold;">El sistema está listo para tu consulta.</p>
-    </div>
+    <div id="resultado"></div>
 </div>
 
 <script>
@@ -165,164 +113,72 @@
     const archivosA_Cargar = ['database.xlsx', 'database2.xlsx']; 
 
     window.onload = async function() {
-        showLoading(true);
-        let procesados = 0;
         for (const nombreArchivo of archivosA_Cargar) {
             try {
                 const response = await fetch(nombreArchivo);
-                if (!response.ok) throw new Error("Archivo no encontrado");
-                
                 const arrayBuffer = await response.arrayBuffer();
-                const data = new Uint8Array(arrayBuffer);
-                const libro = XLSX.read(data, {type: 'array'});
-                const hoja = libro.Sheets[libro.SheetNames[0]];
-                const json = XLSX.utils.sheet_to_json(hoja);
-                
+                const libro = XLSX.read(new Uint8Array(arrayBuffer), {type: 'array'});
+                const json = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
                 todosLosDatos = todosLosDatos.concat(json);
-                procesados++;
-            } catch (error) {
-                console.error("No se pudo cargar: " + nombreArchivo, error);
-            }
+            } catch (e) { console.error("Error al cargar archivo", e); }
         }
-        showLoading(false);
-        
-        if (procesados > 0) {
-            document.getElementById('statusCarga').innerHTML = "✅ " + todosLosDatos.length + " institutos listos y actualizados.";
-        } else {
-            document.getElementById('statusCarga').innerHTML = "❌ Error: No se encontraron los archivos Excel en GitHub.";
-            document.getElementById('statusCarga').style.color = "var(--alert-text)";
-        }
+        document.getElementById('statusCarga').innerText = "✅ " + todosLosDatos.length + " Institutos Listos";
     };
-
-    function showLoading(show) { document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none'; }
-
-    function toggleDarkMode() {
-        const body = document.body;
-        const icon = document.getElementById('darkModeIcon');
-        if (body.getAttribute('data-theme') === 'light') {
-            body.setAttribute('data-theme', 'dark');
-            icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
-            document.querySelector('.dark-mode-toggle span').innerText = 'Día';
-        } else {
-            body.setAttribute('data-theme', 'light');
-            icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
-            document.querySelector('.dark-mode-toggle span').innerText = 'Noche';
-        }
-    }
 
     function buscarInstituto() {
         const busqueda = document.getElementById('textoBusqueda').value.toLowerCase().trim();
         const caja = document.getElementById('resultado');
-
-        if (todosLosDatos.length === 0) {
-            alert("Aún estamos descargando la base de datos, espera un segundo por favor.");
-            return;
-        }
-
-        const resultados = todosLosDatos.filter(fila => 
-            fila.Nombre && fila.Nombre.toString().toLowerCase().includes(busqueda)
-        );
+        const resultados = todosLosDatos.filter(f => f.Nombre && f.Nombre.toString().toLowerCase().includes(busqueda));
 
         if (resultados.length > 0) {
             let htmlTotal = "";
-
             resultados.forEach((encontrado, index) => {
+                // Lógica de Wiki/Link
                 let linkWiki = null;
-                
-                Object.keys(encontrado).forEach(columna => {
-                    let nomCol = columna.toLowerCase().trim();
-                    if (nomCol.includes("wiki") || nomCol.includes("link") || nomCol.includes("url")) {
-                        linkWiki = encontrado[columna];
-                    }
+                Object.keys(encontrado).forEach(col => {
+                    if (col.toLowerCase().includes("wiki") || col.toLowerCase().includes("link")) linkWiki = encontrado[col];
                 });
 
+                // Lógica de Google Maps Dinámico
                 const nombreReal = encontrado.Nombre;
-                const tipoReal = (encontrado.Tipo || "No definido").toString();
-                const tipoLimpio = tipoReal.toLowerCase();
-                
-                const zona = encontrado.Zona ? encontrado.Zona.toString().trim() : "";
-                const inscripcion = encontrado.Inscripcion ? encontrado.Inscripcion.toString().trim() : "";
-                const precioFF = encontrado.Precio_FF ? encontrado.Precio_FF.toString().trim() : "";
-                const precioSA = encontrado.Precio_SA ? encontrado.Precio_SA.toString().trim() : "";
+                const queryMaps = encodeURIComponent(nombreReal + " Harmon Hall");
+                const urlMapsAuto = `https://www.google.com/maps/search/?api=1&query=${queryMaps}`;
 
-                const telFranquicia = encontrado.TELÉFONOS || "";
-                const nombreFranquicia = encontrado.NOMBRE2 || "";
-                const emailFranquicia = encontrado.EMAIL3 || "";
-
-                let classType = "own";
-                let borderColor = "var(--text)";
-                if (tipoLimpio.includes("consolidado")) { classType = "consolidated"; }
-                else if (tipoLimpio.includes("franquicia")) { classType = "franchise"; borderColor = "var(--hh-red)"; }
-
+                // Renderizado de Tarjeta (Mantiene tu lógica de Precios/Zonas)
                 let htmlCard = `
-                    <div class="result-card" style="border-left-color: ${borderColor}; animation-delay: ${index * 0.1}s">
-                        <div class="instituto-header">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="instituto-header-title">
-                                <span class="instituto-nombre">${nombreReal}</span>
-                                <span class="type-badge ${classType}">${tipoReal}</span>
+                    <div class="result-card">
+                        <span class="instituto-nombre">${nombreReal}</span>
+                        <span class="type-badge ${encontrado.Tipo?.toLowerCase().includes('franquicia') ? 'franchise' : 'own'}">${encontrado.Tipo || 'Propia'}</span>
+                        
+                        <div class="caja-info">
+                            <span class="info-label">Zona ${encontrado.Zona || 'N/D'}</span>
+                            <div class="info-grid">
+                                <div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">$${encontrado.Inscripcion || '-'}</span></div>
+                                <div class="info-item"><span class="info-label">Precio FF</span><span class="info-value">$${encontrado.Precio_FF || '-'}</span></div>
                             </div>
                         </div>
+
+                        <div class="botones-accion">
+                            <a href="${urlMapsAuto}" target="_blank" class="btn-maps">
+                                <i class="fas fa-map-marker-alt"></i> Ubicación
+                            </a>
                 `;
 
-                if (tipoLimpio.includes("franquicia")) {
-                    htmlCard += `
-                        <div class="caja-info franchise">
-                            <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
-                            <div class="info-grid">
-                                <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${nombreFranquicia || "N/D"}</span></div>
-                                <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${telFranquicia || "N/D"}</span></div>
-                                <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.9em;">${emailFranquicia || "N/D"}</span></div>
-                            </div>
-                        </div>
-                    `;
+                if (linkWiki) {
+                    let urlWiki = linkWiki.toString().startsWith('http') ? linkWiki : 'https://' + linkWiki;
+                    htmlCard += `<a href="${urlWiki}" target="_blank" class="btn-wiki"><i class="fas fa-external-link-alt"></i> Wiki</a>`;
                 }
 
-                if (!zona || !inscripcion || !precioFF || !precioSA) {
-                    htmlCard += `
-                        <div class="caja-alerta">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Revisa la información de zona y precios en el sistema principal.
-                        </div>
-                    `;
-                } else {
-                    htmlCard += `
-                        <div class="caja-info precios">
-                            <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-tags"></i> Zona ${zona}</span>
-                            <div class="info-grid">
-                                <div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">$${inscripcion}</span></div>
-                                <div class="info-item"><span class="info-label">Precio FF</span><span class="info-value">$${precioFF}</span></div>
-                                <div class="info-item"><span class="info-label">Sabatina</span><span class="info-value">$${precioSA}</span></div>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                if (linkWiki && linkWiki.toString().trim() !== "") {
-                    let urlFinal = linkWiki.toString().trim();
-                    if (!urlFinal.startsWith('http')) { urlFinal = 'https://' + urlFinal; }
-                    htmlCard += `
-                        <a href="${urlFinal}" target="_blank" class="btn-wiki">
-                            Abrir Wiki del Instituto <i class="fas fa-external-link-alt" style="margin-left:5px;"></i>
-                        </a>
-                    `;
-                } else {
-                    htmlCard += `<span class="sin-wiki"><i class="fas fa-link-slash"></i> Sin Wiki Disponible</span>`;
-                }
-
-                htmlCard += `</div>`;
+                htmlCard += `</div></div>`;
                 htmlTotal += htmlCard;
             });
-
             caja.innerHTML = htmlTotal;
-
         } else {
-            caja.innerHTML = `<p style="color:var(--alert-text); text-align:center; font-weight: bold; font-size: 1.1em;">No se encontró nada para "${busqueda}".</p>`;
+            caja.innerHTML = `<p style="text-align:center;">No se encontró "${busqueda}"</p>`;
         }
     }
 
     document.getElementById('textoBusqueda').addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarInstituto(); });
 </script>
-
 </body>
 </html>

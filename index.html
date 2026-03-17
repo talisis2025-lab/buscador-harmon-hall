@@ -85,6 +85,23 @@
         .btn-buscar { width: 100%; padding: 16px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; cursor: pointer; font-weight: 900; font-size: 1.1em; text-transform: uppercase; transition: transform 0.2s, background-color 0.3s; margin-top: 10px; }
         .btn-buscar:hover { transform: scale(1.02); opacity: 0.9; }
 
+        /* Estilos para el selector de programa */
+        select.btn-buscar {
+            background-color: var(--input-bg);
+            color: var(--text);
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 0.95em;
+            text-transform: none;
+            padding: 12px 15px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            appearance: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        select.btn-buscar:focus { outline: none; border-color: var(--text); }
+
         #loadingSpinner { display: none; position: absolute; top: 25px; right: 25px; color: var(--text); font-size: 1.5em; animation: spin 1s linear infinite; }
         #statusCarga { font-size: 0.85em; margin-top: 15px; display: block; color: var(--text); font-weight: bold; text-align: center; }
         
@@ -109,7 +126,6 @@
         .caja-info { margin-top: 15px; padding: 15px; border-radius: 12px; background-color: var(--info-box); transition: background-color 0.3s; }
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
         .info-item { display: flex; flex-direction: column; gap: 4px; font-size: 0.95em; }
-        .info-item .icon-row { display: flex; align-items: center; gap: 8px; color: var(--text); }
         .info-label { color: #888; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
         .info-value { font-weight: 900; color: var(--text); font-size: 1.1em; }
         
@@ -210,6 +226,87 @@
         }
     }
 
+    // --- NUEVAS FUNCIONES DE LA CALCULADORA ---
+    function actualizarCotizacion(idCard, index) {
+        const selector = document.getElementById(`select-${index}`);
+        const programa = selector.value;
+        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
+        const contenedorPrecios = document.getElementById(`precios-${index}`);
+        
+        let htmlPrecios = "";
+        const inscripcion = parseFloat(datos.Inscripcion) || 0;
+
+        if (programa === 'adults') {
+            const ff = parseFloat(datos.Adults_FF) || 0;
+            const sab = parseFloat(datos.Adults_SAB) || 0;
+            const libro = parseFloat(datos.Libros_Adults) || 0;
+            htmlPrecios = generarHtmlPrecios(inscripcion, ff, sab, libro, "Adultos (Cursos 1-20)", datos.Zona);
+        } 
+        else if (programa === 'pro') {
+            const ff = parseFloat(datos.Adults_PRO_FF) || 0;
+            const libro = parseFloat(datos.Libros_Adults) || 0;
+            htmlPrecios = generarHtmlPrecios(inscripcion, ff, 0, libro, "Adultos Pro (Cursos 21-24)", datos.Zona);
+        }
+        else if (programa === 'kids') {
+            const sab = parseFloat(datos.KPT_SAB) || 0;
+            const sem = parseFloat(datos.KPT_SEM) || 0;
+            const libro = parseFloat(datos.Libros_KIDS) || 0;
+            htmlPrecios = generarHtmlPrecios(inscripcion, sem, sab, libro, "Kids", datos.Zona);
+        }
+        else if (programa === 'pteen') {
+            const sab = parseFloat(datos.KPT_SAB) || 0;
+            const sem = parseFloat(datos.KPT_SEM) || 0;
+            const libro = parseFloat(datos.Libros_PTEEN) || 0;
+            htmlPrecios = generarHtmlPrecios(inscripcion, sem, sab, libro, "Pre-Teens", datos.Zona);
+        }
+        else if (programa === 'toefl') {
+            const total = parseFloat(datos.TOEFL_ITP_PRE) || 0;
+            htmlPrecios = generarHtmlEspecial(total, "PAGO ÚNICO TOEFL ITP");
+        }
+        else if (programa === 'tkt') {
+            const total = parseFloat(datos.TKT) || 0;
+            htmlPrecios = generarHtmlEspecial(total, "PAGO ÚNICO TKT");
+        }
+        else if (programa === 'icc') {
+            const total = parseFloat(datos.ICC_FF) || 0;
+            htmlPrecios = generarHtmlEspecial(total, "PAGO ÚNICO ICC");
+        }
+
+        contenedorPrecios.innerHTML = htmlPrecios;
+    }
+
+    function generarHtmlPrecios(ins, ff, sab, lib, titulo, zona) {
+        const zonaTexto = zona ? ` | Zona ${zona}` : '';
+        let totalFF = 0; let totalSAB = 0;
+        
+        // Solo sumamos si hay un precio registrado para esa modalidad
+        if (ff > 0) totalFF = ins + ff + lib;
+        if (sab > 0) totalSAB = ins + sab + lib;
+
+        return `
+            <div class="caja-info precios">
+                <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-tags"></i> ${titulo}${zonaTexto}</span>
+                <div class="info-grid">
+                    <div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">$${ins}</span></div>
+                    <div class="info-item"><span class="info-label">Libro</span><span class="info-value">$${lib}</span></div>
+                    ${ff > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Total FF / SEM</span><span class="info-value">$${totalFF}</span></div>` : ''}
+                    ${sab > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Total Sabatino</span><span class="info-value">$${totalSAB}</span></div>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    function generarHtmlEspecial(total, titulo) {
+        return `
+            <div class="caja-info precios" style="border-left: 4px solid var(--hh-yellow); text-align:center;">
+                <span class="info-label">${titulo}</span>
+                <div style="font-size: 2.2em; font-weight: 900; color: var(--text); margin: 10px 0;">$${total}</div>
+                <span class="info-label" style="font-size:0.75em; color: var(--text);"><i class="fas fa-check-circle"></i> Materiales y certificación incluidos</span>
+            </div>
+        `;
+    }
+    // ------------------------------------------
+
     function buscarInstituto() {
         const busqueda = document.getElementById('textoBusqueda').value.toLowerCase().trim();
         const caja = document.getElementById('resultado');
@@ -240,11 +337,6 @@
                 const tipoReal = (encontrado.Tipo || "No definido").toString();
                 const tipoLimpio = tipoReal.toLowerCase();
                 
-                const zona = encontrado.Zona ? encontrado.Zona.toString().trim() : "";
-                const inscripcion = encontrado.Inscripcion ? encontrado.Inscripcion.toString().trim() : "";
-                const precioFF = encontrado.Precio_FF ? encontrado.Precio_FF.toString().trim() : "";
-                const precioSA = encontrado.Precio_SA ? encontrado.Precio_SA.toString().trim() : "";
-
                 const telFranquicia = encontrado.TELÉFONOS || "";
                 const nombreFranquicia = encontrado.NOMBRE2 || "";
                 const emailFranquicia = encontrado.EMAIL3 || "";
@@ -254,8 +346,11 @@
                 if (tipoLimpio.includes("consolidado")) { classType = "consolidated"; }
                 else if (tipoLimpio.includes("franquicia")) { classType = "franchise"; borderColor = "var(--hh-red)"; }
 
+                // Codificamos los datos para que el selector los pueda leer sin romper el HTML
+                const infoJson = encodeURIComponent(JSON.stringify(encontrado));
+
                 let htmlCard = `
-                    <div class="result-card" style="border-left-color: ${borderColor}; animation-delay: ${index * 0.1}s">
+                    <div class="result-card" id="card-${index}" style="border-left-color: ${borderColor}; animation-delay: ${index * 0.1}s">
                         <div class="instituto-header">
                             <i class="fas fa-map-marker-alt"></i>
                             <div class="instituto-header-title">
@@ -278,25 +373,21 @@
                     `;
                 }
 
-                if (!zona || !inscripcion || !precioFF || !precioSA) {
-                    htmlCard += `
-                        <div class="caja-alerta">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Revisa la información de zona y precios en el sistema principal.
-                        </div>
-                    `;
-                } else {
-                    htmlCard += `
-                        <div class="caja-info precios">
-                            <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-tags"></i> Zona ${zona}</span>
-                            <div class="info-grid">
-                                <div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">$${inscripcion}</span></div>
-                                <div class="info-item"><span class="info-label">Precio FF</span><span class="info-value">$${precioFF}</span></div>
-                                <div class="info-item"><span class="info-label">Sabatina</span><span class="info-value">$${precioSA}</span></div>
-                            </div>
-                        </div>
-                    `;
-                }
+                // --- AQUÍ INSERTAMOS EL SELECTOR Y EL CONTENEDOR DE LA CALCULADORA ---
+                htmlCard += `
+                        <label style="font-size:0.7em; margin-top: 15px; margin-bottom:5px; color:var(--text);">Selecciona Programa:</label>
+                        <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion('card-${index}', ${index})">
+                            <option value="adults">Adultos (1-20)</option>
+                            <option value="pro">Adultos Pro (21-24)</option>
+                            <option value="kids">Kids</option>
+                            <option value="pteen">Pre-Teens</option>
+                            <option value="toefl">TOEFL ITP</option>
+                            <option value="tkt">TKT</option>
+                            <option value="icc">ICC</option>
+                        </select>
+
+                        <div id="precios-${index}"></div>
+                `;
 
                 if (linkWiki && linkWiki.toString().trim() !== "") {
                     let urlFinal = linkWiki.toString().trim();
@@ -315,6 +406,11 @@
             });
 
             caja.innerHTML = htmlTotal;
+
+            // Disparar la cotización inicial (Adultos) para todas las tarjetas renderizadas
+            resultados.forEach((_, index) => {
+                actualizarCotizacion(`card-${index}`, index);
+            });
 
         } else {
             caja.innerHTML = `<p style="color:var(--alert-text); text-align:center; font-weight: bold; font-size: 1.1em;">No se encontró nada para "${busqueda}".</p>`;

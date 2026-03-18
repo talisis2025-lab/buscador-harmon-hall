@@ -133,7 +133,7 @@
 
     <div class="seccion">
         <label>Buscador de Institutos</label>
-        <input type="text" id="textoBusqueda" placeholder="Ej: San Luis Potosí..." onfocus="this.select()">
+        <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." onfocus="this.select()">
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
 
@@ -262,7 +262,7 @@
                 // Si es instituto propio
                 if (tieneWiki) {
                     if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                    enlaceHtml = `<a href="${linkUrl}" target="_blank" class="btn-wiki">Abrir enlace</a>`;
+                    enlaceHtml = `<a href="${linkUrl}" target="_blank" class="btn-wiki">Abrir WIKI</a>`;
                 } else {
                     // Si no tiene wiki configurada
                     enlaceHtml = `<div style="text-align:center; margin-top:20px; padding:12px; background-color:var(--info-box); border-radius:12px; font-weight:bold; color:var(--text); font-size:0.9em; opacity:0.7;">

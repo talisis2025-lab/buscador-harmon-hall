@@ -103,6 +103,10 @@
         .info-label { color: #888; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
         .info-value { font-weight: 900; color: var(--text); font-size: 1.1em; }
         
+        .caja-info.franchise { background-color: var(--franchise-bg); border: 1px solid var(--franchise-border); border-left: 4px solid var(--hh-red); }
+        
+        .caja-alerta { margin-top: 15px; padding: 12px; background-color: var(--alert-bg); color: var(--alert-text); border-radius: 12px; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
+
         .btn-wiki { display: block; margin-top: 20px; padding: 15px; background-color: var(--hh-yellow); color: var(--hh-black); text-decoration: none; border-radius: 12px; font-weight: 900; text-align: center; border: 2px solid var(--hh-black); text-transform: uppercase; }
         #loadingSpinner { display: none; position: absolute; top: 25px; right: 25px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -129,7 +133,7 @@
 
     <div class="seccion">
         <label>Buscador de Institutos</label>
-        <input type="text" id="textoBusqueda" placeholder="Ej: San Luis Potosí...">
+        <input type="text" id="textoBusqueda" placeholder="Ej: San Luis Potosí..." onfocus="this.select()">
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
 
@@ -171,34 +175,54 @@
         
         let html = "";
         const ins = parseFloat(datos.Inscripcion) || 0;
+        let tienePrecio = false;
 
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
-            if (programa === 'adults') { mensu = datos.Adults_FF; sab = datos.Adults_SAB; lib = datos.Libros_Adults; titulo = "Adultos (1-20)"; }
-            else if (programa === 'pro') { mensu = datos.Adults_PRO_FF; lib = datos.Libros_Adults; titulo = "Adultos Pro (21-24)"; }
-            else if (programa === 'kids') { mensu = datos.KPT_SEM; sab = datos.KPT_SAB; lib = datos.Libros_KIDS; titulo = "Kids"; }
-            else if (programa === 'pteen') { mensu = datos.KPT_SEM; sab = datos.KPT_SAB; lib = datos.Libros_PTEEN; titulo = "Pre-Teens"; }
+            if (programa === 'adults') { mensu = parseFloat(datos.Adults_FF)||0; sab = parseFloat(datos.Adults_SAB)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (1-20)"; }
+            else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos Pro (21-24)"; }
+            else if (programa === 'kids') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_KIDS)||0; titulo = "Kids"; }
+            else if (programa === 'pteen') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_PTEEN)||0; titulo = "Pre-Teens"; }
             
-            html = `<div class="caja-info">
-                <span class="info-label"><i class="fas fa-tags"></i> ${titulo} | Zona ${datos.Zona || 'A'}</span>
-                <div class="info-grid">
-                    <div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">$${ins}</span></div>
-                    <div class="info-item"><span class="info-label">Libro</span><span class="info-value">$${parseFloat(lib) || 0}</span></div>
-                    ${mensu > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">$${mensu}</span></div>` : ''}
-                    ${sab > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">$${sab}</span></div>` : ''}
-                </div>
-            </div>`;
+            if (mensu > 0 || sab > 0) tienePrecio = true;
+
+            if (tienePrecio) {
+                html = `<div class="caja-info">
+                    <span class="info-label"><i class="fas fa-tags"></i> ${titulo} | Zona ${datos.Zona || 'A'}</span>
+                    <div class="info-grid">
+                        ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">$${ins}</span></div>` : ''}
+                        ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">$${lib}</span></div>` : ''}
+                        ${mensu > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">$${mensu}</span></div>` : ''}
+                        ${sab > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">$${sab}</span></div>` : ''}
+                    </div>
+                </div>`;
+            }
         } else {
             let total = 0, t = "";
-            if (programa === 'toefl') { total = datos.TOEFL_ITP_PRE; t = "PAGO ÚNICO TOEFL ITP"; }
-            else if (programa === 'tkt') { total = datos.TKT; t = "PAGO ÚNICO TKT"; }
-            else if (programa === 'icc') { total = datos.ICC_FF; t = "PAGO ÚNICO ICC"; }
-            html = `<div class="caja-info" style="border-left: 4px solid var(--hh-yellow); text-align:center;">
-                <span class="info-label">${t}</span>
-                <div style="font-size: 2em; font-weight: 900; margin: 10px 0;">$${parseFloat(total) || 0}</div>
-                <span class="info-label" style="font-size:0.7em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
-            </div>`;
+            if (programa === 'toefl') { total = parseFloat(datos.TOEFL_ITP_PRE)||0; t = "PAGO ÚNICO TOEFL ITP"; }
+            else if (programa === 'tkt') { total = parseFloat(datos.TKT)||0; t = "PAGO ÚNICO TKT"; }
+            else if (programa === 'icc') { total = parseFloat(datos.ICC_FF)||0; t = "PAGO ÚNICO ICC"; }
+            
+            if (total > 0) tienePrecio = true;
+
+            if (tienePrecio) {
+                html = `<div class="caja-info" style="border-left: 4px solid var(--hh-yellow); text-align:center;">
+                    <span class="info-label">${t}</span>
+                    <div style="font-size: 2em; font-weight: 900; margin: 10px 0;">$${total}</div>
+                    <span class="info-label" style="font-size:0.7em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
+                </div>`;
+            }
         }
+
+        // Si no hay precio detectado, mostrar la alerta
+        if (!tienePrecio) {
+            html = `
+                <div class="caja-alerta">
+                    <i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.
+                </div>
+            `;
+        }
+
         contenedor.innerHTML = html;
     }
 
@@ -212,6 +236,23 @@
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
             
+            let franquiciaHtml = "";
+            if (classType === "franchise") {
+                franquiciaHtml = `
+                    <div class="caja-info franchise" style="margin-bottom: 15px; margin-top: 15px;">
+                        <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${encontrado.NOMBRE2 || "N/D"}</span></div>
+                            <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${encontrado.TELÉFONOS || "N/D"}</span></div>
+                            <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.9em;">${encontrado.EMAIL3 || "N/D"}</span></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let linkUrl = encontrado.Wiki || '#';
+            if (linkUrl !== '#' && !linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
+
             htmlTotal += `
                 <div class="result-card">
                     <div class="instituto-header">
@@ -219,6 +260,7 @@
                         <span class="type-badge ${classType}">${encontrado.Tipo || 'Instituto'}</span></div>
                         <i class="fas fa-school" style="font-size: 1.5em;"></i>
                     </div>
+                    ${franquiciaHtml}
                     <label style="font-size:0.7em;">Selecciona Programa:</label>
                     <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
                         <option value="adults">Adultos (1-20)</option>
@@ -230,12 +272,24 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
-                    <a href="${encontrado.Wiki || '#'}" target="_blank" class="btn-wiki">Ver Wiki</a>
+                    <a href="${linkUrl}" target="_blank" class="btn-wiki">Abrir enlace</a>
                 </div>`;
         });
-        document.getElementById('resultado').innerHTML = htmlTotal;
-        resultados.forEach((_, i) => actualizarCotizacion(i));
+
+        if (resultados.length > 0) {
+            document.getElementById('resultado').innerHTML = htmlTotal;
+            resultados.forEach((_, i) => actualizarCotizacion(i));
+        } else {
+            document.getElementById('resultado').innerHTML = `<p style="color:var(--alert-text); text-align:center; font-weight: bold;">No se encontró nada para "${busqueda}".</p>`;
+        }
     }
+
+    // Escuchar la tecla Enter en el campo de búsqueda
+    document.getElementById('textoBusqueda').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            buscarInstituto();
+        }
+    });
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmon Hall - Buscador Institucional</title>
+    <title>Harmon Hall - Buscador</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -16,6 +16,7 @@
             --bg: var(--hh-yellow);
             --card-bg: var(--hh-white);
             --text: var(--hh-black);
+            --header-text: var(--hh-black);
             --border: #e8eaed;
             --input-bg: #f9f9f9;
             --input-border: #eee;
@@ -30,6 +31,7 @@
             --bg: #111111;
             --card-bg: #222222;
             --text: #ffffff;
+            --header-text: var(--hh-yellow);
             --border: #333333;
             --input-bg: #333333;
             --input-border: #444444;
@@ -41,7 +43,7 @@
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
             margin: 0;
@@ -50,66 +52,161 @@
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh;
-            transition: background-color 0.3s; 
+            transition: background-color 0.3s, color 0.3s; 
             overflow-x: hidden;
         }
 
-        /* Detalle técnico CSS: Fondos radiales adaptativos */
-        .wave-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-        }
         [data-theme="light"] .wave-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: radial-gradient(circle at 20% 30%, #fff176 0%, transparent 40%),
                         radial-gradient(circle at 80% 70%, #fff176 0%, transparent 40%);
         }
+
+        /* Detalle técnico agregado para el modo oscuro */
         [data-theme="dark"] .wave-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: radial-gradient(circle at 20% 30%, #2a2a2a 0%, transparent 40%),
                         radial-gradient(circle at 80% 70%, #2a2a2a 0%, transparent 40%);
         }
 
         .header { width: 100%; max-width: 600px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--text); padding-bottom: 15px; margin-bottom: 30px; }
-        .header-title h1 { margin: 0; font-size: 1.8em; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; }
-        
-        .dark-mode-toggle { cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .logo-section { display: flex; align-items: center; gap: 10px; }
+        .header-title h1 { margin: 0; font-size: 1.8em; font-weight: 900; color: var(--text); letter-spacing: -1px; text-transform: uppercase; }
+        .dark-mode-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.9em; cursor: pointer; color: var(--text); font-weight: bold; }
 
         .contenedor { width: 100%; max-width: 550px; position: relative; }
         .seccion { margin-bottom: 20px; padding: 25px; border-radius: 20px; background-color: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
+        label { display: block; margin-bottom: 10px; font-weight: 900; color: var(--text); font-size: 1em; text-transform: uppercase; }
+
+        .busqueda-wrap { position: relative; }
+
         input[type="text"] { 
-            width: 100%; padding: 18px 25px; border: 2px solid var(--input-border); border-radius: 50px; 
-            outline: none; background-color: var(--input-bg); color: var(--text); font-size: 1.05em; box-sizing: border-box; 
+            width: 100%; 
+            padding: 18px 25px; 
+            border: 2px solid var(--input-border); 
+            border-radius: 50px; 
+            outline: none; 
+            background-color: var(--input-bg); 
+            color: var(--text); 
+            font-size: 1.05em; 
+            box-sizing: border-box; 
         }
         
-        .btn-buscar { width: 100%; padding: 16px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; cursor: pointer; font-weight: 900; text-transform: uppercase; margin-top: 10px; }
+        .btn-buscar { width: 100%; padding: 16px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; cursor: pointer; font-weight: 900; font-size: 1.1em; text-transform: uppercase; margin-top: 10px; }
 
-        .result-card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-left: 8px solid var(--text); margin-bottom: 20px; animation: slideUp 0.4s ease-out; }
+        select.btn-buscar {
+            background-color: var(--input-bg);
+            color: var(--text);
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            text-transform: none;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
 
-        .type-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75em; font-weight: 900; color: #fff; text-transform: uppercase; display: inline-block; }
+        #resultado { margin-top: 20px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+        .result-card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); position: relative; border-left: 8px solid var(--text); animation: fade-in-card 0.5s ease-out forwards; }
+        
+        @keyframes fade-in-card { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .instituto-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; gap: 12px; }
+        .instituto-nombre { font-size: 1.4em; font-weight: 900; color: var(--text); line-height: 1.2; }
+        .type-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75em; font-weight: 900; color: var(--hh-white); text-transform: uppercase; display: inline-block; margin-top: 6px; }
         .type-badge.own { background: var(--hh-black); }
         .type-badge.franchise { background: var(--hh-red); }
-
+        
         .caja-info { margin-top: 15px; padding: 15px; border-radius: 12px; background-color: var(--info-box); }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .info-label { color: #888; font-weight: bold; font-size: 0.75em; text-transform: uppercase; }
-        .info-value { font-weight: 900; font-size: 1.1em; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
+        .info-item { display: flex; flex-direction: column; gap: 4px; }
+        .info-label { color: #888; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
+        .info-value { font-weight: 900; color: var(--text); font-size: 1.1em; word-break: break-word; }
+        
+        .caja-info.franchise { background-color: var(--franchise-bg); border: 1px solid var(--franchise-border); border-left: 4px solid var(--hh-red); }
+        
+        .caja-alerta { margin-top: 15px; padding: 12px; background-color: var(--alert-bg); color: var(--alert-text); border-radius: 12px; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
+
+        .btn-wiki { display: block; margin-top: 20px; padding: 15px; background-color: var(--hh-yellow); color: var(--hh-black); text-decoration: none; border-radius: 12px; font-weight: 900; text-align: center; border: 2px solid var(--hh-black); text-transform: uppercase; }
 
         .btn-copiar {
-            width: 100%; margin-top: 15px; padding: 14px; background-color: var(--hh-red); 
-            color: white; border: none; border-radius: 12px; font-weight: 900; text-transform: uppercase; cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px 15px;
+            background-color: var(--hh-red);
+            color: var(--hh-white);
+            border: none;
+            border-radius: 12px;
+            font-weight: 900;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: pointer;
         }
 
-        /* Toast Notification */
-        .toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; }
-        .toast { 
-            background: var(--hh-black); color: var(--hh-yellow); padding: 12px 25px; 
-            border-radius: 50px; font-weight: 900; font-size: 0.85em; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.2s forwards;
-        }
-        [data-theme="dark"] .toast { background: var(--hh-yellow); color: var(--hh-black); }
+        .btn-copiar:hover, .btn-wiki:hover, .btn-buscar:hover { filter: brightness(0.95); }
 
-        @keyframes toastIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes toastOut { to { opacity: 0; visibility: hidden; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #loadingSpinner { display: none; position: absolute; top: 25px; right: 25px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .sugerencias {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+            overflow: hidden;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .sugerencia-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--text); transition: background-color 0.15s ease; }
+        .sugerencia-item:hover { background: var(--info-box); }
+        .sugerencia-item:last-child { border-bottom: none; }
+        .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.78em; font-weight: 600; opacity: 0.7; }
+
+        /* Estilos para la notificación Toast (Agregados) */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--hh-black);
+            color: var(--hh-yellow);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.2s forwards;
+        }
+
+        [data-theme="dark"] .toast {
+            background: var(--hh-yellow);
+            color: var(--hh-black);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
     </style>
 </head>
 <body data-theme="light">
@@ -117,36 +214,45 @@
 <div class="wave-bg"></div>
 
 <div class="header">
-    <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
+    <div class="logo-section">
+        <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
+    </div>
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <i id="darkModeIcon" class="fas fa-moon"></i> <span id="modeText">Noche</span>
+        <i id="darkModeIcon" class="fas fa-moon"></i> <span>Noche</span>
     </div>
 </div>
 
 <div class="contenedor">
-    <div class="seccion" style="text-align: center;">
-        <span id="statusCarga">Cargando seguridad...</span>
+    <div class="seccion" style="text-align: center; padding: 15px;">
+        <i id="loadingSpinner" class="fas fa-spinner"></i>
+        <span id="statusCarga">Conectando base de datos... ⏳</span>
     </div>
 
     <div class="seccion">
-        <input type="text" id="textoBusqueda" placeholder="Buscar instituto..." onfocus="this.select()">
-        <button class="btn-buscar" onclick="buscarInstituto()">Buscar</button>
+        <label>Buscador de Institutos</label>
+        <div class="busqueda-wrap">
+            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." onfocus="this.select()">
+            <div id="sugerencias" class="sugerencias"></div>
+        </div>
+        <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
 
     <div id="resultado"></div>
 </div>
 
 <script>
-    // --- 1. SEGURIDAD: VALIDACIÓN DE DOMINIO ---
+    // =================================================================
+    // --- 1. SEGURIDAD: VALIDACIÓN DE DOMINIO INICIAL ---
+    // =================================================================
     const dominiosAutorizados = ['unid.mx', 'talisis.com', 'harmonhall.edu.mx'];
 
     function verificarAcceso() {
         if (sessionStorage.getItem('acceso_valido') === 'true') return true;
 
-        const correo = prompt("🔐 ACCESO RESTRINGIDO\n\nIngresa tu correo institucional (@unid.mx / @talisis.com):");
+        const correo = prompt("🔐 ACCESO RESTRINGIDO\n\nIngresa tu correo institucional:");
         
         if (!correo) {
-            document.body.innerHTML = "<h1 style='text-align:center; margin-top:100px;'>Acceso cancelado.</h1>";
+            document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; background:var(--bg);'><h1 style='color:var(--text);'>Acceso cancelado.</h1></div>";
             return false;
         }
 
@@ -156,39 +262,165 @@
             sessionStorage.setItem('acceso_valido', 'true');
             return true;
         } else {
-            alert("Acceso denegado. El dominio @" + dominio + " no está autorizado.");
-            document.body.innerHTML = "<h1 style='text-align:center; color:red; margin-top:100px;'>🚫 NO AUTORIZADO</h1>";
+            alert("Acceso denegado. El dominio @" + (dominio || "desconocido") + " no está autorizado.");
+            document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; background:var(--hh-red);'><h1 style='color:white; text-align:center;'>🚫 NO AUTORIZADO<br><span style='font-size:0.5em'>Dominio inválido</span></h1></div>";
             return false;
         }
     }
 
-    // Ejecutar validación antes de cargar nada
+    // Ejecutar validación antes de cargar cualquier otra cosa
     if (!verificarAcceso()) {
         throw new Error("Parada de seguridad: Usuario no autorizado.");
     }
+    // =================================================================
 
-    // --- 2. LÓGICA DEL BUSCADOR ---
+
+    // --- 2. LÓGICA DE LA APLICACIÓN ---
     let todosLosDatos = [];
-    const archivos = ['database.xlsx', 'database2.xlsx'];
+    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx']; 
 
-    function mostrarNotificacion(msg) {
-        let container = document.querySelector('.toast-container') || document.createElement('div');
-        container.className = 'toast-container';
-        document.body.appendChild(container);
+    function normalizarTexto(texto) {
+        return (texto ?? "")
+            .toString()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim();
+    }
+
+    function formatearMoneda(valor) {
+        const numero = Number(valor) || 0;
+        return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
+    }
+
+    function obtenerCotizacion(datos, programa) {
+        const ins = parseFloat(datos.Inscripcion) || 0;
+        let html = "";
+        let texto = "";
+        let tienePrecio = false;
+
+        if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
+            let mensu = 0, sab = 0, lib = 0, titulo = "";
+
+            if (programa === 'adults') {
+                mensu = parseFloat(datos.Adults_FF) || 0;
+                sab = parseFloat(datos.Adults_SAB) || 0;
+                lib = parseFloat(datos.Libros_Adults) || 0;
+                titulo = "Adultos (1-20)";
+            } else if (programa === 'pro') {
+                mensu = parseFloat(datos.Adults_PRO_FF) || 0;
+                lib = parseFloat(datos.Libros_Adults) || 0;
+                titulo = "Adultos Pro (21-24)";
+            } else if (programa === 'kids') {
+                mensu = parseFloat(datos.KPT_SEM) || 0;
+                sab = parseFloat(datos.KPT_SAB) || 0;
+                lib = parseFloat(datos.Libros_KIDS) || 0;
+                titulo = "Kids";
+            } else if (programa === 'pteen') {
+                mensu = parseFloat(datos.KPT_SEM) || 0;
+                sab = parseFloat(datos.KPT_SAB) || 0;
+                lib = parseFloat(datos.Libros_PTEEN) || 0;
+                titulo = "Pre-Teens";
+            }
+            
+            if (mensu > 0 || sab > 0) tienePrecio = true;
+
+            if (tienePrecio) {
+                html = `<div class="caja-info">
+                    <span class="info-label"><i class="fas fa-tags"></i> ${titulo} | Zona ${datos.Zona || 'A'}</span>
+                    <div class="info-grid">
+                        ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
+                        ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
+                        ${mensu > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
+                        ${sab > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
+                    </div>
+                </div>`;
+
+                texto = [
+                    `Programa: ${titulo}`,
+                    `Zona: ${datos.Zona || 'A'}`,
+                    ins > 0 ? `Inscripción: ${formatearMoneda(ins)}` : null,
+                    lib > 0 ? `Libro: ${formatearMoneda(lib)}` : null,
+                    mensu > 0 ? `Mensualidad FF/SEM: ${formatearMoneda(mensu)}` : null,
+                    sab > 0 ? `Mensualidad Sabatina: ${formatearMoneda(sab)}` : null
+                ].filter(Boolean).join("\n");
+            }
+        } else {
+            let total = 0, titulo = "";
+
+            if (programa === 'toefl') {
+                total = parseFloat(datos.TOEFL_ITP_PRE) || 0;
+                titulo = "PAGO ÚNICO TOEFL ITP";
+            } else if (programa === 'tkt') {
+                total = parseFloat(datos.TKT) || 0;
+                titulo = "PAGO ÚNICO TKT";
+            } else if (programa === 'icc') {
+                total = parseFloat(datos.ICC_FF) || 0;
+                titulo = "PAGO ÚNICO ICC";
+            }
+
+            if (total > 0) tienePrecio = true;
+
+            if (tienePrecio) {
+                html = `<div class="caja-info" style="border-left: 4px solid var(--hh-yellow); text-align:center;">
+                    <span class="info-label">${titulo}</span>
+                    <div style="font-size: 2em; font-weight: 900; margin: 10px 0;">${formatearMoneda(total)}</div>
+                    <span class="info-label" style="font-size:0.7em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
+                </div>`;
+
+                texto = [
+                    `Programa: ${titulo}`,
+                    `Total: ${formatearMoneda(total)}`,
+                    `Todo incluido`
+                ].join("\n");
+            }
+        }
+
+        if (!tienePrecio) {
+            html = `
+                <div class="caja-alerta">
+                    <i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.
+                </div>
+            `;
+            texto = "Precios no definidos, valida la información.";
+        }
+
+        return { html, texto, tienePrecio };
+    }
+
+    // Función de notificación agregada
+    function mostrarNotificacion(mensaje) {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
 
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${mensaje}`;
+        
         container.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 2500);
     }
 
+    // Función de copiado modificada
     async function copiarAlPortapapeles(texto) {
         try {
             await navigator.clipboard.writeText(texto);
-            mostrarNotificacion("COPIADO AL PORTAPAPELLES");
-        } catch (err) {
-            mostrarNotificacion("ERROR AL COPIAR");
+            mostrarNotificacion("Resumen copiado con éxito");
+        } catch (error) {
+            const area = document.createElement("textarea");
+            area.value = texto;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            document.body.removeChild(area);
+            mostrarNotificacion("Resumen copiado con éxito");
         }
     }
 
@@ -197,25 +429,225 @@
         const isLight = body.getAttribute('data-theme') === 'light';
         body.setAttribute('data-theme', isLight ? 'dark' : 'light');
         document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        document.getElementById('modeText').innerText = isLight ? 'Día' : 'Noche';
+        document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
     }
 
-    // (Aquí irían tus funciones de búsqueda, normalizarTexto y renderizado de antes)
-    // He omitido la repetición de lógica de Excel para brevedad, pero asegúrate de 
-    // usar las funciones de "copiarAlPortapapeles" y "mostrarNotificacion" 
-    // dentro de tu botón de copiar.
+    function actualizarCotizacion(index) {
+        const selector = document.getElementById(`select-${index}`);
+        const programa = selector.value;
+        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
+        const contenedor = document.getElementById(`precios-${index}`);
 
-    window.onload = async function() {
-        document.getElementById('statusCarga').innerText = "Cargando bases de datos... ⏳";
-        // Lógica de carga de archivos Excel aquí...
-        document.getElementById('statusCarga').innerText = "✅ Sistema Seguro y Listo";
+        const cotizacion = obtenerCotizacion(datos, programa);
+        contenedor.innerHTML = cotizacion.html;
+    }
+
+    function copiarResumen(index) {
+        const selector = document.getElementById(`select-${index}`);
+        const programa = selector.value;
+        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
+
+        const tipo = (datos.Tipo || "").toLowerCase();
+        const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
+        const cotizacion = obtenerCotizacion(datos, programa);
+
+        let textoBase = [
+            `Instituto: ${datos.Nombre || 'N/D'}`,
+            `Tipo: ${datos.Tipo || 'Instituto'}`,
+            `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
+            cotizacion.texto
+        ].filter(Boolean).join("\n");
+
+        if (classType === "franquicia") {
+            textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || "N/D"}`;
+        }
+
+        copiarAlPortapapeles(textoBase);
+    }
+
+    function renderSugerencias(lista) {
+        const contenedor = document.getElementById("sugerencias");
+
+        if (!lista.length) {
+            contenedor.innerHTML = "";
+            contenedor.style.display = "none";
+            return;
+        }
+
+        contenedor.innerHTML = lista.map(item => `
+            <div class="sugerencia-item" data-nombre="${String(item.Nombre || "").replace(/"/g, '&quot;')}">
+                ${item.Nombre || "Sin nombre"}
+                <span class="sugerencia-sub">${item.Tipo || "Instituto"}${item.Zona ? " • Zona " + item.Zona : ""}</span>
+            </div>
+        `).join("");
+
+        contenedor.style.display = "block";
+    }
+
+    function actualizarSugerencias() {
+        const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value);
+        const contenedor = document.getElementById("sugerencias");
+
+        if (!busqueda) {
+            contenedor.innerHTML = "";
+            contenedor.style.display = "none";
+            return;
+        }
+
+        const sugerencias = todosLosDatos
+            .filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda))
+            .sort((a, b) => {
+                const na = normalizarTexto(a.Nombre);
+                const nb = normalizarTexto(b.Nombre);
+                const aEmpieza = na.startsWith(busqueda) ? 0 : 1;
+                const bEmpieza = nb.startsWith(busqueda) ? 0 : 1;
+                if (aEmpieza !== bEmpieza) return aEmpieza - bEmpieza;
+                return na.localeCompare(nb);
+            })
+            .slice(0, 6);
+
+        renderSugerencias(sugerencias);
+    }
+
+    function seleccionarSugerencia(nombre) {
+        document.getElementById('textoBusqueda').value = nombre;
+        document.getElementById("sugerencias").style.display = "none";
+        buscarInstituto();
     }
 
     function buscarInstituto() {
-        // Implementar la lógica de filtrado de 'todosLosDatos'
-        // Al final de la card generada, el botón debe verse así:
-        // <button class="btn-copiar" onclick="copiarAlPortapapeles('Tu resumen aquí')">Copiar Resumen</button>
+        const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value.trim());
+        document.getElementById("sugerencias").style.display = "none";
+
+        const resultados = todosLosDatos.filter(f => 
+            f.Nombre && normalizarTexto(f.Nombre).includes(busqueda)
+        );
+
+        let htmlTotal = "";
+
+        resultados.forEach((encontrado, index) => {
+            const infoJson = encodeURIComponent(JSON.stringify(encontrado));
+            const tipo = (encontrado.Tipo || "").toLowerCase();
+            const classType = tipo.includes("franquicia") ? "franchise" : "own";
+            
+            let franquiciaHtml = "";
+            if (classType === "franchise") {
+                franquiciaHtml = `
+                    <div class="caja-info franchise" style="margin-bottom: 15px; margin-top: 15px;">
+                        <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${encontrado.NOMBRE2 || "N/D"}</span></div>
+                            <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${encontrado.TELÉFONOS || "N/D"}</span></div>
+                            <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.9em;">${encontrado.EMAIL3 || "N/D"}</span></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let enlaceHtml = "";
+            let linkUrl = (encontrado.Wiki || "").toString().trim();
+            let tieneWiki = linkUrl !== "" && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
+
+            if (classType === "franchise") {
+                enlaceHtml = "";
+            } else {
+                if (tieneWiki) {
+                    if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
+                    enlaceHtml = `<a href="${linkUrl}" target="_blank" class="btn-wiki">Abrir WIKI</a>`;
+                } else {
+                    enlaceHtml = `<div style="text-align:center; margin-top:20px; padding:12px; background-color:var(--info-box); border-radius:12px; font-weight:bold; color:var(--text); font-size:0.9em; opacity:0.7;">
+                        <i class="fas fa-info-circle"></i> Sin wiki disponible
+                    </div>`;
+                }
+            }
+
+            htmlTotal += `
+                <div class="result-card">
+                    <div class="instituto-header">
+                        <div>
+                            <span class="instituto-nombre">${encontrado.Nombre}</span><br>
+                            <span class="type-badge ${classType}">${encontrado.Tipo || 'Instituto'}</span>
+                        </div>
+                        <i class="fas fa-school" style="font-size: 1.5em;"></i>
+                    </div>
+
+                    ${franquiciaHtml}
+
+                    <label style="font-size:0.7em;">Selecciona Programa:</label>
+                    <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
+                        <option value="adults">Adultos (1-20)</option>
+                        <option value="pro">Adultos Pro (21-24)</option>
+                        <option value="kids">Kids</option>
+                        <option value="pteen">Pre-Teens</option>
+                        <option value="toefl">TOEFL ITP</option>
+                        <option value="tkt">TKT</option>
+                        <option value="icc">ICC</option>
+                    </select>
+
+                    <div id="precios-${index}"></div>
+
+                    <button class="btn-copiar" onclick="copiarResumen(${index})">
+                        <i class="fas fa-copy"></i> Copiar resumen
+                    </button>
+
+                    ${enlaceHtml}
+                </div>`;
+        });
+
+        if (resultados.length > 0) {
+            document.getElementById('resultado').innerHTML = htmlTotal;
+            resultados.forEach((_, i) => actualizarCotizacion(i));
+        } else {
+            document.getElementById('resultado').innerHTML = `<p style="color:var(--alert-text); text-align:center; font-weight: bold;">No se encontró nada para "${document.getElementById('textoBusqueda').value.trim()}".</p>`;
+        }
     }
+
+    window.onload = async function() {
+        document.getElementById('loadingSpinner').style.display = 'block';
+
+        for (const archivo of archivosA_Cargar) {
+            try {
+                const response = await fetch(archivo);
+                const arrayBuffer = await response.arrayBuffer();
+                const libro = XLSX.read(new Uint8Array(arrayBuffer), {type: 'array'});
+                const json = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
+                todosLosDatos = todosLosDatos.concat(json);
+            } catch (e) {
+                console.error("Error cargando: " + archivo, e);
+                document.getElementById('statusCarga').innerHTML = "❌ Error al cargar algunos datos.";
+            }
+        }
+
+        document.getElementById('loadingSpinner').style.display = 'none';
+        
+        if(!document.getElementById('statusCarga').innerHTML.includes("Error")) {
+            document.getElementById('statusCarga').innerHTML = "✅ Base de datos lista.";
+        }
+    };
+
+    document.getElementById('textoBusqueda').addEventListener('input', actualizarSugerencias);
+
+    document.getElementById('textoBusqueda').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            buscarInstituto();
+        } else if (e.key === 'Escape') {
+            document.getElementById("sugerencias").style.display = "none";
+        }
+    });
+
+    document.getElementById("sugerencias").addEventListener("click", function(e) {
+        const item = e.target.closest(".sugerencia-item");
+        if (!item) return;
+        seleccionarSugerencia(item.getAttribute("data-nombre"));
+    });
+
+    document.addEventListener("click", function(e) {
+        const wrap = document.querySelector(".busqueda-wrap");
+        const sugerencias = document.getElementById("sugerencias");
+        if (!wrap.contains(e.target)) {
+            sugerencias.style.display = "none";
+        }
+    });
 </script>
 </body>
 </html>

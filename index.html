@@ -6,78 +6,122 @@
     <title>Harmon Hall - Buscador</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --hh-yellow: #FFEA00;
-            --hh-black: #000000;
+            --hh-yellow-hover: #e6d300;
+            --hh-black: #111111;
             --hh-white: #FFFFFF;
             --hh-red: #cc1e3d;
+            --hh-red-hover: #a81730;
             
-            --bg: var(--hh-yellow);
+            /* Ajuste a fondos corporativos más limpios */
+            --bg: #f4f6f9; 
             --card-bg: var(--hh-white);
             --text: var(--hh-black);
             --header-text: var(--hh-black);
-            --border: #e8eaed;
-            --input-bg: #f9f9f9;
-            --input-border: #eee;
-            --info-box: #f4f4f4;
-            --alert-bg: #ffebee;
+            --border: #e2e8f0;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --info-box: #f8fafc;
+            --alert-bg: #fef2f2;
             --alert-text: #cc1e3d;
-            --franchise-bg: #fff8f8;
-            --franchise-border: #ffcdd2;
+            --franchise-bg: #fff5f5;
+            --franchise-border: #fecdd3;
         }
 
         [data-theme="dark"] {
-            --bg: #111111;
-            --card-bg: #222222;
-            --text: #ffffff;
+            --bg: #0f1115;
+            --card-bg: #1e2128;
+            --text: #f1f5f9;
             --header-text: var(--hh-yellow);
-            --border: #333333;
-            --input-bg: #333333;
-            --input-border: #444444;
-            --info-box: #2a2a2a;
-            --alert-bg: #4a151b;
-            --alert-text: #ff8a9f;
-            --franchise-bg: #301b1e;
-            --franchise-border: #5c262e;
+            --border: #334155;
+            --input-bg: #0f1115;
+            --input-border: #475569;
+            --info-box: #272b36;
+            --alert-bg: #3f141d;
+            --alert-text: #fecdd3;
+            --franchise-bg: #2d1b20;
+            --franchise-border: #6b2a36;
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            /* Cambio a tipografía Montserrat */
+            font-family: 'Montserrat', sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
             margin: 0;
-            padding: 20px; 
+            padding: 30px 20px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s; 
+            transition: background-color 0.3s ease, color 0.3s ease; 
             overflow-x: hidden;
         }
 
-        [data-theme="light"] .wave-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 20% 30%, #fff176 0%, transparent 40%),
-                        radial-gradient(circle at 80% 70%, #fff176 0%, transparent 40%);
+        /* Fondo dinámico más sutil y elegante */
+        .wave-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 35vh; z-index: -1;
+            background: var(--hh-yellow);
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: 0 10px 30px rgba(255, 234, 0, 0.15);
+            transition: all 0.3s ease;
         }
 
-        /* Detalle técnico agregado para el modo oscuro */
         [data-theme="dark"] .wave-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 20% 30%, #2a2a2a 0%, transparent 40%),
-                        radial-gradient(circle at 80% 70%, #2a2a2a 0%, transparent 40%);
+            background: #1a1c23;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid var(--hh-yellow);
         }
 
-        .header { width: 100%; max-width: 600px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--text); padding-bottom: 15px; margin-bottom: 30px; }
+        .header { 
+            width: 100%; 
+            max-width: 600px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding-bottom: 20px; 
+            margin-bottom: 20px; 
+        }
+        
         .logo-section { display: flex; align-items: center; gap: 10px; }
-        .header-title h1 { margin: 0; font-size: 1.8em; font-weight: 900; color: var(--text); letter-spacing: -1px; text-transform: uppercase; }
-        .dark-mode-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.9em; cursor: pointer; color: var(--text); font-weight: bold; }
+        .header-title h1 { 
+            margin: 0; 
+            font-size: 2.2em; 
+            font-weight: 900; 
+            color: var(--header-text); 
+            letter-spacing: -1px; 
+            text-transform: uppercase; 
+        }
+        
+        /* Contraste en el texto del logo según el modo */
+        [data-theme="light"] .header-title h1 span { color: var(--hh-black); }
+        [data-theme="dark"] .header-title h1 span { color: var(--hh-white); }
+
+        .dark-mode-toggle { 
+            display: flex; align-items: center; gap: 8px; font-size: 0.9em; 
+            cursor: pointer; color: var(--header-text); font-weight: 700; 
+            padding: 8px 16px; border-radius: 50px; background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px); transition: background 0.2s;
+        }
+        .dark-mode-toggle:hover { background: rgba(255,255,255,0.4); }
+        [data-theme="dark"] .dark-mode-toggle { background: rgba(0,0,0,0.3); }
 
         .contenedor { width: 100%; max-width: 550px; position: relative; }
-        .seccion { margin-bottom: 20px; padding: 25px; border-radius: 20px; background-color: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .seccion { 
+            margin-bottom: 25px; 
+            padding: 30px; 
+            border-radius: 24px; 
+            background-color: var(--card-bg); 
+            box-shadow: 0 12px 35px rgba(0,0,0,0.06); 
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
         
-        label { display: block; margin-bottom: 10px; font-weight: 900; color: var(--text); font-size: 1em; text-transform: uppercase; }
+        label { display: block; margin-bottom: 12px; font-weight: 700; color: var(--text); font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .busqueda-wrap { position: relative; }
 
@@ -90,123 +134,123 @@
             background-color: var(--input-bg); 
             color: var(--text); 
             font-size: 1.05em; 
+            font-family: inherit;
             box-sizing: border-box; 
+            transition: all 0.2s ease;
         }
         
-        .btn-buscar { width: 100%; padding: 16px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; cursor: pointer; font-weight: 900; font-size: 1.1em; text-transform: uppercase; margin-top: 10px; }
+        /* Efecto focus moderno corporativo */
+        input[type="text"]:focus {
+            border-color: var(--hh-black);
+            box-shadow: 0 0 0 4px rgba(255, 234, 0, 0.4);
+        }
+        [data-theme="dark"] input[type="text"]:focus {
+            border-color: var(--hh-yellow);
+            box-shadow: 0 0 0 4px rgba(255, 234, 0, 0.2);
+        }
+        
+        .btn-buscar { 
+            width: 100%; padding: 16px 20px; background: var(--text); color: var(--card-bg); 
+            border: none; border-radius: 50px; cursor: pointer; font-weight: 700; 
+            font-size: 1.05em; text-transform: uppercase; margin-top: 15px; 
+            font-family: inherit; letter-spacing: 0.5px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        [data-theme="dark"] .btn-buscar { color: var(--hh-black); background: var(--hh-yellow); }
 
         select.btn-buscar {
             background-color: var(--input-bg);
             color: var(--text);
             border: 2px solid var(--input-border);
-            border-radius: 12px;
+            border-radius: 14px;
             text-transform: none;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-weight: bold;
+            padding: 14px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            box-shadow: none;
+            cursor: pointer;
         }
+        select.btn-buscar:focus { border-color: var(--hh-black); outline: none; }
+        [data-theme="dark"] select.btn-buscar:focus { border-color: var(--hh-yellow); }
 
-        #resultado { margin-top: 20px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
-        .result-card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); position: relative; border-left: 8px solid var(--text); animation: fade-in-card 0.5s ease-out forwards; }
+        #resultado { margin-top: 10px; display: flex; flex-direction: column; gap: 25px; padding-bottom: 40px; }
+        
+        .result-card { 
+            background: var(--card-bg); padding: 30px; border-radius: 24px; 
+            box-shadow: 0 12px 35px rgba(0,0,0,0.06); position: relative; 
+            border: 1px solid var(--border);
+            border-top: 6px solid var(--hh-black); 
+            animation: fade-in-card 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+        [data-theme="dark"] .result-card { border-top-color: var(--hh-yellow); }
         
         @keyframes fade-in-card { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .instituto-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; gap: 12px; }
-        .instituto-nombre { font-size: 1.4em; font-weight: 900; color: var(--text); line-height: 1.2; }
-        .type-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75em; font-weight: 900; color: var(--hh-white); text-transform: uppercase; display: inline-block; margin-top: 6px; }
+        .instituto-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; gap: 12px; }
+        .instituto-nombre { font-size: 1.5em; font-weight: 900; color: var(--text); line-height: 1.2; letter-spacing: -0.5px; }
+        .type-badge { padding: 6px 14px; border-radius: 50px; font-size: 0.75em; font-weight: 700; color: var(--hh-white); text-transform: uppercase; display: inline-block; margin-top: 8px; letter-spacing: 0.5px; }
         .type-badge.own { background: var(--hh-black); }
         .type-badge.franchise { background: var(--hh-red); }
         
-        .caja-info { margin-top: 15px; padding: 15px; border-radius: 12px; background-color: var(--info-box); }
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
+        .caja-info { margin-top: 15px; padding: 20px; border-radius: 16px; background-color: var(--info-box); border: 1px solid var(--border); }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 12px; }
         .info-item { display: flex; flex-direction: column; gap: 4px; }
-        .info-label { color: #888; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
-        .info-value { font-weight: 900; color: var(--text); font-size: 1.1em; word-break: break-word; }
+        .info-label { color: #64748b; font-weight: 700; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-value { font-weight: 700; color: var(--text); font-size: 1.1em; word-break: break-word; }
         
-        .caja-info.franchise { background-color: var(--franchise-bg); border: 1px solid var(--franchise-border); border-left: 4px solid var(--hh-red); }
+        .caja-info.franchise { background-color: var(--franchise-bg); border: 1px solid var(--franchise-border); border-left: 5px solid var(--hh-red); }
         
-        .caja-alerta { margin-top: 15px; padding: 12px; background-color: var(--alert-bg); color: var(--alert-text); border-radius: 12px; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
+        .caja-alerta { margin-top: 15px; padding: 15px; background-color: var(--alert-bg); color: var(--alert-text); border-radius: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; font-size: 0.9em; border: 1px solid var(--franchise-border); }
 
-        .btn-wiki { display: block; margin-top: 20px; padding: 15px; background-color: var(--hh-yellow); color: var(--hh-black); text-decoration: none; border-radius: 12px; font-weight: 900; text-align: center; border: 2px solid var(--hh-black); text-transform: uppercase; }
-
-        .btn-copiar {
-            display: block;
-            width: 100%;
-            margin-top: 12px;
-            padding: 14px 15px;
-            background-color: var(--hh-red);
-            color: var(--hh-white);
-            border: none;
-            border-radius: 12px;
-            font-weight: 900;
-            text-align: center;
-            text-transform: uppercase;
-            cursor: pointer;
+        .btn-wiki { 
+            display: block; margin-top: 20px; padding: 16px; background-color: var(--hh-yellow); 
+            color: var(--hh-black); text-decoration: none; border-radius: 16px; font-weight: 800; 
+            text-align: center; text-transform: uppercase; letter-spacing: 0.5px;
+            transition: all 0.2s ease;
         }
 
-        .btn-copiar:hover, .btn-wiki:hover, .btn-buscar:hover { filter: brightness(0.95); }
+        .btn-copiar {
+            display: block; width: 100%; margin-top: 15px; padding: 16px; 
+            background-color: var(--hh-red); color: var(--hh-white); border: none; 
+            border-radius: 16px; font-weight: 800; text-align: center; 
+            text-transform: uppercase; cursor: pointer; font-family: inherit;
+            letter-spacing: 0.5px; transition: all 0.2s ease;
+        }
 
-        #loadingSpinner { display: none; position: absolute; top: 25px; right: 25px; animation: spin 1s linear infinite; }
+        /* Efectos Hover modernos */
+        .btn-buscar:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .btn-copiar:hover { background-color: var(--hh-red-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(204, 30, 61, 0.2); }
+        .btn-wiki:hover { background-color: var(--hh-yellow-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 234, 0, 0.3); }
+
+        #loadingSpinner { display: none; position: absolute; top: 30px; right: 30px; color: var(--hh-black); font-size: 1.2em; animation: spin 1s linear infinite; }
+        [data-theme="dark"] #loadingSpinner { color: var(--hh-yellow); }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .sugerencias {
-            display: none;
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 14px 32px rgba(0,0,0,0.12);
-            overflow: hidden;
-            max-height: 260px;
-            overflow-y: auto;
+            display: none; position: absolute; top: calc(100% + 10px); left: 0; right: 0; z-index: 50;
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; max-height: 280px; overflow-y: auto;
         }
 
-        .sugerencia-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--text); transition: background-color 0.15s ease; }
-        .sugerencia-item:hover { background: var(--info-box); }
+        .sugerencia-item { padding: 14px 20px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text); transition: background-color 0.2s ease; }
+        .sugerencia-item:hover { background: var(--info-box); padding-left: 25px; } /* Pequeño efecto visual al hacer hover */
         .sugerencia-item:last-child { border-bottom: none; }
-        .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.78em; font-weight: 600; opacity: 0.7; }
+        .sugerencia-sub { display: block; margin-top: 6px; font-size: 0.8em; font-weight: 500; color: #64748b; }
 
-        /* Estilos para la notificación Toast (Agregados) */
-        .toast-container {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-        }
+        .toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 9999; }
 
         .toast {
-            background: var(--hh-black);
-            color: var(--hh-yellow);
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 0.85em;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.2s forwards;
+            background: var(--hh-black); color: var(--hh-yellow); padding: 14px 28px; 
+            border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.85em; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; 
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s ease-in 2.2s forwards;
+            letter-spacing: 0.5px;
         }
 
-        [data-theme="dark"] .toast {
-            background: var(--hh-yellow);
-            color: var(--hh-black);
-        }
+        [data-theme="dark"] .toast { background: var(--hh-yellow); color: var(--hh-black); }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
 <body data-theme="light">
@@ -223,15 +267,15 @@
 </div>
 
 <div class="contenedor">
-    <div class="seccion" style="text-align: center; padding: 15px;">
+    <div class="seccion" style="text-align: center; padding: 20px;">
         <i id="loadingSpinner" class="fas fa-spinner"></i>
-        <span id="statusCarga">Conectando base de datos... ⏳</span>
+        <span id="statusCarga" style="font-weight: 600;">Conectando base de datos... ⏳</span>
     </div>
 
     <div class="seccion">
         <label>Buscador de Institutos</label>
         <div class="busqueda-wrap">
-            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." onfocus="this.select()">
+            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catarina..." onfocus="this.select()">
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
@@ -292,12 +336,12 @@
 
             if (tienePrecio) {
                 html = `<div class="caja-info">
-                    <span class="info-label"><i class="fas fa-tags"></i> ${titulo} | Zona ${datos.Zona || 'A'}</span>
+                    <span class="info-label" style="display:block; margin-bottom:10px;"><i class="fas fa-tags" style="color:var(--text);"></i> ${titulo} | Zona ${datos.Zona || 'A'}</span>
                     <div class="info-grid">
                         ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
                         ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
-                        ${mensu > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
-                        ${sab > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.04); padding:8px; border-radius:8px;"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
+                        ${mensu > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.03); padding:12px; border-radius:12px;"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
+                        ${sab > 0 ? `<div class="info-item" style="background:rgba(0,0,0,0.03); padding:12px; border-radius:12px;"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
                     </div>
                 </div>`;
 
@@ -327,10 +371,10 @@
             if (total > 0) tienePrecio = true;
 
             if (tienePrecio) {
-                html = `<div class="caja-info" style="border-left: 4px solid var(--hh-yellow); text-align:center;">
+                html = `<div class="caja-info" style="border-left: 5px solid var(--hh-yellow); text-align:center;">
                     <span class="info-label">${titulo}</span>
-                    <div style="font-size: 2em; font-weight: 900; margin: 10px 0;">${formatearMoneda(total)}</div>
-                    <span class="info-label" style="font-size:0.7em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
+                    <div style="font-size: 2.2em; font-weight: 900; margin: 15px 0; color: var(--text);">${formatearMoneda(total)}</div>
+                    <span class="info-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
                 </div>`;
 
                 texto = [
@@ -353,7 +397,6 @@
         return { html, texto, tienePrecio };
     }
 
-    // Función de notificación agregada
     function mostrarNotificacion(mensaje) {
         let container = document.querySelector('.toast-container');
         if (!container) {
@@ -373,7 +416,6 @@
         }, 2500);
     }
 
-    // Función de copiado modificada
     async function copiarAlPortapapeles(texto) {
         try {
             await navigator.clipboard.writeText(texto);
@@ -498,12 +540,12 @@
             let franquiciaHtml = "";
             if (classType === "franchise") {
                 franquiciaHtml = `
-                    <div class="caja-info franchise" style="margin-bottom: 15px; margin-top: 15px;">
-                        <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
+                    <div class="caja-info franchise" style="margin-bottom: 20px; margin-top: 15px;">
+                        <span class="info-label" style="margin-bottom: 12px; display:block; color: var(--hh-red);"><i class="fas fa-headset"></i> Contacto Franquicia</span>
                         <div class="info-grid">
                             <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${encontrado.NOMBRE2 || "N/D"}</span></div>
                             <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${encontrado.TELÉFONOS || "N/D"}</span></div>
-                            <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.9em;">${encontrado.EMAIL3 || "N/D"}</span></div>
+                            <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.95em;">${encontrado.EMAIL3 || "N/D"}</span></div>
                         </div>
                     </div>
                 `;
@@ -518,9 +560,9 @@
             } else {
                 if (tieneWiki) {
                     if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                    enlaceHtml = `<a href="${linkUrl}" target="_blank" class="btn-wiki">Abrir WIKI</a>`;
+                    enlaceHtml = `<a href="${linkUrl}" target="_blank" class="btn-wiki"><i class="fas fa-external-link-alt"></i> Abrir WIKI</a>`;
                 } else {
-                    enlaceHtml = `<div style="text-align:center; margin-top:20px; padding:12px; background-color:var(--info-box); border-radius:12px; font-weight:bold; color:var(--text); font-size:0.9em; opacity:0.7;">
+                    enlaceHtml = `<div style="text-align:center; margin-top:20px; padding:15px; background-color:var(--info-box); border-radius:14px; font-weight:600; color:#64748b; font-size:0.9em;">
                         <i class="fas fa-info-circle"></i> Sin wiki disponible
                     </div>`;
                 }
@@ -533,12 +575,12 @@
                             <span class="instituto-nombre">${encontrado.Nombre}</span><br>
                             <span class="type-badge ${classType}">${encontrado.Tipo || 'Instituto'}</span>
                         </div>
-                        <i class="fas fa-school" style="font-size: 1.5em;"></i>
+                        <i class="fas fa-school" style="font-size: 1.8em; color: var(--border);"></i>
                     </div>
 
                     ${franquiciaHtml}
 
-                    <label style="font-size:0.7em;">Selecciona Programa:</label>
+                    <label style="font-size:0.8em; color: #64748b; margin-top: 10px;">Selecciona Programa:</label>
                     <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
                         <option value="adults">Adultos (1-20)</option>
                         <option value="pro">Adultos Pro (21-24)</option>
@@ -563,7 +605,7 @@
             document.getElementById('resultado').innerHTML = htmlTotal;
             resultados.forEach((_, i) => actualizarCotizacion(i));
         } else {
-            document.getElementById('resultado').innerHTML = `<p style="color:var(--alert-text); text-align:center; font-weight: bold;">No se encontró nada para "${document.getElementById('textoBusqueda').value.trim()}".</p>`;
+            document.getElementById('resultado').innerHTML = `<div class="caja-alerta" style="justify-content:center; padding: 20px;"><i class="fas fa-search"></i> No se encontró nada para "${document.getElementById('textoBusqueda').value.trim()}".</div>`;
         }
     }
 
@@ -579,16 +621,17 @@
                 todosLosDatos = todosLosDatos.concat(json);
             } catch (e) {
                 console.error("Error cargando: " + archivo, e);
-                // Aquí también agregué el manejo básico de errores sugerido anteriormente
                 document.getElementById('statusCarga').innerHTML = "❌ Error al cargar algunos datos.";
             }
         }
 
         document.getElementById('loadingSpinner').style.display = 'none';
         
-        // Verifica que no haya habido error antes de poner el mensaje de éxito
         if(!document.getElementById('statusCarga').innerHTML.includes("Error")) {
             document.getElementById('statusCarga').innerHTML = "✅ Base de datos lista.";
+            setTimeout(() => {
+                document.getElementById('statusCarga').parentElement.style.display = 'none';
+            }, 2000);
         }
     };
 

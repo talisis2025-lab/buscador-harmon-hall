@@ -241,41 +241,6 @@
 </div>
 
 <script>
-    // =================================================================
-    // --- 1. SEGURIDAD: VALIDACIÓN DE DOMINIO INICIAL ---
-    // =================================================================
-    const dominiosAutorizados = ['unid.mx', 'talisis.com'];
-
-    function verificarAcceso() {
-        if (sessionStorage.getItem('acceso_valido') === 'true') return true;
-
-        const correo = prompt("🔐 ACCESO RESTRINGIDO\n\nIngresa tu correo institucional:");
-        
-        if (!correo) {
-            document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; background:var(--bg);'><h1 style='color:var(--text);'>Acceso cancelado.</h1></div>";
-            return false;
-        }
-
-        const dominio = correo.toLowerCase().split('@')[1];
-
-        if (dominiosAutorizados.includes(dominio)) {
-            sessionStorage.setItem('acceso_valido', 'true');
-            return true;
-        } else {
-            alert("Acceso denegado. El dominio @" + (dominio || "desconocido") + " no está autorizado.");
-            document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; background:var(--hh-red);'><h1 style='color:white; text-align:center;'>🚫 NO AUTORIZADO<br><span style='font-size:0.5em'>Dominio inválido</span></h1></div>";
-            return false;
-        }
-    }
-
-    // Ejecutar validación antes de cargar cualquier otra cosa
-    if (!verificarAcceso()) {
-        throw new Error("Parada de seguridad: Usuario no autorizado.");
-    }
-    // =================================================================
-
-
-    // --- 2. LÓGICA DE LA APLICACIÓN ---
     let todosLosDatos = [];
     const archivosA_Cargar = ['database.xlsx', 'database2.xlsx']; 
 
@@ -614,12 +579,14 @@
                 todosLosDatos = todosLosDatos.concat(json);
             } catch (e) {
                 console.error("Error cargando: " + archivo, e);
+                // Aquí también agregué el manejo básico de errores sugerido anteriormente
                 document.getElementById('statusCarga').innerHTML = "❌ Error al cargar algunos datos.";
             }
         }
 
         document.getElementById('loadingSpinner').style.display = 'none';
         
+        // Verifica que no haya habido error antes de poner el mensaje de éxito
         if(!document.getElementById('statusCarga').innerHTML.includes("Error")) {
             document.getElementById('statusCarga').innerHTML = "✅ Base de datos lista.";
         }

@@ -20,7 +20,7 @@
             --header-text: var(--hh-black);
             --border: #e8eaed;
             --input-bg: #ffffff;
-            --input-border: #e4e4e4;
+            --input-border: #cfcfcf;
             --info-box: #f6f6f6;
             --alert-bg: #ffebee;
             --alert-text: #cc1e3d;
@@ -40,7 +40,7 @@
             --header-text: var(--hh-yellow);
             --border: #323232;
             --input-bg: #2a2a2a;
-            --input-border: #3b3b3b;
+            --input-border: #4b4b4b;
             --info-box: #262626;
             --alert-bg: #4a151b;
             --alert-text: #ff8a9f;
@@ -77,13 +77,11 @@
             position: fixed;
             inset: 0;
             z-index: -1;
-            background:
-                linear-gradient(180deg, rgba(255,234,0,1) 0%, rgba(255,244,170,1) 100%);
+            background: linear-gradient(180deg, rgba(255,234,0,1) 0%, rgba(255,244,170,1) 100%);
         }
 
         [data-theme="dark"] .wave-bg {
-            background:
-                linear-gradient(180deg, #0f0f0f 0%, #1c1c1c 100%);
+            background: linear-gradient(180deg, #0f0f0f 0%, #1c1c1c 100%);
         }
 
         .wave-bg::before,
@@ -260,9 +258,11 @@
             transform: translateY(0);
         }
 
+        /* IMPORTANTE: el select no debe heredar el fondo negro del botón */
         select.btn-buscar {
-            background-color: var(--input-bg);
-            color: var(--text);
+            background: var(--input-bg);
+            background-image: none !important;
+            color: var(--text) !important;
             border: 2px solid var(--input-border);
             border-radius: 14px;
             text-transform: none;
@@ -270,10 +270,35 @@
             margin-bottom: 15px;
             font-weight: 800;
             box-shadow: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            outline: none;
+            line-height: 1.2;
+        }
+
+        select.btn-buscar:focus {
+            border-color: var(--hh-black);
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
+        }
+
+        [data-theme="dark"] select.btn-buscar:focus {
+            box-shadow: 0 0 0 4px rgba(255,234,0,0.08);
         }
 
         select.btn-buscar:hover {
             transform: none;
+        }
+
+        select.btn-buscar option {
+            background: var(--card-bg);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] select.btn-buscar option {
+            background: #1f1f1f;
+            color: #ffffff;
         }
 
         #resultado {
@@ -638,7 +663,7 @@
     <div class="seccion">
         <label>Buscador de Institutos</label>
         <div class="busqueda-wrap">
-            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." onfocus="this.select()">
+            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
@@ -649,7 +674,8 @@
 
 <script>
     let todosLosDatos = [];
-    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx']; 
+    let baseCargada = false;
+    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
 
     function normalizarTexto(texto) {
         return (texto ?? "")
@@ -658,6 +684,16 @@
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .trim();
+    }
+
+    function escaparHTML(texto) {
+        return (texto ?? "")
+            .toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
 
     function formatearMoneda(valor) {
@@ -694,12 +730,12 @@
                 lib = parseFloat(datos.Libros_PTEEN) || 0;
                 titulo = "Pre-Teens";
             }
-            
+
             if (mensu > 0 || sab > 0) tienePrecio = true;
 
             if (tienePrecio) {
                 html = `<div class="caja-info">
-                    <span class="info-label"><i class="fas fa-tags"></i> ${titulo} | Zona ${datos.Zona || 'A'}</span>
+                    <span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span>
                     <div class="info-grid">
                         ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
                         ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
@@ -735,7 +771,7 @@
 
             if (tienePrecio) {
                 html = `<div class="caja-info" style="border-left: 4px solid var(--hh-yellow); text-align:center;">
-                    <span class="info-label">${titulo}</span>
+                    <span class="info-label">${escaparHTML(titulo)}</span>
                     <div style="font-size: 2em; font-weight: 900; margin: 10px 0;">${formatearMoneda(total)}</div>
                     <span class="info-label" style="font-size:0.7em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
                 </div>`;
@@ -770,8 +806,8 @@
 
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${mensaje}`;
-        
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
+
         container.appendChild(toast);
 
         setTimeout(() => {
@@ -786,6 +822,8 @@
         } catch (error) {
             const area = document.createElement("textarea");
             area.value = texto;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
             document.body.appendChild(area);
             area.select();
             document.execCommand("copy");
@@ -804,9 +842,12 @@
 
     function actualizarCotizacion(index) {
         const selector = document.getElementById(`select-${index}`);
+        if (!selector) return;
+
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
         const contenedor = document.getElementById(`precios-${index}`);
+        if (!contenedor) return;
 
         const cotizacion = obtenerCotizacion(datos, programa);
         contenedor.innerHTML = cotizacion.html;
@@ -814,6 +855,8 @@
 
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
+        if (!selector) return;
+
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
 
@@ -829,7 +872,7 @@
         ].filter(Boolean).join("\n");
 
         if (classType === "franquicia") {
-            textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || "N/D"}`;
+            textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         }
 
         copiarAlPortapapeles(textoBase);
@@ -845,9 +888,9 @@
         }
 
         contenedor.innerHTML = lista.map(item => `
-            <div class="sugerencia-item" data-nombre="${String(item.Nombre || "").replace(/"/g, '&quot;')}">
-                ${item.Nombre || "Sin nombre"}
-                <span class="sugerencia-sub">${item.Tipo || "Instituto"}${item.Zona ? " • Zona " + item.Zona : ""}</span>
+            <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))}">
+                ${escaparHTML(item.Nombre || "Sin nombre")}
+                <span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span>
             </div>
         `).join("");
 
@@ -886,10 +929,18 @@
     }
 
     function buscarInstituto() {
-        const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value.trim());
+        const texto = document.getElementById('textoBusqueda').value.trim();
+        const busqueda = normalizarTexto(texto);
         document.getElementById("sugerencias").style.display = "none";
 
-        const resultados = todosLosDatos.filter(f => 
+        if (!busqueda) {
+            document.getElementById('resultado').innerHTML = `
+                <p class="empty-state">Escribe el nombre del instituto para buscar.</p>
+            `;
+            return;
+        }
+
+        const resultados = todosLosDatos.filter(f =>
             f.Nombre && normalizarTexto(f.Nombre).includes(busqueda)
         );
 
@@ -899,16 +950,16 @@
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
-            
+
             let franquiciaHtml = "";
             if (classType === "franchise") {
                 franquiciaHtml = `
                     <div class="caja-info franchise" style="margin-bottom: 15px; margin-top: 15px;">
                         <span class="info-label" style="margin-bottom: 8px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
                         <div class="info-grid">
-                            <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${encontrado.NOMBRE2 || "N/D"}</span></div>
-                            <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${encontrado.TELÉFONOS || "N/D"}</span></div>
-                            <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.9em;">${encontrado.EMAIL3 || "N/D"}</span></div>
+                            <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${escaparHTML(encontrado.NOMBRE2 || "N/D")}</span></div>
+                            <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${escaparHTML(encontrado.TELÉFONOS || encontrado.TELEFONOS || "N/D")}</span></div>
+                            <div class="info-item" style="grid-column: span 2;"><span class="info-label">Email</span><span class="info-value" style="word-break: break-all; font-size: 0.9em;">${escaparHTML(encontrado.EMAIL3 || encontrado.EMAIL || "N/D")}</span></div>
                         </div>
                     </div>
                 `;
@@ -923,7 +974,7 @@
             } else {
                 if (tieneWiki) {
                     if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                    enlaceHtml = `<a href="${linkUrl}" target="_blank" class="btn-wiki">Abrir WIKI</a>`;
+                    enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir WIKI</a>`;
                 } else {
                     enlaceHtml = `<div style="text-align:center; margin-top:20px; padding:12px; background-color:var(--info-box); border-radius:12px; font-weight:bold; color:var(--text); font-size:0.9em; opacity:0.7;">
                         <i class="fas fa-info-circle"></i> Sin wiki disponible
@@ -935,8 +986,8 @@
                 <div class="result-card">
                     <div class="instituto-header">
                         <div>
-                            <span class="instituto-nombre">${encontrado.Nombre}</span><br>
-                            <span class="type-badge ${classType}">${encontrado.Tipo || 'Instituto'}</span>
+                            <span class="instituto-nombre">${escaparHTML(encontrado.Nombre || "Sin nombre")}</span><br>
+                            <span class="type-badge ${classType}">${escaparHTML(encontrado.Tipo || 'Instituto')}</span>
                         </div>
                         <i class="fas fa-school" style="font-size: 1.5em;"></i>
                     </div>
@@ -968,55 +1019,68 @@
             document.getElementById('resultado').innerHTML = htmlTotal;
             resultados.forEach((_, i) => actualizarCotizacion(i));
         } else {
-            document.getElementById('resultado').innerHTML = `<p class="empty-state">No se encontró nada para "${document.getElementById('textoBusqueda').value.trim()}".</p>`;
+            document.getElementById('resultado').innerHTML = `
+                <p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>
+            `;
         }
     }
 
     window.onload = async function() {
-        document.getElementById('loadingSpinner').style.display = 'block';
+        const spinner = document.getElementById('loadingSpinner');
+        const status = document.getElementById('statusCarga');
+        spinner.style.display = 'block';
 
         for (const archivo of archivosA_Cargar) {
             try {
                 const response = await fetch(archivo);
+                if (!response.ok) {
+                    throw new Error(`No se pudo cargar ${archivo} (${response.status})`);
+                }
+
                 const arrayBuffer = await response.arrayBuffer();
-                const libro = XLSX.read(new Uint8Array(arrayBuffer), {type: 'array'});
+                const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
                 todosLosDatos = todosLosDatos.concat(json);
             } catch (e) {
                 console.error("Error cargando: " + archivo, e);
-                document.getElementById('statusCarga').innerHTML = "❌ Error al cargar algunos datos.";
+                status.innerHTML = "❌ Error al cargar algunos datos.";
             }
         }
 
-        document.getElementById('loadingSpinner').style.display = 'none';
-        
-        if(!document.getElementById('statusCarga').innerHTML.includes("Error")) {
-            document.getElementById('statusCarga').innerHTML = "✅ Base de datos lista.";
+        spinner.style.display = 'none';
+        baseCargada = true;
+
+        if (!status.innerHTML.includes("Error")) {
+            status.innerHTML = "✅ Base de datos lista.";
         }
     };
 
-    document.getElementById('textoBusqueda').addEventListener('input', actualizarSugerencias);
+    document.addEventListener('DOMContentLoaded', function () {
+        const textoBusqueda = document.getElementById('textoBusqueda');
+        const sugerencias = document.getElementById('sugerencias');
 
-    document.getElementById('textoBusqueda').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            buscarInstituto();
-        } else if (e.key === 'Escape') {
-            document.getElementById("sugerencias").style.display = "none";
-        }
-    });
+        textoBusqueda.addEventListener('input', actualizarSugerencias);
 
-    document.getElementById("sugerencias").addEventListener("click", function(e) {
-        const item = e.target.closest(".sugerencia-item");
-        if (!item) return;
-        seleccionarSugerencia(item.getAttribute("data-nombre"));
-    });
+        textoBusqueda.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                buscarInstituto();
+            } else if (e.key === 'Escape') {
+                sugerencias.style.display = 'none';
+            }
+        });
 
-    document.addEventListener("click", function(e) {
-        const wrap = document.querySelector(".busqueda-wrap");
-        const sugerencias = document.getElementById("sugerencias");
-        if (!wrap.contains(e.target)) {
-            sugerencias.style.display = "none";
-        }
+        sugerencias.addEventListener("click", function(e) {
+            const item = e.target.closest(".sugerencia-item");
+            if (!item) return;
+            seleccionarSugerencia(item.getAttribute("data-nombre"));
+        });
+
+        document.addEventListener("click", function(e) {
+            const wrap = document.querySelector(".busqueda-wrap");
+            if (!wrap.contains(e.target)) {
+                sugerencias.style.display = "none";
+            }
+        });
     });
 </script>
 </body>

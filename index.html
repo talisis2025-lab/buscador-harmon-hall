@@ -131,9 +131,8 @@
             transform: scale(1.04);
         }
 
-        /* Logo Harmon Hall: negro en día / amarillo completo en noche */
         .header-title h1 span {
-            color: inherit; /* hereda el color del tema automáticamente */
+            color: inherit;
         }
 
         .dark-mode-toggle {
@@ -163,6 +162,7 @@
             width: 100%;
             max-width: 640px;
             position: relative;
+            overflow: visible;
         }
 
         .seccion {
@@ -181,6 +181,12 @@
             box-shadow: var(--shadow-lift);
         }
 
+        .search-section {
+            position: relative;
+            z-index: 30;
+            overflow: visible;
+        }
+
         label {
             display: block;
             margin-bottom: 12px;
@@ -194,6 +200,8 @@
 
         .busqueda-wrap {
             position: relative;
+            z-index: 40;
+            overflow: visible;
         }
 
         .busqueda-wrap::before {
@@ -223,6 +231,8 @@
             font-weight: 500;
             box-shadow: inset 0 4px 12px rgba(0,0,0,0.04);
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 41;
         }
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
@@ -290,6 +300,8 @@
             flex-direction: column;
             gap: 28px;
             padding-bottom: 60px;
+            position: relative;
+            z-index: 1;
         }
 
         .result-card {
@@ -299,7 +311,7 @@
             box-shadow: var(--shadow);
             position: relative;
             border: 1px solid var(--border);
-            overflow: hidden;
+            overflow: visible;
             backdrop-filter: blur(24px);
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -328,6 +340,7 @@
             height: 6px;
             width: 100%;
             background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
+            border-radius: 32px 32px 0 0;
         }
 
         .instituto-header {
@@ -415,9 +428,16 @@
             border: 1px solid rgba(204,30,61,0.15);
         }
 
-        .btn-wiki, .btn-copiar {
-            width: 100%;
+        .acciones {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
             margin-top: 20px;
+        }
+
+        .btn-wiki, .btn-copiar {
+            display: block;
+            width: 100%;
             padding: 17px 22px;
             border-radius: 28px;
             font-weight: 900;
@@ -427,12 +447,14 @@
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+            border: none;
         }
 
         .btn-wiki {
             background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
             color: var(--hh-black);
             border: 2px solid var(--hh-black);
+            text-decoration: none;
         }
         .btn-wiki:hover {
             transform: translateY(-5px) scale(1.03);
@@ -471,12 +493,12 @@
             top: calc(100% + 12px);
             left: 0;
             right: 0;
-            z-index: 100;
+            z-index: 9999;
             background: var(--card-bg);
             border-radius: 28px;
             box-shadow: var(--shadow-lift);
             backdrop-filter: blur(24px);
-            overflow: hidden;
+            overflow-y: auto;
             max-height: 320px;
             border: 1px solid var(--border);
         }
@@ -489,6 +511,14 @@
         }
         .sugerencia-item:hover {
             background: rgba(255,234,0,0.18);
+        }
+
+        .sugerencia-sub {
+            display: block;
+            font-size: 0.82em;
+            opacity: 0.72;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
         .toast {
@@ -525,6 +555,7 @@
             body { padding: 16px 12px; }
             .seccion { padding: 24px 20px; }
             .result-card { padding: 24px 20px; }
+            .acciones { gap: 12px; }
         }
     </style>
 </head>
@@ -533,7 +564,6 @@
 
 <div class="header">
     <div class="logo-section">
-        <!-- Logo modificado: negro completo en día / amarillo completo en noche -->
         <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
     </div>
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">
@@ -548,7 +578,7 @@
         <span id="statusCarga">Conectando base de datos… ⏳</span>
     </div>
 
-    <div class="seccion">
+    <div class="seccion search-section">
         <label>Buscador de Institutos</label>
         <div class="busqueda-wrap">
             <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
@@ -568,56 +598,143 @@
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
     }
+
     function escaparHTML(texto) {
-        return (texto ?? "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+        return (texto ?? "").toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
+
     function formatearMoneda(valor) {
         const numero = Number(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
+
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
+
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
-            if (programa === 'adults') { mensu = parseFloat(datos.Adults_FF)||0; sab = parseFloat(datos.Adults_SAB)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (1-20)"; }
-            else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos Pro (21-24)"; }
-            else if (programa === 'kids') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_KIDS)||0; titulo = "Kids"; }
-            else if (programa === 'pteen') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_PTEEN)||0; titulo = "Pre-Teens"; }
+
+            if (programa === 'adults') {
+                mensu = parseFloat(datos.Adults_FF) || 0;
+                sab = parseFloat(datos.Adults_SAB) || 0;
+                lib = parseFloat(datos.Libros_Adults) || 0;
+                titulo = "Adultos (1-20)";
+            } else if (programa === 'pro') {
+                mensu = parseFloat(datos.Adults_PRO_FF) || 0;
+                lib = parseFloat(datos.Libros_Adults) || 0;
+                titulo = "Adultos Pro (21-24)";
+            } else if (programa === 'kids') {
+                mensu = parseFloat(datos.KPT_SEM) || 0;
+                sab = parseFloat(datos.KPT_SAB) || 0;
+                lib = parseFloat(datos.Libros_KIDS) || 0;
+                titulo = "Kids";
+            } else if (programa === 'pteen') {
+                mensu = parseFloat(datos.KPT_SEM) || 0;
+                sab = parseFloat(datos.KPT_SAB) || 0;
+                lib = parseFloat(datos.Libros_PTEEN) || 0;
+                titulo = "Pre-Teens";
+            }
+
             if (mensu > 0 || sab > 0) tienePrecio = true;
+
             if (tienePrecio) {
-                html = `<div class="caja-info"><span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span><div class="info-grid">${ins>0?`<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>`:''}${lib>0?`<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>`:''}${mensu>0?`<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>`:''}${sab>0?`<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>`:''}</div></div>`;
-                texto = [`Programa: ${titulo}`,`Zona: ${datos.Zona||'A'}`,ins>0?`Inscripción: ${formatearMoneda(ins)}`:null,lib>0?`Libro: ${formatearMoneda(lib)}`:null,mensu>0?`Mensualidad FF/SEM: ${formatearMoneda(mensu)}`:null,sab>0?`Mensualidad Sabatina: ${formatearMoneda(sab)}`:null].filter(Boolean).join("\n");
+                html = `
+                    <div class="caja-info">
+                        <span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span>
+                        <div class="info-grid">
+                            ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
+                            ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
+                            ${mensu > 0 ? `<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
+                            ${sab > 0 ? `<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
+                        </div>
+                    </div>`;
+                texto = [
+                    `Programa: ${titulo}`,
+                    `Zona: ${datos.Zona || 'A'}`,
+                    ins > 0 ? `Inscripción: ${formatearMoneda(ins)}` : null,
+                    lib > 0 ? `Libro: ${formatearMoneda(lib)}` : null,
+                    mensu > 0 ? `Mensualidad FF/SEM: ${formatearMoneda(mensu)}` : null,
+                    sab > 0 ? `Mensualidad Sabatina: ${formatearMoneda(sab)}`
+                ].filter(Boolean).join("\n");
             }
         } else {
             let total = 0, titulo = "";
-            if (programa === 'toefl') { total = parseFloat(datos.TOEFL_ITP_PRE)||0; titulo = "PAGO ÚNICO TOEFL ITP"; }
-            else if (programa === 'tkt') { total = parseFloat(datos.TKT)||0; titulo = "PAGO ÚNICO TKT"; }
-            else if (programa === 'icc') { total = parseFloat(datos.ICC_FF)||0; titulo = "PAGO ÚNICO ICC"; }
+
+            if (programa === 'toefl') {
+                total = parseFloat(datos.TOEFL_ITP_PRE) || 0;
+                titulo = "PAGO ÚNICO TOEFL ITP";
+            } else if (programa === 'tkt') {
+                total = parseFloat(datos.TKT) || 0;
+                titulo = "PAGO ÚNICO TKT";
+            } else if (programa === 'icc') {
+                total = parseFloat(datos.ICC_FF) || 0;
+                titulo = "PAGO ÚNICO ICC";
+            }
+
             if (total > 0) tienePrecio = true;
+
             if (tienePrecio) {
-                html = `<div class="caja-info" style="border-left:4px solid var(--hh-yellow); text-align:center;"><span class="info-label">${escaparHTML(titulo)}</span><div style="font-size:2.1em;font-weight:900;margin:12px 0;">${formatearMoneda(total)}</div><span class="info-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span></div>`;
-                texto = [`Programa: ${titulo}`,`Total: ${formatearMoneda(total)}`,`Todo incluido`].join("\n");
+                html = `
+                    <div class="caja-info" style="border-left:4px solid var(--hh-yellow); text-align:center;">
+                        <span class="info-label">${escaparHTML(titulo)}</span>
+                        <div style="font-size:2.1em;font-weight:900;margin:12px 0;">${formatearMoneda(total)}</div>
+                        <span class="info-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span>
+                    </div>`;
+                texto = [`Programa: ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
             }
         }
+
         if (!tienePrecio) {
             html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
             texto = "Precios no definidos, valida la información.";
         }
+
         return { html, texto, tienePrecio };
     }
+
     function mostrarNotificacion(mensaje) {
-        let container = document.querySelector('.toast-container') || (() => { let c = document.createElement('div'); c.className = 'toast-container'; c.style.position='fixed'; c.style.bottom='30px'; c.style.left='50%'; c.style.transform='translateX(-50%)'; c.style.zIndex='9999'; document.body.appendChild(c); return c; })();
+        let container = document.querySelector('.toast-container') || (() => {
+            let c = document.createElement('div');
+            c.className = 'toast-container';
+            c.style.position = 'fixed';
+            c.style.bottom = '30px';
+            c.style.left = '50%';
+            c.style.transform = 'translateX(-50%)';
+            c.style.zIndex = '9999';
+            document.body.appendChild(c);
+            return c;
+        })();
+
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 2800);
     }
+
     async function copiarAlPortapapeles(texto) {
-        try { await navigator.clipboard.writeText(texto); mostrarNotificacion("Resumen copiado con éxito"); }
-        catch { const area = document.createElement("textarea"); area.value = texto; area.style.position="fixed"; area.style.opacity="0"; document.body.appendChild(area); area.select(); document.execCommand("copy"); document.body.removeChild(area); mostrarNotificacion("Resumen copiado con éxito"); }
+        try {
+            await navigator.clipboard.writeText(texto);
+            mostrarNotificacion("Resumen copiado con éxito");
+        } catch {
+            const area = document.createElement("textarea");
+            area.value = texto;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            document.body.removeChild(area);
+            mostrarNotificacion("Resumen copiado con éxito");
+        }
     }
+
     function toggleDarkMode() {
         const body = document.body;
         const isLight = body.getAttribute('data-theme') === 'light';
@@ -625,95 +742,140 @@
         document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
         document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
     }
+
     function actualizarCotizacion(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
+
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
         const contenedor = document.getElementById(`precios-${index}`);
         if (!contenedor) return;
+
         const cotizacion = obtenerCotizacion(datos, programa);
         contenedor.innerHTML = cotizacion.html;
     }
+
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
+
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
         const tipo = (datos.Tipo || "").toLowerCase();
         const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
         const cotizacion = obtenerCotizacion(datos, programa);
-        let textoBase = [`Instituto: ${datos.Nombre || 'N/D'}`,`Tipo: ${datos.Tipo || 'Instituto'}`,`Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`, cotizacion.texto].filter(Boolean).join("\n");
-        if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
+
+        let textoBase = [
+            `Instituto: ${datos.Nombre || 'N/D'}`,
+            `Tipo: ${datos.Tipo || 'Instituto'}`,
+            `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
+            cotizacion.texto
+        ].filter(Boolean).join("\n");
+
+        if (classType === "franquicia") {
+            textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
+        }
+
         copiarAlPortapapeles(textoBase);
     }
+
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
-        if (!lista.length) { contenedor.innerHTML = ""; contenedor.style.display = "none"; return; }
+
+        if (!lista.length) {
+            contenedor.innerHTML = "";
+            contenedor.style.display = "none";
+            return;
+        }
+
         contenedor.innerHTML = lista.map(item => `
             <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))}">
                 ${escaparHTML(item.Nombre || "Sin nombre")}
                 <span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span>
             </div>
         `).join("");
+
         contenedor.style.display = "block";
     }
+
     function actualizarSugerencias() {
         const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value);
-        if (!busqueda) { document.getElementById("sugerencias").style.display = "none"; return; }
-        const sugerencias = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda)).sort((a,b) => {
-            const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
-            return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
-        }).slice(0,6);
+
+        if (!busqueda) {
+            document.getElementById("sugerencias").style.display = "none";
+            return;
+        }
+
+        const sugerencias = todosLosDatos
+            .filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda))
+            .sort((a, b) => {
+                const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
+                return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
+            })
+            .slice(0, 6);
+
         renderSugerencias(sugerencias);
     }
+
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
         buscarInstituto();
     }
+
     function buscarInstituto() {
         const texto = document.getElementById('textoBusqueda').value.trim();
         const busqueda = normalizarTexto(texto);
+
         document.getElementById("sugerencias").style.display = "none";
+
         if (!busqueda) {
             document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
             return;
         }
+
         const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
         let htmlTotal = "";
+
         resultados.forEach((encontrado, index) => {
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
+
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="caja-info franchise" style="margin:18px 0;">
                     <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
                     <div class="info-grid">
-                        <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div>
-                        <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div>
-                        <div class="info-item" style="grid-column:span 2;"><span class="info-label">Email</span><span class="info-value" style="font-size:0.92em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
+                        <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${escaparHTML(encontrado.NOMBRE2 || "N/D")}</span></div>
+                        <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${escaparHTML(encontrado.TELÉFONOS || encontrado.TELEFONOS || "N/D")}</span></div>
+                        <div class="info-item" style="grid-column:span 2;"><span class="info-label">Email</span><span class="info-value" style="font-size:0.92em;">${escaparHTML(encontrado.EMAIL3 || encontrado.EMAIL || "N/D")}</span></div>
                     </div>
                 </div>` : "";
+
             let enlaceHtml = "";
-            let linkUrl = (encontrado.Wiki||"").toString().trim();
+            let linkUrl = (encontrado.Wiki || "").toString().trim();
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
+
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
                 enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir WIKI</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
             }
+
             htmlTotal += `
                 <div class="result-card">
                     <div class="instituto-header">
                         <div>
-                            <span class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</span><br>
-                            <span class="type-badge ${classType}">${escaparHTML(encontrado.Tipo||'Instituto')}</span>
+                            <span class="instituto-nombre">${escaparHTML(encontrado.Nombre || "Sin nombre")}</span><br>
+                            <span class="type-badge ${classType}">${escaparHTML(encontrado.Tipo || 'Instituto')}</span>
                         </div>
                         <i class="fas fa-school" style="font-size:1.8em;opacity:0.3;"></i>
                     </div>
+
                     ${franquiciaHtml}
+
                     <label style="font-size:0.75em;opacity:0.8;">Selecciona Programa:</label>
                     <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
                         <option value="adults">Adultos (1-20)</option>
@@ -724,19 +886,29 @@
                         <option value="tkt">TKT</option>
                         <option value="icc">ICC</option>
                     </select>
+
                     <div id="precios-${index}"></div>
-                    <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
-                    ${enlaceHtml}
+
+                    <div class="acciones">
+                        <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
+                        ${enlaceHtml}
+                    </div>
                 </div>`;
         });
-        document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
+
+        document.getElementById('resultado').innerHTML = resultados.length
+            ? htmlTotal
+            : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
+
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
 
     window.onload = async function() {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
+
         spinner.style.display = 'block';
+
         for (const archivo of archivosA_Cargar) {
             try {
                 const response = await fetch(archivo);
@@ -750,25 +922,33 @@
                 status.innerHTML = "❌ Error al cargar algunos datos.";
             }
         }
+
         spinner.style.display = 'none';
         baseCargada = true;
+
         if (!status.innerHTML.includes("Error")) status.innerHTML = "✅ Base de datos lista.";
     };
 
     document.addEventListener('DOMContentLoaded', () => {
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');
+
         textoBusqueda.addEventListener('input', actualizarSugerencias);
+
         textoBusqueda.addEventListener('keydown', e => {
             if (e.key === 'Enter') buscarInstituto();
             if (e.key === 'Escape') sugerencias.style.display = 'none';
         });
+
         sugerencias.addEventListener("click", e => {
             const item = e.target.closest(".sugerencia-item");
             if (item) seleccionarSugerencia(item.getAttribute("data-nombre"));
         });
+
         document.addEventListener("click", e => {
-            if (!document.querySelector(".busqueda-wrap").contains(e.target)) sugerencias.style.display = "none";
+            if (!document.querySelector(".busqueda-wrap").contains(e.target)) {
+                sugerencias.style.display = "none";
+            }
         });
     });
 </script>

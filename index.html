@@ -7,715 +7,512 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ==============================
+           VARIABLES DE DISEÑO (THEMES)
+           ============================== */
         :root {
+            /* Colores de Marca */
             --hh-yellow: #FFEA00;
             --hh-black: #000000;
             --hh-white: #FFFFFF;
             --hh-red: #cc1e3d;
+
+            /* Modo Claro (Default) */
             --bg: var(--hh-yellow);
-            --card-bg: rgba(255,255,255,0.92);
+            --card-bg: rgba(255, 255, 255, 0.94); /* Un toque más opaco para mejor legibilidad */
             --text: var(--hh-black);
             --header-text: var(--hh-black);
-            --border: rgba(0,0,0,0.08);
-            --input-bg: rgba(255,255,255,0.95);
-            --input-border: rgba(0,0,0,0.12);
-            --info-box: rgba(245,245,245,0.85);
-            --alert-bg: #ffebee;
+            --border: rgba(0, 0, 0, 0.08);
+
+            /* Elementos de Entrada */
+            --input-bg: var(--hh-white);
+            --input-border: rgba(0, 0, 0, 0.12);
+
+            /* Cajas de Info y Alertas */
+            --info-box: #f8f9fa; /* Un gris muy tenue */
+            --alert-bg: #fff5f5;
             --alert-text: var(--hh-red);
-            --franchise-bg: rgba(255,240,240,0.92);
-            --franchise-border: rgba(204,30,61,0.25);
-            --shadow: 0 20px 60px rgba(0,0,0,0.12);
-            --shadow-soft: 0 12px 30px rgba(0,0,0,0.08);
-            --shadow-lift: 0 30px 70px rgba(0,0,0,0.18);
-            --radius-lg: 32px;
-            --radius-md: 24px;
-            --radius-sm: 16px;
-        }
-        
-        [data-theme="dark"] {
-            --bg: #0a0a0a;
-            --card-bg: rgba(30,30,30,0.92);
-            --text: #ffffff;
-            --header-text: var(--hh-yellow);
-            --border: rgba(255,255,255,0.08);
-            --input-bg: rgba(40,40,40,0.95);
-            --input-border: rgba(255,255,255,0.15);
-            --info-box: rgba(45,45,45,0.85);
-            --alert-bg: #4a151b;
-            --alert-text: #ff8a9f;
-            --franchise-bg: rgba(60,20,25,0.92);
-            --franchise-border: rgba(204,30,61,0.35);
-            --shadow: 0 20px 60px rgba(0,0,0,0.45);
-            --shadow-soft: 0 12px 30px rgba(0,0,0,0.35);
-            --shadow-lift: 0 30px 70px rgba(0,0,0,0.55);
+            --franchise-bg: #fff9f9;
+
+            /* Sombras y Efectos */
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-lift: 0 20px 40px rgba(0, 0, 0, 0.12);
+
+            /* Radios de Esquina */
+            --radius-lg: 24px;
+            --radius-md: 16px;
         }
 
+        /* Modo Oscuro (Dark Theme) */
+        [data-theme="dark"] {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --header-text: var(--hh-yellow);
+            --border: rgba(255, 255, 255, 0.05);
+
+            --input-bg: #2a2a2a;
+            --input-border: rgba(255, 255, 255, 0.1);
+
+            --info-box: #252525;
+            --alert-bg: #2d1619;
+            --alert-text: #ff8a9f;
+            --franchise-bg: #281a1c;
+
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ==============================
+           ESTILOS GENERALES Y LAYOUT
+           ============================== */
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 24px 16px;
             min-height: 100vh;
-            transition: background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
-            overflow-x: hidden;
-            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color 0.4s ease;
+            position: relative;
         }
 
+        /* Fondo Radial Sutil para dar profundidad */
         .wave-bg {
             position: fixed;
             inset: 0;
             z-index: -2;
-            background: linear-gradient(135deg, 
-                rgba(255,234,0,0.75) 0%,
-                rgba(255,244,170,0.45) 50%,
-                rgba(255,234,0,0.75) 100%);
-            animation: waveFloat 28s ease-in-out infinite;
-        }
-        [data-theme="dark"] .wave-bg {
-            background: linear-gradient(135deg, 
-                rgba(20,20,20,0.95) 0%,
-                rgba(35,35,35,0.75) 50%,
-                rgba(20,20,20,0.95) 100%);
-        }
-        @keyframes waveFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(30px, -30px) rotate(1deg); }
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.3), transparent 70%);
         }
 
-        .wave-bg::before {
-            content: "";
-            position: absolute;
-            inset: -200px;
-            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 60%);
-            animation: subtlePulse 18s ease-in-out infinite;
-        }
-        @keyframes subtlePulse {
-            0%, 100% { opacity: 0.35; transform: scale(1); }
-            50% { opacity: 0.55; transform: scale(1.08); }
-        }
-
+        /* ==============================
+           CABECERA (HEADER)
+           ============================== */
         .header {
             width: 100%;
-            max-width: 1100px;
+            max-width: 600px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 8px 28px;
-            margin-bottom: 12px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            margin-bottom: 24px;
         }
 
         .header-title h1 {
             margin: 0;
-            font-size: clamp(2.1rem, 5vw, 2.8rem);
+            font-size: 1.8rem;
             font-weight: 900;
             color: var(--header-text);
-            letter-spacing: -1.8px;
-            line-height: 1;
             text-transform: uppercase;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .header-title h1:hover {
-            transform: scale(1.04);
+            letter-spacing: -1px;
         }
 
-        /* Logo Harmon Hall: negro en día / amarillo completo en noche */
-        .header-title h1 span {
-            color: inherit; /* hereda el color del tema automáticamente */
-        }
+        .header-title h1 span { color: inherit; }
 
+        /* Botón de Cambio de Tema */
         .dark-mode-toggle {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.92em;
-            font-weight: 800;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
             background: var(--card-bg);
-            padding: 12px 20px;
-            border-radius: 999px;
-            box-shadow: var(--shadow-soft);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
             border: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: 0.3s ease;
             user-select: none;
         }
-        .dark-mode-toggle:hover {
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: var(--shadow-lift);
-        }
-        .dark-mode-toggle:active {
-            transform: scale(0.95);
-        }
+        .dark-mode-toggle:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
 
+        /* ==============================
+           CONTENEDOR Y SECCIONES
+           ============================== */
         .contenedor {
             width: 100%;
-            max-width: 640px;
+            max-width: 550px;
             position: relative;
         }
 
         .seccion {
-            margin-bottom: 28px;
-            padding: 32px 28px;
-            border-radius: var(--radius-lg);
             background: var(--card-bg);
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-lg);
             border: 1px solid var(--border);
-            backdrop-filter: blur(28px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .seccion:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-lift);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            transition: 0.3s ease;
+            overflow: visible; /* CRUCIAL: Para que el menú de sugerencias no se corte */
         }
 
-        label {
+        .seccion.status { padding: 18px; text-align: center; }
+        .seccion.busqueda { padding: 24px 20px; }
+
+        label.section-label {
             display: block;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 800;
             color: var(--text);
-            font-size: 0.88em;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            opacity: 0.85;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
         }
 
+        /* ==============================
+           ZONA DE BÚSQUEDA Y SUGERENCIAS
+           ============================== */
         .busqueda-wrap {
             position: relative;
+            z-index: 10; /* Eleva la zona de búsqueda por encima del resto */
         }
 
-        .busqueda-wrap::before {
-            content: "\f002";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
+        /* Icono de Lupa dentro del Input */
+        .busqueda-wrap .fa-search {
             position: absolute;
-            left: 22px;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text);
-            opacity: 0.45;
-            font-size: 1.1em;
-            z-index: 2;
-            transition: all 0.3s ease;
+            opacity: 0.4;
+            font-size: 1rem;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 18px 22px 18px 58px;
-            border: 2px solid var(--input-border);
-            border-radius: 28px;
+            padding: 15px 15px 15px 48px; /* Espacio para el icono */
+            border-radius: 15px;
+            border: 1px solid var(--input-border);
             outline: none;
             background: var(--input-bg);
             color: var(--text);
-            font-size: 1.08em;
-            font-weight: 500;
-            box-shadow: inset 0 4px 12px rgba(0,0,0,0.04);
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 1rem;
+            transition: 0.3s;
         }
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22),
-                        inset 0 4px 12px rgba(0,0,0,0.04);
-            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 0 4px rgba(255, 234, 0, 0.15);
         }
 
-        .btn-buscar {
-            width: 100%;
-            padding: 18px 24px;
-            background: linear-gradient(180deg, #111111 0%, #000000 100%);
-            color: var(--hh-white);
-            border: none;
-            border-radius: 28px;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 1.05em;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 16px;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.22);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .btn-buscar:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 22px 40px rgba(0,0,0,0.28);
-        }
-        .btn-buscar:active {
-            transform: scale(0.96);
+        /* Menú Desplegable de Sugerencias */
+        .sugerencias {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            z-index: 20; /* Supera a la tarjeta de resultados */
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-lift);
+            overflow: hidden;
+            max-height: 280px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
         }
 
-        select.btn-buscar {
-            width: 100%;
-            background: var(--input-bg);
-            border: 2px solid var(--input-border);
-            border-radius: 24px;
-            padding: 16px 18px;
-            font-weight: 700;
-            margin-bottom: 18px;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
-            appearance: none;
-            color: var(--text) !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-position: right 18px center;
-            background-repeat: no-repeat;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        select.btn-buscar:focus {
-            border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22);
-            transform: translateY(-2px);
-        }
-
-        select.btn-buscar option {
-            color: var(--text) !important;
-            background-color: var(--card-bg) !important;
+        .sugerencia-item {
             padding: 12px 18px;
-            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: 0.2s;
         }
+        .sugerencia-item:last-child { border-bottom: none; }
+        .sugerencia-item:hover { background: rgba(255, 234, 0, 0.1); }
 
-        #resultado {
-            margin-top: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-            padding-bottom: 60px;
+        .sugerencia-nombre { font-weight: 700; color: var(--text); display: block; }
+        .sugerencia-sub { font-size: 0.75rem; opacity: 0.6; color: var(--text); }
+
+        /* Botón de Búsqueda Principal */
+        .btn-buscar-main {
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px;
+            background: var(--hh-black);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
         }
+        .btn-buscar-main:hover { opacity: 0.9; }
+        /* Ajuste de color del botón para modo oscuro */
+        [data-theme="dark"] .btn-buscar-main { background: var(--hh-yellow); color: black; }
+
+        /* ==============================
+           TARJETA DE RESULTADOS
+           ============================== */
+        #resultado { margin-top: 20px; }
 
         .result-card {
             background: var(--card-bg);
-            padding: 28px 26px;
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            position: relative;
+            padding: 20px; /* Reducido un poco para compacidad */
             border: 1px solid var(--border);
-            overflow: hidden;
-            backdrop-filter: blur(24px);
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        .result-card:hover {
-            transform: translateY(-12px) scale(1.015);
-            box-shadow: var(--shadow-lift);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            animation: fadeIn 0.4s ease-out;
+            position: relative;
         }
 
-        @keyframes cardPop {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.92);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .result-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 6px;
-            width: 100%;
-            background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .instituto-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 18px;
+            align-items: start;
+            margin-bottom: 15px;
         }
 
         .instituto-nombre {
-            font-size: 1.42em;
+            font-size: 1.3rem;
             font-weight: 900;
-            letter-spacing: -0.6px;
-            line-height: 1.1;
+            color: var(--text);
+            margin: 0;
+            line-height: 1.2;
         }
 
+        /* Badge de Tipo (Propia / Franquicia) */
         .type-badge {
-            padding: 7px 16px;
-            border-radius: 999px;
-            font-size: 0.73em;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
             font-weight: 900;
-            color: var(--hh-white);
-            letter-spacing: 0.6px;
-            margin-top: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-top: 5px;
         }
-        .type-badge.own { background: linear-gradient(180deg, #111, #000); }
-        .type-badge.franchise { background: linear-gradient(180deg, #dd2447, #cc1e3d); }
+        .type-badge.own { background: #e3f2fd; color: #1976d2; }
+        .type-badge.franchise { background: #ffebee; color: #c62828; }
 
-        .caja-info {
-            margin-top: 18px;
-            padding: 20px;
-            border-radius: var(--radius-md);
-            background: var(--info-box);
+        /* Selector de Programa dentro de la tarjeta */
+        .select-programa {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px 15px;
+            border-radius: 10px;
             border: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
+            background: var(--input-bg);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.9rem;
+            appearance: none; /* Elimina estilo nativo */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
         }
+        [data-theme="dark"] .select-programa { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23bbb' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
 
+        /* Contenedor dinámico de precios */
+        .contenedor-precios { margin-top: 15px; }
+
+        /* Grid de Info (Inscripción, Libros, Mensualidad) */
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 18px;
-            margin-top: 12px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
         }
 
         .info-item {
-            transition: transform 0.3s ease;
+            background: var(--info-box);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
-        .info-item:hover {
-            transform: translateY(-3px);
-        }
+        [data-theme="dark"] .info-item { border: none; }
 
         .info-label {
-            color: #888;
-            font-weight: 800;
-            font-size: 0.76em;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--text);
+            opacity: 0.6;
+            font-weight: 800;
+            margin-bottom: 2px;
+            display: block;
         }
 
         .info-value {
-            font-weight: 900;
-            font-size: 1.12em;
-            word-break: break-word;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            display: block;
         }
 
-        .caja-info.franchise {
-            background: var(--franchise-bg);
-            border-left: 5px solid var(--hh-red);
+        /* ==============================
+           BOTONES DE ACCIÓN (SOLUCIÓN SUPERPOSICIÓN)
+           ============================== */
+        .botones-accion {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column; /* Apila botones verticalmente */
+            gap: 10px; /* Espacio entre botones */
         }
 
-        .caja-alerta {
-            margin-top: 18px;
-            padding: 16px 18px;
-            background: var(--alert-bg);
-            color: var(--alert-text);
-            border-radius: var(--radius-md);
-            font-weight: 800;
+        .btn-copiar, .btn-wiki {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 0.95em;
-            border: 1px solid rgba(204,30,61,0.15);
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: 0.2s ease;
         }
+        .btn-copiar:hover, .btn-wiki:hover { transform: translateY(-1px); }
 
-        .btn-wiki, .btn-copiar {
-            width: 100%;
-            margin-top: 20px;
-            padding: 17px 22px;
-            border-radius: 28px;
-            font-weight: 900;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
-        }
+        .btn-copiar { background: var(--hh-red); color: white; }
+        .btn-copiar:hover { background: #b01934; }
 
         .btn-wiki {
-            background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
-            color: var(--hh-black);
-            border: 2px solid var(--hh-black);
-        }
-        .btn-wiki:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 20px 38px rgba(255,234,0,0.35);
-        }
-
-        .btn-copiar {
-            background: linear-gradient(180deg, var(--hh-red), #b81a34);
-            color: white;
-        }
-        .btn-copiar:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 20px 38px rgba(204,30,61,0.35);
-        }
-
-        .btn-wiki:active, .btn-copiar:active {
-            transform: scale(0.94);
-        }
-
-        #loadingSpinner {
-            display: none;
-            position: absolute;
-            top: 28px;
-            right: 28px;
-            font-size: 1.4em;
+            background: transparent;
+            border: 2px solid var(--text);
             color: var(--text);
-            animation: iosSpin 1.2s linear infinite;
         }
-        @keyframes iosSpin {
-            100% { transform: rotate(360deg); }
-        }
+        .btn-wiki:hover { background: rgba(0,0,0,0.05); }
+        [data-theme="dark"] .btn-wiki:hover { background: rgba(255,255,255,0.05); }
 
-        .sugerencias {
-            display: none;
-            position: absolute;
-            top: calc(100% + 12px);
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: var(--card-bg);
-            border-radius: 28px;
-            box-shadow: var(--shadow-lift);
-            backdrop-filter: blur(24px);
-            overflow: hidden;
-            max-height: 320px;
-            border: 1px solid var(--border);
-        }
-
-        .sugerencia-item {
-            padding: 16px 22px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: background 0.25s ease;
-        }
-        .sugerencia-item:hover {
-            background: rgba(255,234,0,0.18);
-        }
-
-        .toast {
-            background: rgba(0,0,0,0.88);
-            color: var(--hh-yellow);
-            padding: 14px 26px;
-            border-radius: 999px;
-            font-weight: 900;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
-            animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        [data-theme="dark"] .toast {
-            background: var(--hh-yellow);
-            color: #000;
-        }
-        @keyframes iosToast {
-            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
-            15% { transform: translateY(0) scale(1.05); opacity: 1; }
-            85% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(40px) scale(0.9); opacity: 0; }
-        }
-
-        .empty-state {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 32px 24px;
-            text-align: center;
-            font-weight: 800;
-            box-shadow: var(--shadow-soft);
-            color: var(--alert-text);
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 16px 12px; }
-            .seccion { padding: 24px 20px; }
-            .result-card { padding: 24px 20px; }
-        }
+        /* Otros estados */
+        #statusCarga { font-size: 0.85rem; font-weight: 600; }
+        #loadingSpinner { font-size: 1rem; color: var(--text); }
+        .empty-state { text-align: center; color: var(--text); opacity: 0.6; font-size: 0.9rem; padding: 20px; }
     </style>
 </head>
 <body data-theme="light">
-<div class="wave-bg"></div>
+    <div class="wave-bg"></div>
 
-<div class="header">
-    <div class="logo-section">
-        <!-- Logo modificado: negro completo en día / amarillo completo en noche -->
-        <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
-    </div>
-    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <i id="darkModeIcon" class="fas fa-moon"></i> 
-        <span>Noche</span>
-    </div>
-</div>
-
-<div class="contenedor">
-    <div class="seccion" style="text-align: center; padding: 18px 24px; position:relative;">
-        <i id="loadingSpinner" class="fas fa-spinner"></i>
-        <span id="statusCarga">Conectando base de datos… ⏳</span>
-    </div>
-
-    <div class="seccion">
-        <label>Buscador de Institutos</label>
-        <div class="busqueda-wrap">
-            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
-            <div id="sugerencias" class="sugerencias"></div>
+    <div class="header">
+        <div class="header-title"><h1>Harmon Hall</h1></div>
+        <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+            <i id="darkModeIcon" class="fas fa-moon"></i> <span>Noche</span>
         </div>
-        <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
 
-    <div id="resultado"></div>
-</div>
+    <div class="contenedor">
+        <div class="seccion status">
+            <i id="loadingSpinner" class="fas fa-circle-notch fa-spin" style="display:none; margin-right:8px;"></i>
+            <span id="statusCarga">Cargando base de datos...</span>
+        </div>
 
-<script>
-    let todosLosDatos = [];
-    let baseCargada = false;
-    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
-
-    function normalizarTexto(texto) {
-        return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-    }
-    function escaparHTML(texto) {
-        return (texto ?? "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-    }
-    function formatearMoneda(valor) {
-        const numero = Number(valor) || 0;
-        return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
-    }
-    function obtenerCotizacion(datos, programa) {
-        const ins = parseFloat(datos.Inscripcion) || 0;
-        let html = "", texto = "", tienePrecio = false;
-        if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
-            let mensu = 0, sab = 0, lib = 0, titulo = "";
-            if (programa === 'adults') { mensu = parseFloat(datos.Adults_FF)||0; sab = parseFloat(datos.Adults_SAB)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (1-20)"; }
-            else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos Pro (21-24)"; }
-            else if (programa === 'kids') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_KIDS)||0; titulo = "Kids"; }
-            else if (programa === 'pteen') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_PTEEN)||0; titulo = "Pre-Teens"; }
-            if (mensu > 0 || sab > 0) tienePrecio = true;
-            if (tienePrecio) {
-                html = `<div class="caja-info"><span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span><div class="info-grid">${ins>0?`<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>`:''}${lib>0?`<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>`:''}${mensu>0?`<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>`:''}${sab>0?`<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>`:''}</div></div>`;
-                texto = [`Programa: ${titulo}`,`Zona: ${datos.Zona||'A'}`,ins>0?`Inscripción: ${formatearMoneda(ins)}`:null,lib>0?`Libro: ${formatearMoneda(lib)}`:null,mensu>0?`Mensualidad FF/SEM: ${formatearMoneda(mensu)}`:null,sab>0?`Mensualidad Sabatina: ${formatearMoneda(sab)}`:null].filter(Boolean).join("\n");
-            }
-        } else {
-            let total = 0, titulo = "";
-            if (programa === 'toefl') { total = parseFloat(datos.TOEFL_ITP_PRE)||0; titulo = "PAGO ÚNICO TOEFL ITP"; }
-            else if (programa === 'tkt') { total = parseFloat(datos.TKT)||0; titulo = "PAGO ÚNICO TKT"; }
-            else if (programa === 'icc') { total = parseFloat(datos.ICC_FF)||0; titulo = "PAGO ÚNICO ICC"; }
-            if (total > 0) tienePrecio = true;
-            if (tienePrecio) {
-                html = `<div class="caja-info" style="border-left:4px solid var(--hh-yellow); text-align:center;"><span class="info-label">${escaparHTML(titulo)}</span><div style="font-size:2.1em;font-weight:900;margin:12px 0;">${formatearMoneda(total)}</div><span class="info-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span></div>`;
-                texto = [`Programa: ${titulo}`,`Total: ${formatearMoneda(total)}`,`Todo incluido`].join("\n");
-            }
-        }
-        if (!tienePrecio) {
-            html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
-            texto = "Precios no definidos, valida la información.";
-        }
-        return { html, texto, tienePrecio };
-    }
-    function mostrarNotificacion(mensaje) {
-        let container = document.querySelector('.toast-container') || (() => { let c = document.createElement('div'); c.className = 'toast-container'; c.style.position='fixed'; c.style.bottom='30px'; c.style.left='50%'; c.style.transform='translateX(-50%)'; c.style.zIndex='9999'; document.body.appendChild(c); return c; })();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 2800);
-    }
-    async function copiarAlPortapapeles(texto) {
-        try { await navigator.clipboard.writeText(texto); mostrarNotificacion("Resumen copiado con éxito"); }
-        catch { const area = document.createElement("textarea"); area.value = texto; area.style.position="fixed"; area.style.opacity="0"; document.body.appendChild(area); area.select(); document.execCommand("copy"); document.body.removeChild(area); mostrarNotificacion("Resumen copiado con éxito"); }
-    }
-    function toggleDarkMode() {
-        const body = document.body;
-        const isLight = body.getAttribute('data-theme') === 'light';
-        body.setAttribute('data-theme', isLight ? 'dark' : 'light');
-        document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
-    }
-    function actualizarCotizacion(index) {
-        const selector = document.getElementById(`select-${index}`);
-        if (!selector) return;
-        const programa = selector.value;
-        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
-        const contenedor = document.getElementById(`precios-${index}`);
-        if (!contenedor) return;
-        const cotizacion = obtenerCotizacion(datos, programa);
-        contenedor.innerHTML = cotizacion.html;
-    }
-    function copiarResumen(index) {
-        const selector = document.getElementById(`select-${index}`);
-        if (!selector) return;
-        const programa = selector.value;
-        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
-        const tipo = (datos.Tipo || "").toLowerCase();
-        const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
-        const cotizacion = obtenerCotizacion(datos, programa);
-        let textoBase = [`Instituto: ${datos.Nombre || 'N/D'}`,`Tipo: ${datos.Tipo || 'Instituto'}`,`Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`, cotizacion.texto].filter(Boolean).join("\n");
-        if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
-        copiarAlPortapapeles(textoBase);
-    }
-    function renderSugerencias(lista) {
-        const contenedor = document.getElementById("sugerencias");
-        if (!lista.length) { contenedor.innerHTML = ""; contenedor.style.display = "none"; return; }
-        contenedor.innerHTML = lista.map(item => `
-            <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))}">
-                ${escaparHTML(item.Nombre || "Sin nombre")}
-                <span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span>
+        <div class="seccion busqueda">
+            <label class="section-label">Buscador de Institutos</label>
+            <div class="busqueda-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catarina" autocomplete="off">
+                <div id="sugerencias" class="sugerencias"></div>
             </div>
-        `).join("");
-        contenedor.style.display = "block";
-    }
-    function actualizarSugerencias() {
-        const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value);
-        if (!busqueda) { document.getElementById("sugerencias").style.display = "none"; return; }
-        const sugerencias = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda)).sort((a,b) => {
-            const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
-            return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
-        }).slice(0,6);
-        renderSugerencias(sugerencias);
-    }
-    function seleccionarSugerencia(nombre) {
-        document.getElementById('textoBusqueda').value = nombre;
-        document.getElementById("sugerencias").style.display = "none";
-        buscarInstituto();
-    }
-    function buscarInstituto() {
-        const texto = document.getElementById('textoBusqueda').value.trim();
-        const busqueda = normalizarTexto(texto);
-        document.getElementById("sugerencias").style.display = "none";
-        if (!busqueda) {
-            document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
-            return;
+            <button class="btn-buscar-main" onclick="buscarInstituto()">Buscar</button>
+        </div>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        /* ==============================
+           LÓGICA JAVASCRIPT
+           ============================== */
+        let todosLosDatos = [];
+        const archivosA_Cargar = ['database.xlsx', 'database2.xlsx']; // Ajusta a tus nombres reales
+
+        // Funciones de Utilidad
+        function normalizarTexto(texto) {
+            return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
-        const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
-        let htmlTotal = "";
-        resultados.forEach((encontrado, index) => {
-            const infoJson = encodeURIComponent(JSON.stringify(encontrado));
-            const tipo = (encontrado.Tipo || "").toLowerCase();
-            const classType = tipo.includes("franquicia") ? "franchise" : "own";
-            let franquiciaHtml = classType === "franchise" ? `
-                <div class="caja-info franchise" style="margin:18px 0;">
-                    <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
-                    <div class="info-grid">
-                        <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div>
-                        <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div>
-                        <div class="info-item" style="grid-column:span 2;"><span class="info-label">Email</span><span class="info-value" style="font-size:0.92em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
-                    </div>
-                </div>` : "";
-            let enlaceHtml = "";
-            let linkUrl = (encontrado.Wiki||"").toString().trim();
-            let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
-            if (classType !== "franchise" && tieneWiki) {
-                if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir WIKI</a>`;
-            } else if (classType !== "franchise") {
-                enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
+
+        function escaparHTML(texto) {
+            return (texto ?? "").toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
+        }
+
+        function formatearMoneda(valor) {
+            return "$" + (Number(valor) || 0).toLocaleString("es-MX");
+        }
+
+        // Gestión del Tema (Día/Noche)
+        function toggleDarkMode() {
+            const body = document.body;
+            const isLight = body.getAttribute('data-theme') === 'light';
+            body.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
+        }
+
+        // Carga Inicial de Datos Excel
+        window.onload = async function() {
+            const status = document.getElementById('statusCarga');
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'inline-block';
+            
+            for (const archivo of archivosA_Cargar) {
+                try {
+                    const res = await fetch(archivo);
+                    if (!res.ok) throw new Error(`No se pudo cargar ${archivo}`);
+                    const buf = await res.arrayBuffer();
+                    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                    const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                    todosLosDatos = todosLosDatos.concat(data);
+                } catch (e) {
+                    console.error(e);
+                    status.innerText = "❌ Error al cargar datos.";
+                    status.style.color = 'var(--hh-red)';
+                }
             }
-            htmlTotal += `
+            spinner.style.display = 'none';
+            if (todosLosDatos.length > 0) {
+                status.innerText = "Base de datos lista ✅";
+            }
+        };
+
+        // Lógica de Búsqueda y Resultados
+        function buscarInstituto() {
+            const inputVal = document.getElementById('textoBusqueda').value;
+            const term = normalizarTexto(inputVal);
+            const sugBox = document.getElementById('sugerencias');
+            sugBox.style.display = 'none'; // Oculta sugerencias al buscar
+            
+            const contenedor = document.getElementById('resultado');
+            
+            if (!term) {
+                contenedor.innerHTML = '<p class="empty-state">Escribe el nombre de un instituto.</p>';
+                return;
+            }
+
+            const resultados = todosLosDatos.filter(d => d.Nombre && normalizarTexto(d.Nombre).includes(term));
+            
+            if (!resultados.length) {
+                contenedor.innerHTML = `<p class="empty-state">No se encontraron resultados para "${escaparHTML(inputVal)}".</p>`;
+                return;
+            }
+
+            // Renderizado de Tarjetas de Resultados
+            contenedor.innerHTML = resultados.map((d, i) => {
+                const tipoStr = (d.Tipo || "").toLowerCase();
+                const isFran = tipoStr.includes("franquicia");
+                const infoJson = encodeURIComponent(JSON.stringify(d));
+
+                return `
                 <div class="result-card">
                     <div class="instituto-header">
                         <div>
-                            <span class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</span><br>
-                            <span class="type-badge ${classType}">${escaparHTML(encontrado.Tipo||'Instituto')}</span>
+                            <h2 class="instituto-nombre">${escaparHTML(d.Nombre)}</h2>
+                            <span class="type-badge ${isFran ? 'franchise' : 'own'}">${escaparHTML(d.Tipo || 'Instituto')}</span>
                         </div>
-                        <i class="fas fa-school" style="font-size:1.8em;opacity:0.3;"></i>
+                        <i class="fas fa-school" style="opacity:0.2; font-size:1.5rem; margin-top:5px;"></i>
                     </div>
-                    ${franquiciaHtml}
-                    <label style="font-size:0.75em;opacity:0.8;">Selecciona Programa:</label>
-                    <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
+
+                    <select id="select-${i}" onchange="actualizarCotizacion(${i})" data-info="${infoJson}" class="select-programa">
                         <option value="adults">Adultos (1-20)</option>
                         <option value="pro">Adultos Pro (21-24)</option>
                         <option value="kids">Kids</option>
@@ -724,53 +521,139 @@
                         <option value="tkt">TKT</option>
                         <option value="icc">ICC</option>
                     </select>
-                    <div id="precios-${index}"></div>
-                    <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
-                    ${enlaceHtml}
-                </div>`;
-        });
-        document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
-        if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
-    }
 
-    window.onload = async function() {
-        const spinner = document.getElementById('loadingSpinner');
-        const status = document.getElementById('statusCarga');
-        spinner.style.display = 'block';
-        for (const archivo of archivosA_Cargar) {
+                    <div id="precios-${i}" class="contenedor-precios"></div>
+
+                    <div class="botones-accion">
+                        <button class="btn-copiar" onclick="copiarResumen(${i})"><i class="fas fa-copy"></i> Copiar Cotización</button>
+                        ${d.Wiki && d.Wiki !== "0" ? `<a href="${escaparHTML(d.Wiki)}" target="_blank" class="btn-wiki"><i class="fas fa-external-link-alt"></i> Abrir Enlace</a>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            // Inicializa la cotización por defecto para cada tarjeta
+            resultados.forEach((_, i) => actualizarCotizacion(i));
+        }
+
+        // Cálculo de Cotización dinámico
+        function obtenerCotizacion(datos, programa) {
+            const ins = parseFloat(datos.Inscripcion) || 0;
+            let html = "", texto = "", tienePrecio = false;
+            
+            // Mapeo de campos de Excel según programa
+            const programasMap = {
+                'adults': { m: datos.Adults_FF, s: datos.Adults_SAB, l: datos.Libros_Adults, t: "Adultos (1-20)" },
+                'pro': { m: datos.Adults_PRO_FF, s: 0, l: datos.Libros_Adults, t: "Adultos Pro (21-24)" },
+                'kids': { m: datos.KPT_SEM, s: datos.KPT_SAB, l: datos.Libros_KIDS, t: "Kids" },
+                'pteen': { m: datos.KPT_SEM, s: datos.KPT_SAB, l: datos.Libros_PTEEN, t: "Pre-Teens" }
+            };
+
+            if (programasMap[programa]) {
+                const p = programasMap[programa];
+                const mensu = parseFloat(p.m) || 0;
+                const sab = parseFloat(p.s) || 0;
+                const lib = parseFloat(p.l) || 0;
+
+                if (mensu > 0 || sab > 0) {
+                    tienePrecio = true;
+                    html = `
+                    <div class="info-grid">
+                        ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
+                        ${lib > 0 ? `<div class="info-item"><span class="info-label">Libros</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
+                        ${mensu > 0 ? `<div class="info-item"><span class="info-label">Mensual FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
+                        ${sab > 0 ? `<div class="info-item"><span class="info-label">Sabatino</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
+                    </div>`;
+                    texto = `Programa: ${p.t}\nInscrip: ${formatearMoneda(ins)}\nLibros: ${formatearMoneda(lib)}\nMensual: ${formatearMoneda(mensu || sab)}`;
+                }
+            } else {
+                // Pagos únicos (TOEFL, TKT, ICC)
+                const pagosUnicos = { 'toefl': [datos.TOEFL_ITP_PRE, "TOEFL ITP"], 'tkt': [datos.TKT, "TKT"], 'icc': [datos.ICC_FF, "ICC"] };
+                if (pagosUnicos[programa]) {
+                    const [val, tit] = pagosUnicos[programa];
+                    if (parseFloat(val) > 0) {
+                        tienePrecio = true;
+                        html = `<div class="info-item" style="text-align:center; margin-top:10px;"><span class="info-label">${tit}</span><span class="info-value" style="font-size:1.5rem; color:var(--hh-red);">${formatearMoneda(val)}</span><span class="info-label">PAGO ÚNICO</span></div>`;
+                        texto = `${tit}: ${formatearMoneda(val)}`;
+                    }
+                }
+            }
+
+            if (!tienePrecio) {
+                html = `<div style="color:var(--hh-red); font-size:0.8rem; margin-top:10px; font-weight:700; text-align:center;"><i class="fas fa-info-circle"></i> Precio no disponible para este programa.</div>`;
+                texto = "Precio no disponible.";
+            }
+
+            return { html, texto, tienePrecio };
+        }
+
+        // Actualiza el HTML de precios al cambiar el selector
+        function actualizarCotizacion(index) {
+            const selector = document.getElementById(`select-${index}`);
+            const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
+            const res = obtenerCotizacion(datos, selector.value);
+            document.getElementById(`precios-${index}`).innerHTML = res.html;
+        }
+
+        // Copia el resumen al portapapeles
+        async function copiarResumen(index) {
+            const selector = document.getElementById(`select-${index}`);
+            const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
+            const cot = obtenerCotizacion(datos, selector.value);
+            const body = `Harmon Hall - Cotización\nInstituto: ${datos.Nombre}\n${cot.texto}`;
             try {
-                const response = await fetch(archivo);
-                if (!response.ok) throw new Error(`Error ${response.status}`);
-                const arrayBuffer = await response.arrayBuffer();
-                const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                const json = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
-                todosLosDatos = todosLosDatos.concat(json);
-            } catch (e) {
-                console.error("Error cargando " + archivo, e);
-                status.innerHTML = "❌ Error al cargar algunos datos.";
+                await navigator.clipboard.writeText(body);
+                alert("¡Cotización copiada al portapapeles!");
+            } catch (err) {
+                alert("No se pudo copiar automáticamente. Por favor copia el texto manualmente.");
             }
         }
-        spinner.style.display = 'none';
-        baseCargada = true;
-        if (!status.innerHTML.includes("Error")) status.innerHTML = "✅ Base de datos lista.";
-    };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const textoBusqueda = document.getElementById('textoBusqueda');
-        const sugerencias = document.getElementById('sugerencias');
-        textoBusqueda.addEventListener('input', actualizarSugerencias);
-        textoBusqueda.addEventListener('keydown', e => {
-            if (e.key === 'Enter') buscarInstituto();
-            if (e.key === 'Escape') sugerencias.style.display = 'none';
+        // Lógica de Sugerencias en Tiempo Real
+        document.getElementById('textoBusqueda').addEventListener('input', (e) => {
+            const inputVal = e.target.value;
+            const term = normalizarTexto(inputVal);
+            const sugBox = document.getElementById('sugerencias');
+            
+            if (term.length < 2) { sugBox.style.display = 'none'; return; }
+            
+            // Filtra y ordena (coincidencias al inicio primero)
+            const matches = todosLosDatos
+                .filter(d => d.Nombre && normalizarTexto(d.Nombre).includes(term))
+                .sort((a,b) => {
+                    const nA = normalizarTexto(a.Nombre);
+                    const nB = normalizarTexto(b.Nombre);
+                    if (nA.startsWith(term) && !nB.startsWith(term)) return -1;
+                    if (!nA.startsWith(term) && nB.startsWith(term)) return 1;
+                    return nA.localeCompare(nB);
+                })
+                .slice(0, 6); // Limita a 6 sugerencias
+            
+            if (matches.length) {
+                sugBox.innerHTML = matches.map(m => {
+                    const tipoStr = (m.Tipo || "").toLowerCase();
+                    const subInfo = isFran = tipoStr.includes("franquicia") ? "Franquicia" : "Propia";
+                    return `
+                    <div class="sugerencia-item" onclick="seleccionarSugerencia('${m.Nombre}')">
+                        <span class="sugerencia-nombre">${escaparHTML(m.Nombre)}</span>
+                        <span class="sugerencia-sub">${subInfo} ${m.Zona ? '• Zona ' + m.Zona : ''}</span>
+                    </div>`;
+                }).join('');
+                sugBox.style.display = 'block';
+            } else { sugBox.style.display = 'none'; }
         });
-        sugerencias.addEventListener("click", e => {
-            const item = e.target.closest(".sugerencia-item");
-            if (item) seleccionarSugerencia(item.getAttribute("data-nombre"));
+
+        // Al hacer clic en una sugerencia
+        function seleccionarSugerencia(nombre) {
+            document.getElementById('textoBusqueda').value = nombre;
+            buscarInstituto();
+        }
+
+        // Cierra sugerencias al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('textoBusqueda').contains(e.target)) {
+                document.getElementById('sugerencias').style.display = 'none';
+            }
         });
-        document.addEventListener("click", e => {
-            if (!document.querySelector(".busqueda-wrap").contains(e.target)) sugerencias.style.display = "none";
-        });
-    });
-</script>
+    </script>
 </body>
 </html>

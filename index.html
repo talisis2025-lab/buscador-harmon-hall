@@ -522,12 +522,12 @@
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
     
-    // Función nueva: Encuentra el director sin importar acentos o mayúsculas
+    // Función corregida: ahora incluye "directores" exactamente.
     function obtenerDirector(obj) {
         if (!obj) return "";
         for (let key in obj) {
             const k = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            if (k === 'Directores' || k === 'directores') {
+            if (k === 'directores' || k === 'director' || k === 'directores de instituto' || k === 'director de instituto') {
                 return obj[key];
             }
         }
@@ -595,7 +595,6 @@
         contenedor.innerHTML = cotizacion.html;
     }
     
-    // Aquí actualizamos la función de copiar para incluir al director
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -660,7 +659,6 @@
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
             
-            // Verificamos si existe el director para crear su HTML
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director && director.toString().trim() !== "") {

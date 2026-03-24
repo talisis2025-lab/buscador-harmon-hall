@@ -65,6 +65,42 @@
             flex-direction: column;
             align-items: center;
         }
+
+        /* ==================== EASTER EGG - GLITCH MODE ==================== */
+        body.glitch-mode {
+            background: #c00 !important;
+        }
+        .search-glitch {
+            animation: search-corrupt 0.6s infinite alternate;
+        }
+        @keyframes search-corrupt {
+            0% { filter: hue-rotate(0deg) brightness(1); }
+            100% { filter: hue-rotate(200deg) brightness(0.4); }
+        }
+        .letter-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;   /* permite seguir escribiendo */
+            z-index: 9998;
+            background: rgba(0,0,0,0.92);
+            display: none;
+            overflow: hidden;
+        }
+        .letter {
+            position: absolute;
+            color: #000;
+            font-family: monospace;
+            font-weight: 900;
+            font-size: 2.4em;
+            opacity: 0.85;
+            user-select: none;
+            text-shadow: 0 0 8px #f00;
+        }
+        .letter.big {
+            font-size: 3.6em;
+            color: #111;
+        }
+
         .wave-bg {
             position: fixed;
             inset: 0;
@@ -471,52 +507,6 @@
             .seccion { padding: 24px 20px; }
             .result-card { padding: 24px 20px; }
         }
-
-        /* ====================== EASTER EGG - GLITCH MODE ====================== */
-        body.glitch-mode {
-            background: #c00 !important;
-            animation: glitch-bg 0.6s infinite alternate;
-        }
-        @keyframes glitch-bg {
-            0% { background: #c00; }
-            100% { background: #900; }
-        }
-        .search-glitch {
-            animation: search-corrupt 0.5s infinite alternate;
-        }
-        @keyframes search-corrupt {
-            0% { filter: hue-rotate(0deg) brightness(1); }
-            100% { filter: hue-rotate(200deg) brightness(0.4); }
-        }
-        .letter-overlay {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9998;
-            background: rgba(0,0,0,0.92);
-            display: none;
-            overflow: hidden;
-        }
-        .letter {
-            position: absolute;
-            color: #ff0;
-            font-family: monospace;
-            font-weight: 900;
-            font-size: 2.2em;
-            opacity: 0.75;
-            text-shadow: 0 0 12px #f00;
-            user-select: none;
-            animation: floatLetter 12s linear infinite;
-        }
-        .letter.big {
-            font-size: 3.4em;
-            color: #fff;
-            text-shadow: 0 0 20px #f00;
-        }
-        @keyframes floatLetter {
-            0% { transform: translateY(110vh) rotate(0deg); }
-            100% { transform: translateY(-100px) rotate(360deg); }
-        }
     </style>
 </head>
 <body data-theme="light">
@@ -570,9 +560,7 @@
         for (let key in obj) {
             if (typeof key === "string" && key.toLowerCase().includes("director")) {
                 const valor = obj[key];
-                if (valor && valor.toString().trim() !== "") {
-                    return valor.toString().trim();
-                }
+                if (valor && valor.toString().trim() !== "") return valor.toString().trim();
             }
         }
         return "";
@@ -826,7 +814,7 @@
 
         const input = document.getElementById('textoBusqueda');
         input.classList.add('search-glitch');
-        input.addEventListener('input', checkPhasmopobia, { once: true });
+        input.addEventListener('input', checkPhasmopobia);
     }
 
     function createPhasmopobiaLetters() {
@@ -840,7 +828,7 @@
             span.textContent = letters[Math.floor(Math.random() * letters.length)];
             if (Math.random() > 0.75) span.classList.add('big');
             span.style.left = Math.random() * 100 + 'vw';
-            span.style.animationDuration = (Math.random() * 8 + 8) + 's';
+            span.style.top = Math.random() * 100 + 'vh';
             overlay.appendChild(span);
         }
     }

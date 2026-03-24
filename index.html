@@ -31,7 +31,7 @@
             --radius-md: 24px;
             --radius-sm: 16px;
         }
-      
+     
         [data-theme="dark"] {
             --bg: #0a0a0a;
             --card-bg: rgba(30,30,30,0.92);
@@ -113,7 +113,7 @@
             line-height: 1;
             text-transform: uppercase;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
+            cursor: pointer; /* necesario para el easter egg */
         }
         .header-title h1:hover {
             transform: scale(1.04);
@@ -156,7 +156,8 @@
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             backdrop-filter: blur(28px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .seccion:hover {
             transform: translateY(-6px);
@@ -204,7 +205,8 @@
         }
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22), inset 0 4px 12px rgba(0,0,0,0.04);
+            box-shadow: 0 0 0 5px rgba(255,234,0,0.22),
+                        inset 0 4px 12px rgba(0,0,0,0.04);
             transform: translateY(-3px) scale(1.02);
         }
         .btn-buscar {
@@ -403,8 +405,74 @@
             box-shadow: 0 20px 38px rgba(204,30,61,0.35);
         }
         .btn-wiki:active, .btn-copiar:active { transform: scale(0.94); }
+        #loadingSpinner {
+            display: none;
+            position: absolute;
+            top: 28px;
+            right: 28px;
+            font-size: 1.4em;
+            color: var(--text);
+            animation: iosSpin 1.2s linear infinite;
+        }
+        @keyframes iosSpin { 100% { transform: rotate(360deg); } }
+        .sugerencias {
+            display: none;
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: var(--shadow-lift);
+            backdrop-filter: blur(24px);
+            overflow: hidden;
+            max-height: 340px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        .sugerencia-item {
+            padding: 16px 22px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.25s ease;
+        }
+        .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
+        .toast {
+            background: rgba(0,0,0,0.88);
+            color: var(--hh-yellow);
+            padding: 14px 26px;
+            border-radius: 999px;
+            font-weight: 900;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
+            animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        [data-theme="dark"] .toast {
+            background: var(--hh-yellow);
+            color: #000;
+        }
+        @keyframes iosToast {
+            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
+            15% { transform: translateY(0) scale(1.05); opacity: 1; }
+            85% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(40px) scale(0.9); opacity: 0; }
+        }
+        .empty-state {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 32px 24px;
+            text-align: center;
+            font-weight: 800;
+            box-shadow: var(--shadow-soft);
+            color: var(--alert-text);
+        }
+        @media (max-width: 768px) {
+            body { padding: 16px 12px; }
+            .seccion { padding: 24px 20px; }
+            .result-card { padding: 24px 20px; }
+        }
 
-        /* ==================== EASTER EGG STYLES ==================== */
+        /* ====================== EASTER EGG ====================== */
         .easter-egg {
             position: fixed;
             top: 50%;
@@ -426,13 +494,6 @@
             from { opacity: 0; transform: translate(-50%, -60%) scale(0.7); }
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
-        .easter-egg h2 {
-            margin: 0 0 15px 0;
-            font-size: 1.9em;
-        }
-        .qr-container {
-            margin: 25px 0;
-        }
         .qr-container img {
             width: 240px;
             height: 240px;
@@ -447,7 +508,6 @@
             border: none;
             border-radius: 999px;
             font-weight: 900;
-            font-size: 1.1em;
             cursor: pointer;
         }
     </style>
@@ -482,13 +542,14 @@
     <div id="resultado"></div>
 </div>
 
-<!-- EASTER EGG MODAL -->
+<!-- EASTER EGG -->
 <div id="easterEgg" class="easter-egg">
     <h2>¡Has encontrado el Easter Egg! 🎉</h2>
     <p style="margin-bottom:20px;">Gay si lees esto</p>
     
     <div class="qr-container">
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://imgur.com/HQ5G2l0" alt="QR Gracioso">
+        <!-- ← CAMBIA AQUÍ EL ENLACE QUE QUIERAS -->
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https:https://imgur.com/HQ5G2l0" alt="QR Gracioso">
     </div>
     
     <p style="opacity:0.9;">Escanea el QR para ver algo muy xd</p>
@@ -595,7 +656,7 @@
         const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
-       
+      
         let textoBase = [
             `Instituto: ${datos.Nombre || 'N/D'}`,
             director ? `Director: ${director}` : null,
@@ -603,7 +664,7 @@
             `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
             cotizacion.texto
         ].filter(Boolean).join("\n");
-       
+      
         if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         copiarAlPortapapeles(textoBase);
     }
@@ -649,7 +710,7 @@
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
-           
+          
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director) {
@@ -699,6 +760,7 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
+                  
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}

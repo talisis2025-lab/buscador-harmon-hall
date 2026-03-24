@@ -180,7 +180,7 @@
         }
         .busqueda-wrap {
             position: relative;
-            z-index: 200; /* ← para que las sugerencias queden arriba */
+            z-index: 200;
         }
         .busqueda-wrap::before {
             content: "\f002";
@@ -289,14 +289,8 @@
             box-shadow: var(--shadow-lift);
         }
         @keyframes cardPop {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.92);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(40px) scale(0.92); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .result-card::before {
             content: "";
@@ -347,12 +341,8 @@
             gap: 18px;
             margin-top: 12px;
         }
-        .info-item {
-            transition: transform 0.3s ease;
-        }
-        .info-item:hover {
-            transform: translateY(-3px);
-        }
+        .info-item { transition: transform 0.3s ease; }
+        .info-item:hover { transform: translateY(-3px); }
         .info-label {
             color: #888;
             font-weight: 800;
@@ -382,13 +372,11 @@
             font-size: 0.95em;
             border: 1px solid rgba(204,30,61,0.15);
         }
-
-        /* ==================== FIX BOTONES ==================== */
         .buttons-wrapper {
             margin-top: 24px;
             display: flex;
             flex-direction: column;
-            gap: 14px; /* separación clara entre Copiar y Wiki */
+            gap: 14px;
         }
         .btn-wiki, .btn-copiar {
             width: 100%;
@@ -401,6 +389,8 @@
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+            display: inline-block;
+            text-decoration: none;
         }
         .btn-wiki {
             background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
@@ -414,15 +404,13 @@
         .btn-copiar {
             background: linear-gradient(180deg, var(--hh-red), #b81a34);
             color: white;
+            border: none;
         }
         .btn-copiar:hover {
             transform: translateY(-5px) scale(1.03);
             box-shadow: 0 20px 38px rgba(204,30,61,0.35);
         }
-        .btn-wiki:active, .btn-copiar:active {
-            transform: scale(0.94);
-        }
-
+        .btn-wiki:active, .btn-copiar:active { transform: scale(0.94); }
         #loadingSpinner {
             display: none;
             position: absolute;
@@ -432,18 +420,14 @@
             color: var(--text);
             animation: iosSpin 1.2s linear infinite;
         }
-        @keyframes iosSpin {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ==================== FIX SUGERENCIAS (ya no se esconde debajo) ==================== */
+        @keyframes iosSpin { 100% { transform: rotate(360deg); } }
         .sugerencias {
             display: none;
             position: absolute;
             top: calc(100% + 12px);
             left: 0;
             right: 0;
-            z-index: 9999; /* ← FIX PRINCIPAL */
+            z-index: 9999;
             background: var(--card-bg);
             border-radius: 28px;
             box-shadow: var(--shadow-lift);
@@ -459,9 +443,7 @@
             font-weight: 700;
             transition: background 0.25s ease;
         }
-        .sugerencia-item:hover {
-            background: rgba(255,234,0,0.18);
-        }
+        .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -539,6 +521,19 @@
         const numero = Number(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
+    
+    // Función nueva: Encuentra el director sin importar acentos o mayúsculas
+    function obtenerDirector(obj) {
+        if (!obj) return "";
+        for (let key in obj) {
+            const k = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            if (k === 'directores de instituto' || k === 'director de instituto' || k === 'director') {
+                return obj[key];
+            }
+        }
+        return "";
+    }
+
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
@@ -599,6 +594,8 @@
         const cotizacion = obtenerCotizacion(datos, programa);
         contenedor.innerHTML = cotizacion.html;
     }
+    
+    // Aquí actualizamos la función de copiar para incluir al director
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -607,7 +604,16 @@
         const tipo = (datos.Tipo || "").toLowerCase();
         const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
         const cotizacion = obtenerCotizacion(datos, programa);
-        let textoBase = [`Instituto: ${datos.Nombre || 'N/D'}`,`Tipo: ${datos.Tipo || 'Instituto'}`,`Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`, cotizacion.texto].filter(Boolean).join("\n");
+        const director = obtenerDirector(datos);
+        
+        let textoBase = [
+            `Instituto: ${datos.Nombre || 'N/D'}`,
+            director ? `Director: ${director}` : null,
+            `Tipo: ${datos.Tipo || 'Instituto'}`,
+            `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`, 
+            cotizacion.texto
+        ].filter(Boolean).join("\n");
+        
         if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         copiarAlPortapapeles(textoBase);
     }
@@ -631,7 +637,7 @@
                 const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
                 return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
             })
-            .slice(0, 12); // ← más sugerencias visibles
+            .slice(0, 12);
         renderSugerencias(sugerencias);
     }
     function seleccionarSugerencia(nombre) {
@@ -653,6 +659,18 @@
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
+            
+            // Verificamos si existe el director para crear su HTML
+            const director = obtenerDirector(encontrado);
+            let directorHtml = "";
+            if (director && director.toString().trim() !== "") {
+                directorHtml = `
+                <div class="caja-info" style="margin: 14px 0 18px 0; padding: 14px 20px; border-left: 4px solid var(--hh-yellow);">
+                    <span class="info-label"><i class="fas fa-user-tie"></i> Director de Instituto</span>
+                    <div class="info-value" style="font-size: 1.05em; margin-top: 6px;">${escaparHTML(director)}</div>
+                </div>`;
+            }
+
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="caja-info franchise" style="margin:18px 0;">
                     <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
@@ -667,7 +685,7 @@
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir WIKI</a>`;
+                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir enlace</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
             }
@@ -680,6 +698,7 @@
                         </div>
                         <i class="fas fa-school" style="font-size:1.8em;opacity:0.3;"></i>
                     </div>
+                    ${directorHtml}
                     ${franquiciaHtml}
                     <label style="font-size:0.75em;opacity:0.8;">Selecciona Programa:</label>
                     <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
@@ -693,7 +712,6 @@
                     </select>
                     <div id="precios-${index}"></div>
                     
-                    <!-- WRAPPER PARA BOTONES CON GAP -->
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}

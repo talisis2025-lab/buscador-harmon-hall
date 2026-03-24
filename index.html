@@ -31,7 +31,7 @@
             --radius-md: 24px;
             --radius-sm: 16px;
         }
-       
+      
         [data-theme="dark"] {
             --bg: #0a0a0a;
             --card-bg: rgba(30,30,30,0.92);
@@ -521,14 +521,26 @@
         const numero = Number(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
-    
-    // Función corregida: ahora incluye "directores" exactamente.
+
+    /* ====================== FUNCIÓN DIRECTOR CORREGIDA ====================== */
+    /* El problema era que la comparación era demasiado estricta. 
+       Ahora detecta CUALQUIER columna que contenga la palabra "director" 
+       (Director, DIRECTORES, Director del Instituto, etc.) y funciona en TODOS los institutos. */
     function obtenerDirector(obj) {
-        if (!obj) return "";
+        if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
-            const k = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            if (k === 'directores' || k === 'director' || k === 'directores de instituto' || k === 'director de instituto') {
-                return obj[key];
+            if (!key) continue;
+            const k = key.toString()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "")   // elimina espacios, guiones, acentos extra
+                .trim();
+            if (k.includes("director")) {
+                const valor = obj[key];
+                if (valor && valor.toString().trim() !== "") {
+                    return valor.toString().trim();
+                }
             }
         }
         return "";
@@ -594,7 +606,6 @@
         const cotizacion = obtenerCotizacion(datos, programa);
         contenedor.innerHTML = cotizacion.html;
     }
-    
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -604,15 +615,15 @@
         const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
-        
+       
         let textoBase = [
             `Instituto: ${datos.Nombre || 'N/D'}`,
             director ? `Director: ${director}` : null,
             `Tipo: ${datos.Tipo || 'Instituto'}`,
-            `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`, 
+            `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
             cotizacion.texto
         ].filter(Boolean).join("\n");
-        
+       
         if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         copiarAlPortapapeles(textoBase);
     }
@@ -658,17 +669,16 @@
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
-            
+           
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
-            if (director && director.toString().trim() !== "") {
+            if (director) {
                 directorHtml = `
                 <div class="caja-info" style="margin: 14px 0 18px 0; padding: 14px 20px; border-left: 4px solid var(--hh-yellow);">
                     <span class="info-label"><i class="fas fa-user-tie"></i> Director de Instituto</span>
                     <div class="info-value" style="font-size: 1.05em; margin-top: 6px;">${escaparHTML(director)}</div>
                 </div>`;
             }
-
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="caja-info franchise" style="margin:18px 0;">
                     <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
@@ -709,7 +719,7 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
-                    
+                   
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}

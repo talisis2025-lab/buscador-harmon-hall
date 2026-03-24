@@ -523,20 +523,11 @@
     }
 
     /* ====================== FUNCIÓN DIRECTOR CORREGIDA ====================== */
-    /* El problema era que la comparación era demasiado estricta. 
-       Ahora detecta CUALQUIER columna que contenga la palabra "director" 
-       (Director, DIRECTORES, Director del Instituto, etc.) y funciona en TODOS los institutos. */
+    /* Esta versión detecta CUALQUIER columna que contenga la palabra "director" */
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
-            if (!key) continue;
-            const k = key.toString()
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]/g, "")   // elimina espacios, guiones, acentos extra
-                .trim();
-            if (k.includes("director")) {
+            if (typeof key === "string" && key.toLowerCase().includes("director")) {
                 const valor = obj[key];
                 if (valor && valor.toString().trim() !== "") {
                     return valor.toString().trim();

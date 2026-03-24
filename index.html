@@ -69,17 +69,11 @@
             position: fixed;
             inset: 0;
             z-index: -2;
-            background: linear-gradient(135deg,
-                rgba(255,234,0,0.75) 0%,
-                rgba(255,244,170,0.45) 50%,
-                rgba(255,234,0,0.75) 100%);
+            background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
             animation: waveFloat 28s ease-in-out infinite;
         }
         [data-theme="dark"] .wave-bg {
-            background: linear-gradient(135deg,
-                rgba(20,20,20,0.95) 0%,
-                rgba(35,35,35,0.75) 50%,
-                rgba(20,20,20,0.95) 100%);
+            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
         }
         @keyframes waveFloat {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
@@ -119,6 +113,7 @@
             line-height: 1;
             text-transform: uppercase;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
         }
         .header-title h1:hover {
             transform: scale(1.04);
@@ -161,8 +156,7 @@
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             backdrop-filter: blur(28px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .seccion:hover {
             transform: translateY(-6px);
@@ -194,7 +188,6 @@
             opacity: 0.45;
             font-size: 1.1em;
             z-index: 2;
-            transition: all 0.3s ease;
         }
         input[type="text"] {
             width: 100%;
@@ -211,8 +204,7 @@
         }
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22),
-                        inset 0 4px 12px rgba(0,0,0,0.04);
+            box-shadow: 0 0 0 5px rgba(255,234,0,0.22), inset 0 4px 12px rgba(0,0,0,0.04);
             transform: translateY(-3px) scale(1.02);
         }
         .btn-buscar {
@@ -411,71 +403,52 @@
             box-shadow: 0 20px 38px rgba(204,30,61,0.35);
         }
         .btn-wiki:active, .btn-copiar:active { transform: scale(0.94); }
-        #loadingSpinner {
-            display: none;
-            position: absolute;
-            top: 28px;
-            right: 28px;
-            font-size: 1.4em;
-            color: var(--text);
-            animation: iosSpin 1.2s linear infinite;
-        }
-        @keyframes iosSpin { 100% { transform: rotate(360deg); } }
-        .sugerencias {
-            display: none;
-            position: absolute;
-            top: calc(100% + 12px);
-            left: 0;
-            right: 0;
-            z-index: 9999;
-            background: var(--card-bg);
-            border-radius: 28px;
-            box-shadow: var(--shadow-lift);
-            backdrop-filter: blur(24px);
-            overflow: hidden;
-            max-height: 340px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-        }
-        .sugerencia-item {
-            padding: 16px 22px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: background 0.25s ease;
-        }
-        .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
-        .toast {
-            background: rgba(0,0,0,0.88);
+
+        /* ==================== EASTER EGG STYLES ==================== */
+        .easter-egg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.96);
             color: var(--hh-yellow);
-            padding: 14px 26px;
-            border-radius: 999px;
-            font-weight: 900;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
-            animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            padding: 40px 30px;
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: none;
+            max-width: 92%;
+            width: 420px;
+            animation: eggPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        [data-theme="dark"] .toast {
+        @keyframes eggPop {
+            from { opacity: 0; transform: translate(-50%, -60%) scale(0.7); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .easter-egg h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.9em;
+        }
+        .qr-container {
+            margin: 25px 0;
+        }
+        .qr-container img {
+            width: 240px;
+            height: 240px;
+            border: 10px solid var(--hh-yellow);
+            border-radius: 20px;
+        }
+        .close-egg {
+            margin-top: 20px;
+            padding: 14px 40px;
             background: var(--hh-yellow);
             color: #000;
-        }
-        @keyframes iosToast {
-            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
-            15% { transform: translateY(0) scale(1.05); opacity: 1; }
-            85% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(40px) scale(0.9); opacity: 0; }
-        }
-        .empty-state {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 32px 24px;
-            text-align: center;
-            font-weight: 800;
-            box-shadow: var(--shadow-soft);
-            color: var(--alert-text);
-        }
-        @media (max-width: 768px) {
-            body { padding: 16px 12px; }
-            .seccion { padding: 24px 20px; }
-            .result-card { padding: 24px 20px; }
+            border: none;
+            border-radius: 999px;
+            font-weight: 900;
+            font-size: 1.1em;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -483,7 +456,10 @@
 <div class="wave-bg"></div>
 <div class="header">
     <div class="logo-section">
-        <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
+        <!-- Logo con Easter Egg -->
+        <div class="header-title" id="logoEaster">
+            <h1>Harmon <span>Hall</span></h1>
+        </div>
     </div>
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">
         <i id="darkModeIcon" class="fas fa-moon"></i>
@@ -506,6 +482,20 @@
     <div id="resultado"></div>
 </div>
 
+<!-- EASTER EGG MODAL -->
+<div id="easterEgg" class="easter-egg">
+    <h2>¡Has encontrado el Easter Egg! 🎉</h2>
+    <p style="margin-bottom:20px;">Gay si lees esto</p>
+    
+    <div class="qr-container">
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://imgur.com/HQ5G2l0" alt="QR Gracioso">
+    </div>
+    
+    <p style="opacity:0.9;">Escanea el QR para ver algo muy xd</p>
+    
+    <button class="close-egg" onclick="cerrarEasterEgg()">Cerrar</button>
+</div>
+
 <script>
     let todosLosDatos = [];
     let baseCargada = false;
@@ -522,8 +512,6 @@
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
 
-    /* ====================== FUNCIÓN DIRECTOR CORREGIDA ====================== */
-    /* Esta versión detecta CUALQUIER columna que contenga la palabra "director" */
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
@@ -568,6 +556,7 @@
         }
         return { html, texto, tienePrecio };
     }
+
     function mostrarNotificacion(mensaje) {
         let container = document.querySelector('.toast-container') || (() => { let c = document.createElement('div'); c.className = 'toast-container'; c.style.position='fixed'; c.style.bottom='30px'; c.style.left='50%'; c.style.transform='translateX(-50%)'; c.style.zIndex='9999'; document.body.appendChild(c); return c; })();
         const toast = document.createElement('div');
@@ -710,7 +699,6 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
-                   
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}
@@ -757,6 +745,32 @@
             if (!document.querySelector(".busqueda-wrap").contains(e.target)) sugerencias.style.display = "none";
         });
     });
+
+    /* ====================== EASTER EGG ====================== */
+    let clickCount = 0;
+    let lastClickTime = 0;
+
+    document.getElementById('logoEaster').addEventListener('click', function() {
+        if (document.body.getAttribute('data-theme') !== 'dark') {
+            clickCount = 0;
+            return;
+        }
+
+        const now = Date.now();
+        if (now - lastClickTime > 2000) clickCount = 0;
+
+        clickCount++;
+        lastClickTime = now;
+
+        if (clickCount === 4) {
+            document.getElementById('easterEgg').style.display = 'block';
+            clickCount = 0;
+        }
+    });
+
+    function cerrarEasterEgg() {
+        document.getElementById('easterEgg').style.display = 'none';
+    }
 </script>
 </body>
 </html>

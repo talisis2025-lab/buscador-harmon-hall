@@ -270,7 +270,7 @@
             display: flex;
             flex-direction: column;
             gap: 28px;
-            padding-bottom: 60px;
+            padding-bottom: 120px;
         }
         .result-card {
             background: var(--card-bg);
@@ -444,6 +444,13 @@
             transition: background 0.25s ease;
         }
         .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
+        .sugerencia-sub {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.82em;
+            font-weight: 600;
+            opacity: 0.7;
+        }
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -472,10 +479,120 @@
             box-shadow: var(--shadow-soft);
             color: var(--alert-text);
         }
+
+        /* ===== Botón de ayuda flotante ===== */
+        .help-widget {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        .help-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
+            color: #000;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.22);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .help-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 38px rgba(0,0,0,0.28);
+        }
+        .help-btn:active { transform: scale(0.95); }
+        .help-panel {
+            width: min(320px, calc(100vw - 36px));
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow-lift);
+            backdrop-filter: blur(24px);
+            padding: 16px 16px 14px;
+            transform-origin: bottom right;
+            transform: translateY(12px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.22s ease;
+        }
+        .help-widget.open .help-panel {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        .help-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--header-text);
+        }
+        .help-text {
+            margin: 0;
+            line-height: 1.45;
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.92;
+        }
+        .help-email {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(255,234,0,0.18);
+            font-weight: 800;
+            word-break: break-word;
+        }
+        .help-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text);
+            opacity: 0.65;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .help-close:hover {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+        .help-panel::before {
+            content: "";
+            position: absolute;
+            right: 18px;
+            bottom: -8px;
+            width: 16px;
+            height: 16px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            transform: rotate(45deg);
+        }
+
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
             .seccion { padding: 24px 20px; }
             .result-card { padding: 24px 20px; }
+            .help-widget { right: 12px; bottom: 12px; }
+            .help-panel { width: min(300px, calc(100vw - 24px)); }
         }
     </style>
 </head>
@@ -504,6 +621,28 @@
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
     <div id="resultado"></div>
+</div>
+
+<!-- Botón flotante de ayuda -->
+<div class="help-widget" id="helpWidget" aria-live="polite">
+    <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
+        <button class="help-close" type="button" onclick="toggleHelp(false)" aria-label="Cerrar ayuda">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="help-title">
+            <i class="fas fa-circle-question"></i>
+            <span>Dudas o sugerencias</span>
+        </div>
+        <p class="help-text">
+            Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
+        </p>
+        <div class="help-email">
+            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx
+        </div>
+    </div>
+    <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
+        ?
+    </button>
 </div>
 
 <script>
@@ -586,6 +725,11 @@
         body.setAttribute('data-theme', isLight ? 'dark' : 'light');
         document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
         document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
+    }
+    function toggleHelp(forceState) {
+        const widget = document.getElementById('helpWidget');
+        const shouldOpen = typeof forceState === 'boolean' ? forceState : !widget.classList.contains('open');
+        widget.classList.toggle('open', shouldOpen);
     }
     function actualizarCotizacion(index) {
         const selector = document.getElementById(`select-${index}`);
@@ -755,6 +899,10 @@
         });
         document.addEventListener("click", e => {
             if (!document.querySelector(".busqueda-wrap").contains(e.target)) sugerencias.style.display = "none";
+            const helpWidget = document.getElementById('helpWidget');
+            if (helpWidget && !helpWidget.contains(e.target)) {
+                helpWidget.classList.remove('open');
+            }
         });
     });
 </script>

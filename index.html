@@ -113,7 +113,7 @@
             line-height: 1;
             text-transform: uppercase;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer; /* necesario para el easter egg */
+            cursor: pointer;
         }
         .header-title h1:hover {
             transform: scale(1.04);
@@ -472,48 +472,50 @@
             .result-card { padding: 24px 20px; }
         }
 
-              /* ====================== EASTER EGG ====================== */
-        .easter-egg {
+        /* ====================== EASTER EGG - GLITCH MODE ====================== */
+        body.glitch-mode {
+            background: #c00 !important;
+            animation: glitch-bg 0.6s infinite alternate;
+        }
+        @keyframes glitch-bg {
+            0% { background: #c00; }
+            100% { background: #900; }
+        }
+        .search-glitch {
+            animation: search-corrupt 0.5s infinite alternate;
+        }
+        @keyframes search-corrupt {
+            0% { filter: hue-rotate(0deg) brightness(1); }
+            100% { filter: hue-rotate(200deg) brightness(0.4); }
+        }
+        .letter-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.96);
-            color: var(--hh-yellow);
-            padding: 40px 30px;
-            border-radius: 28px;
-            text-align: center;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-            z-index: 10000;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            background: rgba(0,0,0,0.92);
             display: none;
-            max-width: 92%;
-            width: 420px;
-            animation: eggPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
         }
-        @keyframes eggPop {
-            from { opacity: 0; transform: translate(-50%, -60%) scale(0.7); }
-            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-        .easter-egg h2 {
-            font-size: 2.0em;     
-            margin: 0 0 15px 0;
+        .letter {
+            position: absolute;
+            color: #ff0;
+            font-family: monospace;
             font-weight: 900;
+            font-size: 2.2em;
+            opacity: 0.75;
+            text-shadow: 0 0 12px #f00;
+            user-select: none;
+            animation: floatLetter 12s linear infinite;
         }
-        .qr-container img {
-            width: 240px;
-            height: 240px;
-            border: 10px solid var(--hh-yellow);
-            border-radius: 20px;
+        .letter.big {
+            font-size: 3.4em;
+            color: #fff;
+            text-shadow: 0 0 20px #f00;
         }
-        .close-egg {
-            margin-top: 20px;
-            padding: 14px 40px;
-            background: var(--hh-yellow);
-            color: #000;
-            border: none;
-            border-radius: 999px;
-            font-weight: 900;
-            cursor: pointer;
+        @keyframes floatLetter {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
         }
     </style>
 </head>
@@ -521,10 +523,7 @@
 <div class="wave-bg"></div>
 <div class="header">
     <div class="logo-section">
-        <!-- Logo con Easter Egg -->
-        <div class="header-title" id="logoEaster">
-            <h1>Harmon <span>Hall</span></h1>
-        </div>
+        <div class="header-title" id="logoEaster"><h1>Harmon <span>Hall</span></h1></div>
     </div>
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">
         <i id="darkModeIcon" class="fas fa-moon"></i>
@@ -547,20 +546,8 @@
     <div id="resultado"></div>
 </div>
 
-<!-- EASTER EGG -->
-<div id="easterEgg" class="easter-egg">
-    <h2>¡Has encontrado el Easter Egg! 🎉</h2>
-    <p style="margin-bottom:20px;">Gay si lees esto</p>
-    
-    <div class="qr-container">
-        <!-- ← CAMBIA AQUÍ EL ENLACE QUE QUIERAS -->
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https:https://i.imgur.com/HQ5G2l0.png" alt="QR Gracioso">
-    </div>
-    
-    <p style="opacity:0.9;">Escanea el QR para ver algo muy xd</p>
-    
-    <button class="close-egg" onclick="cerrarEasterEgg()">Cerrar</button>
-</div>
+<!-- Overlay de letras Phasmopobia -->
+<div id="letterOverlay" class="letter-overlay"></div>
 
 <script>
     let todosLosDatos = [];
@@ -765,7 +752,6 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
-                  
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}
@@ -822,21 +808,54 @@
             clickCount = 0;
             return;
         }
-
         const now = Date.now();
         if (now - lastClickTime > 2000) clickCount = 0;
-
         clickCount++;
         lastClickTime = now;
-
         if (clickCount === 4) {
-            document.getElementById('easterEgg').style.display = 'block';
+            activateGlitchMode();
             clickCount = 0;
         }
     });
 
-    function cerrarEasterEgg() {
-        document.getElementById('easterEgg').style.display = 'none';
+    function activateGlitchMode() {
+        document.body.classList.add('glitch-mode');
+        const overlay = document.getElementById('letterOverlay');
+        overlay.style.display = 'block';
+        createPhasmopobiaLetters();
+
+        const input = document.getElementById('textoBusqueda');
+        input.classList.add('search-glitch');
+        input.addEventListener('input', checkPhasmopobia, { once: true });
+    }
+
+    function createPhasmopobiaLetters() {
+        const overlay = document.getElementById('letterOverlay');
+        overlay.innerHTML = '';
+        const word = "PHASMOPHOBIA";
+        const letters = word.split('');
+        for (let i = 0; i < 140; i++) {
+            const span = document.createElement('span');
+            span.className = 'letter';
+            span.textContent = letters[Math.floor(Math.random() * letters.length)];
+            if (Math.random() > 0.75) span.classList.add('big');
+            span.style.left = Math.random() * 100 + 'vw';
+            span.style.animationDuration = (Math.random() * 8 + 8) + 's';
+            overlay.appendChild(span);
+        }
+    }
+
+    function checkPhasmopobia(e) {
+        if (e.target.value.toLowerCase() === 'phasmopobia') {
+            const qrHTML = `
+                <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;padding:25px;border-radius:20px;z-index:10001;text-align:center;box-shadow:0 0 50px #f00;">
+                    <h2 style="color:#FFEA00;font-size:2.0em;margin-bottom:15px;">Phasmopobia Found 👻</h2>
+                    <img src="https://i.imgur.com/HQ5G2l0.jpg" style="width:300px;border:10px solid #FFEA00;border-radius:15px;" alt="QR">
+                    <br><br>
+                    <button onclick="this.parentElement.remove()" style="background:#FFEA00;color:#000;padding:12px 35px;border-radius:999px;font-weight:900;">Cerrar</button>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', qrHTML);
+        }
     }
 </script>
 </body>

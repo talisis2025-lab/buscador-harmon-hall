@@ -527,7 +527,7 @@
         if (!obj) return "";
         for (let key in obj) {
             const k = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            if (k === 'directores de instituto' || k === 'director de instituto' || k === 'director') {
+            if (k === 'Directores' || k === 'directores') {
                 return obj[key];
             }
         }

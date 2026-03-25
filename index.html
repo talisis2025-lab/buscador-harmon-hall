@@ -661,8 +661,7 @@
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
 
-    /* ====================== FUNCIÓN DIRECTOR CORREGIDA ====================== */
-    /* Esta versión detecta CUALQUIER columna que contenga la palabra "director" */
+    /* ====================== FUNCIÓN DIRECTOR ====================== */
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
@@ -703,7 +702,7 @@
         }
         if (!tienePrecio) {
             html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
-            texto = "Precios no definidos, valida la información.";
+            texto = "Precios no definidos";
         }
         return { html, texto, tienePrecio };
     }
@@ -716,7 +715,7 @@
         setTimeout(() => toast.remove(), 2800);
     }
     async function copiarAlPortapapeles(texto) {
-        try { await navigator.clipboard.writeText(texto); mostrarNotificacion("Resumen copiado con éxito"); }
+        try { await navigator.clipboard.writeText(texto); mostrarNotificacion("Resumen copiado"); }
         catch { const area = document.createElement("textarea"); area.value = texto; area.style.position="fixed"; area.style.opacity="0"; document.body.appendChild(area); area.select(); document.execCommand("copy"); document.body.removeChild(area); mostrarNotificacion("Resumen copiado con éxito"); }
     }
     function toggleDarkMode() {
@@ -828,7 +827,7 @@
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir enlace</a>`;
+                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir wiki</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
             }

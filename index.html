@@ -594,39 +594,6 @@
             .help-widget { right: 12px; bottom: 12px; }
             .help-panel { width: min(300px, calc(100vw - 24px)); }
         }
-        @media (prefers-reduced-motion: reduce) {
-
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
-        scroll-behavior: auto !important;
-    }
-
-    .wave-bg,
-    .wave-bg::before,
-    .header-title h1:hover,
-    .dark-mode-toggle:hover,
-    .seccion:hover,
-    .result-card:hover,
-    .btn-buscar:hover,
-    .btn-wiki:hover,
-    .btn-copiar:hover,
-    .help-btn:hover,
-    .help-close:hover,
-    input[type="text"]:focus,
-    select.btn-buscar:focus {
-        transform: none !important;
-        box-shadow: inherit !important;
-    }
-
-}
     </style>
 </head>
 <body data-theme="light">

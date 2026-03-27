@@ -12,53 +12,43 @@
             --hh-black: #000000;
             --hh-white: #FFFFFF;
             --hh-red: #cc1e3d;
-            
-            /* === PALETA PREMIUM MODERNA === */
-            --bg: #FAF8E8;
-            --card-bg: rgba(255,255,255,0.96);
+            --bg: var(--hh-yellow);
+            --card-bg: rgba(255,255,255,0.92);
             --text: var(--hh-black);
             --header-text: var(--hh-black);
-            --border: rgba(0,0,0,0.09);
-            --input-bg: rgba(255,255,255,0.97);
-            --input-border: rgba(0,0,0,0.14);
-            --info-box: rgba(248,246,232,0.92);
+            --border: rgba(0,0,0,0.08);
+            --input-bg: rgba(255,255,255,0.95);
+            --input-border: rgba(0,0,0,0.12);
+            --info-box: rgba(245,245,245,0.85);
             --alert-bg: #ffebee;
             --alert-text: var(--hh-red);
-            --franchise-bg: rgba(255,240,240,0.94);
-            --franchise-border: rgba(204,30,61,0.28);
-            
-            --shadow: 0 20px 60px rgba(0,0,0,0.11),
-                      inset 0 1px 0 rgba(255,255,255,0.7),
-                      inset 0 -1px 0 rgba(0,0,0,0.08);
-            --shadow-soft: 0 12px 32px rgba(0,0,0,0.08);
-            --shadow-lift: 0 28px 70px rgba(0,0,0,0.16);
-            
-            --radius-lg: 40px;
-            --radius-md: 28px;
-            --radius-sm: 18px;
+            --franchise-bg: rgba(255,240,240,0.92);
+            --franchise-border: rgba(204,30,61,0.25);
+            --shadow: 0 20px 60px rgba(0,0,0,0.12);
+            --shadow-soft: 0 12px 30px rgba(0,0,0,0.08);
+            --shadow-lift: 0 30px 70px rgba(0,0,0,0.18);
+            --radius-lg: 32px;
+            --radius-md: 24px;
+            --radius-sm: 16px;
         }
-     
+      
         [data-theme="dark"] {
-            --bg: #0A0A0A;
-            --card-bg: rgba(28,28,28,0.96);
+            --bg: #0a0a0a;
+            --card-bg: rgba(30,30,30,0.92);
             --text: #ffffff;
             --header-text: var(--hh-yellow);
-            --border: rgba(255,255,255,0.09);
-            --input-bg: rgba(35,35,35,0.96);
-            --input-border: rgba(255,255,255,0.18);
-            --info-box: rgba(40,40,40,0.88);
+            --border: rgba(255,255,255,0.08);
+            --input-bg: rgba(40,40,40,0.95);
+            --input-border: rgba(255,255,255,0.15);
+            --info-box: rgba(45,45,45,0.85);
             --alert-bg: #4a151b;
             --alert-text: #ff8a9f;
-            --franchise-bg: rgba(60,20,25,0.94);
-            --franchise-border: rgba(204,30,61,0.38);
-            
-            --shadow: 0 20px 60px rgba(0,0,0,0.55),
-                      inset 0 1px 0 rgba(255,255,255,0.08),
-                      inset 0 -1px 0 rgba(0,0,0,0.4);
-            --shadow-soft: 0 12px 32px rgba(0,0,0,0.45);
-            --shadow-lift: 0 28px 70px rgba(0,0,0,0.65);
+            --franchise-bg: rgba(60,20,25,0.92);
+            --franchise-border: rgba(204,30,61,0.35);
+            --shadow: 0 20px 60px rgba(0,0,0,0.45);
+            --shadow-soft: 0 12px 30px rgba(0,0,0,0.35);
+            --shadow-lift: 0 30px 70px rgba(0,0,0,0.55);
         }
-
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -75,16 +65,15 @@
             flex-direction: column;
             align-items: center;
         }
-
         .wave-bg {
             position: fixed;
             inset: 0;
             z-index: -2;
             background: linear-gradient(135deg,
-                rgba(255,234,0,0.22) 0%,
-                rgba(255,244,170,0.12) 50%,
-                rgba(255,234,0,0.22) 100%);
-            animation: waveFloat 32s ease-in-out infinite;
+                rgba(255,234,0,0.75) 0%,
+                rgba(255,244,170,0.45) 50%,
+                rgba(255,234,0,0.75) 100%);
+            animation: waveFloat 28s ease-in-out infinite;
         }
         [data-theme="dark"] .wave-bg {
             background: linear-gradient(135deg,
@@ -94,20 +83,19 @@
         }
         @keyframes waveFloat {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(25px, -25px) rotate(0.8deg); }
+            50% { transform: translate(30px, -30px) rotate(1deg); }
         }
         .wave-bg::before {
             content: "";
             position: absolute;
             inset: -200px;
-            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25) 0%, transparent 60%);
+            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 60%);
             animation: subtlePulse 18s ease-in-out infinite;
         }
         @keyframes subtlePulse {
-            0%, 100% { opacity: 0.25; transform: scale(1); }
-            50% { opacity: 0.40; transform: scale(1.06); }
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.55; transform: scale(1.08); }
         }
-
         .header {
             width: 100%;
             max-width: 1100px;
@@ -124,10 +112,10 @@
         }
         .header-title h1 {
             margin: 0;
-            font-size: clamp(2.2rem, 5vw, 2.9rem);
+            font-size: clamp(2.1rem, 5vw, 2.8rem);
             font-weight: 900;
             color: var(--header-text);
-            letter-spacing: -2.2px;
+            letter-spacing: -1.8px;
             line-height: 1;
             text-transform: uppercase;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -138,15 +126,14 @@
         .header-title h1 span {
             color: inherit;
         }
-
         .dark-mode-toggle {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            font-size: 0.93em;
+            font-size: 0.92em;
             font-weight: 800;
             background: var(--card-bg);
-            padding: 12px 22px;
+            padding: 12px 20px;
             border-radius: 999px;
             box-shadow: var(--shadow-soft);
             border: 1px solid var(--border);
@@ -161,7 +148,6 @@
         .dark-mode-toggle:active {
             transform: scale(0.95);
         }
-
         .contenedor {
             width: 100%;
             max-width: 640px;
@@ -174,15 +160,14 @@
             background: var(--card-bg);
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
-            backdrop-filter: blur(32px);
+            backdrop-filter: blur(28px);
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
                         box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .seccion:hover {
-            transform: translateY(-8px);
+            transform: translateY(-6px);
             box-shadow: var(--shadow-lift);
         }
-
         label {
             display: block;
             margin-bottom: 12px;
@@ -193,7 +178,6 @@
             letter-spacing: 0.6px;
             opacity: 0.85;
         }
-
         .busqueda-wrap {
             position: relative;
             z-index: 200;
@@ -212,7 +196,6 @@
             z-index: 2;
             transition: all 0.3s ease;
         }
-
         input[type="text"] {
             width: 100%;
             padding: 18px 22px 18px 58px;
@@ -223,45 +206,43 @@
             color: var(--text);
             font-size: 1.08em;
             font-weight: 500;
-            box-shadow: inset 0 4px 14px rgba(0,0,0,0.04);
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.04);
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 6px rgba(255,234,0,0.25),
-                        inset 0 4px 14px rgba(0,0,0,0.04);
+            box-shadow: 0 0 0 5px rgba(255,234,0,0.22),
+                        inset 0 4px 12px rgba(0,0,0,0.04);
             transform: translateY(-3px) scale(1.02);
         }
-
         .btn-buscar {
             width: 100%;
-            padding: 19px 24px;
+            padding: 18px 24px;
             background: linear-gradient(180deg, #111111 0%, #000000 100%);
             color: var(--hh-white);
             border: none;
             border-radius: 28px;
             cursor: pointer;
             font-weight: 900;
-            font-size: 1.06em;
+            font-size: 1.05em;
             text-transform: uppercase;
-            letter-spacing: 0.9px;
+            letter-spacing: 0.8px;
             margin-top: 16px;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.24);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.22);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .btn-buscar:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 24px 44px rgba(0,0,0,0.32);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 22px 40px rgba(0,0,0,0.28);
         }
         .btn-buscar:active {
             transform: scale(0.96);
         }
-
         select.btn-buscar {
             width: 100%;
             background: var(--input-bg);
             border: 2px solid var(--input-border);
-            border-radius: 28px;
+            border-radius: 24px;
             padding: 16px 18px;
             font-weight: 700;
             margin-bottom: 18px;
@@ -275,7 +256,7 @@
         }
         select.btn-buscar:focus {
             border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 6px rgba(255,234,0,0.25);
+            box-shadow: 0 0 0 5px rgba(255,234,0,0.22);
             transform: translateY(-2px);
         }
         select.btn-buscar option {
@@ -284,7 +265,6 @@
             padding: 12px 18px;
             font-weight: 700;
         }
-
         #resultado {
             margin-top: 16px;
             display: flex;
@@ -292,7 +272,6 @@
             gap: 28px;
             padding-bottom: 120px;
         }
-
         .result-card {
             background: var(--card-bg);
             padding: 28px 26px;
@@ -301,12 +280,12 @@
             position: relative;
             border: 1px solid var(--border);
             overflow: hidden;
-            backdrop-filter: blur(32px);
+            backdrop-filter: blur(24px);
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         .result-card:hover {
-            transform: translateY(-12px) scale(1.018);
+            transform: translateY(-12px) scale(1.015);
             box-shadow: var(--shadow-lift);
         }
         @keyframes cardPop {
@@ -318,11 +297,10 @@
             position: absolute;
             top: 0;
             left: 0;
-            height: 7px;
+            height: 6px;
             width: 100%;
             background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
         }
-
         .instituto-header {
             display: flex;
             justify-content: space-between;
@@ -348,14 +326,13 @@
         }
         .type-badge.own { background: linear-gradient(180deg, #111, #000); }
         .type-badge.franchise { background: linear-gradient(180deg, #dd2447, #cc1e3d); }
-
         .caja-info {
             margin-top: 18px;
-            padding: 22px;
+            padding: 20px;
             border-radius: var(--radius-md);
             background: var(--info-box);
             border: 1px solid var(--border);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
             transition: all 0.3s ease;
         }
         .info-grid {
@@ -380,9 +357,8 @@
         }
         .caja-info.franchise {
             background: var(--franchise-bg);
-            border-left: 6px solid var(--hh-red);
+            border-left: 5px solid var(--hh-red);
         }
-
         .caja-alerta {
             margin-top: 18px;
             padding: 16px 18px;
@@ -396,7 +372,6 @@
             font-size: 0.95em;
             border: 1px solid rgba(204,30,61,0.15);
         }
-
         .buttons-wrapper {
             margin-top: 24px;
             display: flex;
@@ -436,7 +411,6 @@
             box-shadow: 0 20px 38px rgba(204,30,61,0.35);
         }
         .btn-wiki:active, .btn-copiar:active { transform: scale(0.94); }
-
         #loadingSpinner {
             display: none;
             position: absolute;
@@ -447,7 +421,6 @@
             animation: iosSpin 1.2s linear infinite;
         }
         @keyframes iosSpin { 100% { transform: rotate(360deg); } }
-
         .sugerencias {
             display: none;
             position: absolute;
@@ -456,7 +429,7 @@
             right: 0;
             z-index: 9999;
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            border-radius: 28px;
             box-shadow: var(--shadow-lift);
             backdrop-filter: blur(24px);
             overflow: hidden;
@@ -478,7 +451,6 @@
             font-weight: 600;
             opacity: 0.7;
         }
-
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -498,11 +470,10 @@
             85% { transform: translateY(0) scale(1); }
             100% { transform: translateY(40px) scale(0.9); opacity: 0; }
         }
-
         .empty-state {
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 40px 24px;
+            border-radius: 28px;
+            padding: 32px 24px;
             text-align: center;
             font-weight: 800;
             box-shadow: var(--shadow-soft);
@@ -532,7 +503,7 @@
             font-weight: 900;
             background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
             color: #000;
-            box-shadow: 0 16px 34px rgba(0,0,0,0.22);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.22);
             transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
         .help-btn:hover {
@@ -540,15 +511,14 @@
             box-shadow: 0 20px 38px rgba(0,0,0,0.28);
         }
         .help-btn:active { transform: scale(0.95); }
-
         .help-panel {
             width: min(320px, calc(100vw - 36px));
             background: var(--card-bg);
             color: var(--text);
             border: 1px solid var(--border);
-            border-radius: 28px;
+            border-radius: 22px;
             box-shadow: var(--shadow-lift);
-            backdrop-filter: blur(28px);
+            backdrop-filter: blur(24px);
             padding: 16px 16px 14px;
             transform-origin: bottom right;
             transform: translateY(12px) scale(0.95);
@@ -679,6 +649,7 @@
     let todosLosDatos = [];
     let baseCargada = false;
     const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
+
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
     }
@@ -689,6 +660,7 @@
         const numero = Number(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
+
     /* ====================== FUNCIÓN DIRECTOR ====================== */
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
@@ -702,6 +674,7 @@
         }
         return "";
     }
+
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
@@ -776,7 +749,7 @@
         const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
-      
+       
         let textoBase = [
             `Instituto: ${datos.Nombre || 'N/D'}`,
             director ? `Director: ${director}` : null,
@@ -784,7 +757,7 @@
             `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
             cotizacion.texto
         ].filter(Boolean).join("\n");
-      
+       
         if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         copiarAlPortapapeles(textoBase);
     }
@@ -830,7 +803,7 @@
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
-          
+           
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director) {
@@ -880,7 +853,7 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
-                  
+                   
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}

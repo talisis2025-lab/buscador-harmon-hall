@@ -13,8 +13,8 @@
             --hh-white: #FFFFFF;
             --hh-red: #cc1e3d;
             
-            /* === NUEVA PALETA PREMIUM === */
-            --bg: #FAF8E8;                    /* crema suave - mucho más elegante */
+            /* === PALETA PREMIUM MODERNA === */
+            --bg: #FAF8E8;
             --card-bg: rgba(255,255,255,0.96);
             --text: var(--hh-black);
             --header-text: var(--hh-black);
@@ -27,7 +27,6 @@
             --franchise-bg: rgba(255,240,240,0.94);
             --franchise-border: rgba(204,30,61,0.28);
             
-            /* Glassmorphism mejorado */
             --shadow: 0 20px 60px rgba(0,0,0,0.11),
                       inset 0 1px 0 rgba(255,255,255,0.7),
                       inset 0 -1px 0 rgba(0,0,0,0.08);
@@ -38,7 +37,7 @@
             --radius-md: 28px;
             --radius-sm: 18px;
         }
-
+     
         [data-theme="dark"] {
             --bg: #0A0A0A;
             --card-bg: rgba(28,28,28,0.96);
@@ -62,7 +61,6 @@
 
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
@@ -72,12 +70,12 @@
             min-height: 100vh;
             transition: background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
             overflow-x: hidden;
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* === FONDO MÁS ELEGANTE Y SUTIL === */
         .wave-bg {
             position: fixed;
             inset: 0;
@@ -94,10 +92,20 @@
                 rgba(35,35,35,0.75) 50%,
                 rgba(20,20,20,0.95) 100%);
         }
-
         @keyframes waveFloat {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
             50% { transform: translate(25px, -25px) rotate(0.8deg); }
+        }
+        .wave-bg::before {
+            content: "";
+            position: absolute;
+            inset: -200px;
+            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25) 0%, transparent 60%);
+            animation: subtlePulse 18s ease-in-out infinite;
+        }
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 0.25; transform: scale(1); }
+            50% { opacity: 0.40; transform: scale(1.06); }
         }
 
         .header {
@@ -109,7 +117,11 @@
             padding: 12px 8px 28px;
             margin-bottom: 12px;
         }
-
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
         .header-title h1 {
             margin: 0;
             font-size: clamp(2.2rem, 5vw, 2.9rem);
@@ -118,6 +130,13 @@
             letter-spacing: -2.2px;
             line-height: 1;
             text-transform: uppercase;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .header-title h1:hover {
+            transform: scale(1.04);
+        }
+        .header-title h1 span {
+            color: inherit;
         }
 
         .dark-mode-toggle {
@@ -133,6 +152,14 @@
             border: 1px solid var(--border);
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+        }
+        .dark-mode-toggle:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: var(--shadow-lift);
+        }
+        .dark-mode-toggle:active {
+            transform: scale(0.95);
         }
 
         .contenedor {
@@ -140,7 +167,6 @@
             max-width: 640px;
             position: relative;
         }
-
         .seccion {
             margin-bottom: 28px;
             padding: 32px 28px;
@@ -152,10 +178,39 @@
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
                         box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
         .seccion:hover {
             transform: translateY(-8px);
             box-shadow: var(--shadow-lift);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 800;
+            color: var(--text);
+            font-size: 0.88em;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            opacity: 0.85;
+        }
+
+        .busqueda-wrap {
+            position: relative;
+            z-index: 200;
+        }
+        .busqueda-wrap::before {
+            content: "\f002";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text);
+            opacity: 0.45;
+            font-size: 1.1em;
+            z-index: 2;
+            transition: all 0.3s ease;
         }
 
         input[type="text"] {
@@ -171,7 +226,6 @@
             box-shadow: inset 0 4px 14px rgba(0,0,0,0.04);
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
             box-shadow: 0 0 0 6px rgba(255,234,0,0.25),
@@ -195,10 +249,48 @@
             box-shadow: 0 16px 32px rgba(0,0,0,0.24);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
         .btn-buscar:hover {
             transform: translateY(-5px) scale(1.03);
             box-shadow: 0 24px 44px rgba(0,0,0,0.32);
+        }
+        .btn-buscar:active {
+            transform: scale(0.96);
+        }
+
+        select.btn-buscar {
+            width: 100%;
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 28px;
+            padding: 16px 18px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
+            appearance: none;
+            color: var(--text) !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-position: right 18px center;
+            background-repeat: no-repeat;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        select.btn-buscar:focus {
+            border-color: var(--hh-yellow);
+            box-shadow: 0 0 0 6px rgba(255,234,0,0.25);
+            transform: translateY(-2px);
+        }
+        select.btn-buscar option {
+            color: var(--text) !important;
+            background-color: var(--card-bg) !important;
+            padding: 12px 18px;
+            font-weight: 700;
+        }
+
+        #resultado {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            padding-bottom: 120px;
         }
 
         .result-card {
@@ -206,22 +298,21 @@
             padding: 28px 26px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
+            position: relative;
             border: 1px solid var(--border);
+            overflow: hidden;
             backdrop-filter: blur(32px);
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-
         .result-card:hover {
             transform: translateY(-12px) scale(1.018);
             box-shadow: var(--shadow-lift);
         }
-
         @keyframes cardPop {
             from { opacity: 0; transform: translateY(40px) scale(0.92); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
         .result-card::before {
             content: "";
             position: absolute;
@@ -232,6 +323,32 @@
             background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
         }
 
+        .instituto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        .instituto-nombre {
+            font-size: 1.42em;
+            font-weight: 900;
+            letter-spacing: -0.6px;
+            line-height: 1.1;
+        }
+        .type-badge {
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 0.73em;
+            font-weight: 900;
+            color: var(--hh-white);
+            letter-spacing: 0.6px;
+            margin-top: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .type-badge.own { background: linear-gradient(180deg, #111, #000); }
+        .type-badge.franchise { background: linear-gradient(180deg, #dd2447, #cc1e3d); }
+
         .caja-info {
             margin-top: 18px;
             padding: 22px;
@@ -239,22 +356,147 @@
             background: var(--info-box);
             border: 1px solid var(--border);
             backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
         }
-
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 18px;
+            margin-top: 12px;
+        }
+        .info-item { transition: transform 0.3s ease; }
+        .info-item:hover { transform: translateY(-3px); }
+        .info-label {
+            color: #888;
+            font-weight: 800;
+            font-size: 0.76em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-value {
+            font-weight: 900;
+            font-size: 1.12em;
+            word-break: break-word;
+        }
         .caja-info.franchise {
             background: var(--franchise-bg);
             border-left: 6px solid var(--hh-red);
         }
 
-        .buttons-wrapper .btn-wiki {
+        .caja-alerta {
+            margin-top: 18px;
+            padding: 16px 18px;
+            background: var(--alert-bg);
+            color: var(--alert-text);
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95em;
+            border: 1px solid rgba(204,30,61,0.15);
+        }
+
+        .buttons-wrapper {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .btn-wiki, .btn-copiar {
+            width: 100%;
+            padding: 17px 22px;
+            border-radius: 28px;
+            font-weight: 900;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-wiki {
             background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
             color: var(--hh-black);
             border: 2px solid var(--hh-black);
         }
-
-        .buttons-wrapper .btn-copiar {
+        .btn-wiki:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 20px 38px rgba(255,234,0,0.35);
+        }
+        .btn-copiar {
             background: linear-gradient(180deg, var(--hh-red), #b81a34);
             color: white;
+            border: none;
+        }
+        .btn-copiar:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 20px 38px rgba(204,30,61,0.35);
+        }
+        .btn-wiki:active, .btn-copiar:active { transform: scale(0.94); }
+
+        #loadingSpinner {
+            display: none;
+            position: absolute;
+            top: 28px;
+            right: 28px;
+            font-size: 1.4em;
+            color: var(--text);
+            animation: iosSpin 1.2s linear infinite;
+        }
+        @keyframes iosSpin { 100% { transform: rotate(360deg); } }
+
+        .sugerencias {
+            display: none;
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lift);
+            backdrop-filter: blur(24px);
+            overflow: hidden;
+            max-height: 340px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        .sugerencia-item {
+            padding: 16px 22px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.25s ease;
+        }
+        .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
+        .sugerencia-sub {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.82em;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .toast {
+            background: rgba(0,0,0,0.88);
+            color: var(--hh-yellow);
+            padding: 14px 26px;
+            border-radius: 999px;
+            font-weight: 900;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
+            animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        [data-theme="dark"] .toast {
+            background: var(--hh-yellow);
+            color: #000;
+        }
+        @keyframes iosToast {
+            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
+            15% { transform: translateY(0) scale(1.05); opacity: 1; }
+            85% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(40px) scale(0.9); opacity: 0; }
         }
 
         .empty-state {
@@ -267,28 +509,125 @@
             color: var(--alert-text);
         }
 
-        /* ===== HELP WIDGET MÁS PREMIUM ===== */
-        .help-btn {
-            background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
-            box-shadow: 0 16px 34px rgba(0,0,0,0.22);
+        /* ===== Botón de ayuda flotante ===== */
+        .help-widget {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
         }
+        .help-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
+            color: #000;
+            box-shadow: 0 16px 34px rgba(0,0,0,0.22);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .help-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 38px rgba(0,0,0,0.28);
+        }
+        .help-btn:active { transform: scale(0.95); }
 
         .help-panel {
+            width: min(320px, calc(100vw - 36px));
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
             border-radius: 28px;
             box-shadow: var(--shadow-lift);
             backdrop-filter: blur(28px);
+            padding: 16px 16px 14px;
+            transform-origin: bottom right;
+            transform: translateY(12px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.22s ease;
+        }
+        .help-widget.open .help-panel {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        .help-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--header-text);
+        }
+        .help-text {
+            margin: 0;
+            line-height: 1.45;
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.92;
+        }
+        .help-email {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(255,234,0,0.18);
+            font-weight: 800;
+            word-break: break-word;
+        }
+        .help-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text);
+            opacity: 0.65;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .help-close:hover {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+        .help-panel::before {
+            content: "";
+            position: absolute;
+            right: 18px;
+            bottom: -8px;
+            width: 16px;
+            height: 16px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            transform: rotate(45deg);
         }
 
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
             .seccion { padding: 24px 20px; }
             .result-card { padding: 24px 20px; }
+            .help-widget { right: 12px; bottom: 12px; }
+            .help-panel { width: min(300px, calc(100vw - 24px)); }
         }
     </style>
 </head>
 <body data-theme="light">
 <div class="wave-bg"></div>
-
 <div class="header">
     <div class="logo-section">
         <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
@@ -298,13 +637,11 @@
         <span>Noche</span>
     </div>
 </div>
-
 <div class="contenedor">
     <div class="seccion" style="text-align: center; padding: 18px 24px; position:relative;">
         <i id="loadingSpinner" class="fas fa-spinner"></i>
         <span id="statusCarga">Conectando base de datos… ⏳</span>
     </div>
-
     <div class="seccion">
         <label>Buscador de Institutos</label>
         <div class="busqueda-wrap">
@@ -313,7 +650,6 @@
         </div>
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
-
     <div id="resultado"></div>
 </div>
 
@@ -340,11 +676,9 @@
 </div>
 
 <script>
-    /* === TODO EL JAVASCRIPT ORIGINAL (sin cambios) === */
     let todosLosDatos = [];
     let baseCargada = false;
     const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
-
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
     }
@@ -355,29 +689,28 @@
         const numero = Number(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
-
+    /* ====================== FUNCIÓN DIRECTOR ====================== */
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
             if (typeof key === "string" && key.toLowerCase().includes("director")) {
                 const valor = obj[key];
-                if (valor && valor.toString().trim() !== "") return valor.toString().trim();
+                if (valor && valor.toString().trim() !== "") {
+                    return valor.toString().trim();
+                }
             }
         }
         return "";
     }
-
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
-
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
             if (programa === 'adults') { mensu = parseFloat(datos.Adults_FF)||0; sab = parseFloat(datos.Adults_SAB)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (1-20)"; }
             else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos Pro (21-24)"; }
             else if (programa === 'kids') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_KIDS)||0; titulo = "Kids"; }
             else if (programa === 'pteen') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_PTEEN)||0; titulo = "Pre-Teens"; }
-
             if (mensu > 0 || sab > 0) tienePrecio = true;
             if (tienePrecio) {
                 html = `<div class="caja-info"><span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span><div class="info-grid">${ins>0?`<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>`:''}${lib>0?`<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>`:''}${mensu>0?`<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>`:''}${sab>0?`<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>`:''}</div></div>`;
@@ -400,41 +733,18 @@
         }
         return { html, texto, tienePrecio };
     }
-
     function mostrarNotificacion(mensaje) {
-        let container = document.querySelector('.toast-container') || (() => { 
-            let c = document.createElement('div'); 
-            c.className = 'toast-container'; 
-            c.style.position='fixed'; 
-            c.style.bottom='30px'; 
-            c.style.left='50%'; 
-            c.style.transform='translateX(-50%)'; 
-            c.style.zIndex='9999'; 
-            document.body.appendChild(c); 
-            return c; 
-        })();
+        let container = document.querySelector('.toast-container') || (() => { let c = document.createElement('div'); c.className = 'toast-container'; c.style.position='fixed'; c.style.bottom='30px'; c.style.left='50%'; c.style.transform='translateX(-50%)'; c.style.zIndex='9999'; document.body.appendChild(c); return c; })();
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 2800);
     }
-
     async function copiarAlPortapapeles(texto) {
         try { await navigator.clipboard.writeText(texto); mostrarNotificacion("Resumen copiado"); }
-        catch { 
-            const area = document.createElement("textarea"); 
-            area.value = texto; 
-            area.style.position="fixed"; 
-            area.style.opacity="0"; 
-            document.body.appendChild(area); 
-            area.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(area); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
-        }
+        catch { const area = document.createElement("textarea"); area.value = texto; area.style.position="fixed"; area.style.opacity="0"; document.body.appendChild(area); area.select(); document.execCommand("copy"); document.body.removeChild(area); mostrarNotificacion("Resumen copiado con éxito"); }
     }
-
     function toggleDarkMode() {
         const body = document.body;
         const isLight = body.getAttribute('data-theme') === 'light';
@@ -442,13 +752,11 @@
         document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
         document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
     }
-
     function toggleHelp(forceState) {
         const widget = document.getElementById('helpWidget');
         const shouldOpen = typeof forceState === 'boolean' ? forceState : !widget.classList.contains('open');
         widget.classList.toggle('open', shouldOpen);
     }
-
     function actualizarCotizacion(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -459,7 +767,6 @@
         const cotizacion = obtenerCotizacion(datos, programa);
         contenedor.innerHTML = cotizacion.html;
     }
-
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -481,7 +788,6 @@
         if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         copiarAlPortapapeles(textoBase);
     }
-
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
         if (!lista.length) { contenedor.innerHTML = ""; contenedor.style.display = "none"; return; }
@@ -493,7 +799,6 @@
         `).join("");
         contenedor.style.display = "block";
     }
-
     function actualizarSugerencias() {
         const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value);
         if (!busqueda) { document.getElementById("sugerencias").style.display = "none"; return; }
@@ -506,13 +811,11 @@
             .slice(0, 12);
         renderSugerencias(sugerencias);
     }
-
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
         buscarInstituto();
     }
-
     function buscarInstituto() {
         const texto = document.getElementById('textoBusqueda').value.trim();
         const busqueda = normalizarTexto(texto);
@@ -523,19 +826,20 @@
         }
         const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
         let htmlTotal = "";
-
         resultados.forEach((encontrado, index) => {
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
+          
             const director = obtenerDirector(encontrado);
-
-            let directorHtml = director ? `
+            let directorHtml = "";
+            if (director) {
+                directorHtml = `
                 <div class="caja-info" style="margin: 14px 0 18px 0; padding: 14px 20px; border-left: 4px solid var(--hh-yellow);">
                     <span class="info-label"><i class="fas fa-user-tie"></i> Director de Instituto</span>
                     <div class="info-value" style="font-size: 1.05em; margin-top: 6px;">${escaparHTML(director)}</div>
-                </div>` : "";
-
+                </div>`;
+            }
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="caja-info franchise" style="margin:18px 0;">
                     <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
@@ -545,18 +849,15 @@
                         <div class="info-item" style="grid-column:span 2;"><span class="info-label">Email</span><span class="info-value" style="font-size:0.92em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
                     </div>
                 </div>` : "";
-
             let enlaceHtml = "";
             let linkUrl = (encontrado.Wiki||"").toString().trim();
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
-
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
                 enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir wiki</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
             }
-
             htmlTotal += `
                 <div class="result-card">
                     <div class="instituto-header">
@@ -586,11 +887,9 @@
                     </div>
                 </div>`;
         });
-
         document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
-
     window.onload = async function() {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
@@ -612,7 +911,6 @@
         baseCargada = true;
         if (!status.innerHTML.includes("Error")) status.innerHTML = "✅ Base de datos lista.";
     };
-
     document.addEventListener('DOMContentLoaded', () => {
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');

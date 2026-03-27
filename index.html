@@ -65,9 +65,9 @@
             flex-direction: column;
             align-items: center;
         }
-        .wave-bg {
+           .wave-bg {
             position: fixed;
-            inset: 0;
+            inset: -80px;                    
             z-index: -2;
             background: linear-gradient(135deg,
                 rgba(255,234,0,0.75) 0%,
@@ -75,15 +75,18 @@
                 rgba(255,234,0,0.75) 100%);
             animation: waveFloat 28s ease-in-out infinite;
         }
+
         [data-theme="dark"] .wave-bg {
             background: linear-gradient(135deg,
                 rgba(20,20,20,0.95) 0%,
                 rgba(35,35,35,0.75) 50%,
                 rgba(20,20,20,0.95) 100%);
+            inset: -80px;                    
         }
+
         [data-theme="dark"] .wave-bg::before {
-            background: radial-gradient(circle at 30% 20%, 
-                rgba(255, 234, 0, 0.22) 0%, 
+            background: radial-gradient(circle at 30% 20%,
+                rgba(255, 234, 0, 0.22) 0%,
                 transparent 65%);
         }
         @keyframes waveFloat {

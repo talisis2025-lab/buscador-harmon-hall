@@ -7,6 +7,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* [Tus estilos CSS se mantienen intactos, están excelentes] */
         :root {
             --hh-yellow: #FFEA00;
             --hh-black: #000000;
@@ -631,7 +632,6 @@
     <div id="resultado"></div>
 </div>
 
-<!-- Botón flotante de ayuda -->
 <div class="help-widget" id="helpWidget" aria-live="polite">
     <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
         <button class="help-close" type="button" onclick="toggleHelp(false)" aria-label="Cerrar ayuda">
@@ -645,8 +645,7 @@
             Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
         </p>
         <div class="help-email">
-            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx
-        </div>
+            <i class="fab fa-microsoft"></i> tu.correo@dominio.com </div>
     </div>
     <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
         ?
@@ -669,7 +668,6 @@
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
 
-    /* ====================== FUNCIÓN DIRECTOR ====================== */
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
@@ -686,46 +684,130 @@
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
+        
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
-            if (programa === 'adults') { mensu = parseFloat(datos.Adults_FF)||0; sab = parseFloat(datos.Adults_SAB)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (1-20)"; }
-            else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (21-24)"; }
-            else if (programa === 'kids') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_KIDS)||0; titulo = "Kids"; }
-            else if (programa === 'pteen') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_PTEEN)||0; titulo = "Pre-Teens"; }
+            
+            switch (programa) {
+                case 'adults': 
+                    mensu = parseFloat(datos.Adults_FF) || 0; 
+                    sab = parseFloat(datos.Adults_SAB) || 0; 
+                    lib = parseFloat(datos.Libros_Adults) || 0; 
+                    titulo = "Adultos (1-20)"; 
+                    break;
+                case 'pro': 
+                    mensu = parseFloat(datos.Adults_PRO_FF) || 0; 
+                    lib = parseFloat(datos.Libros_Adults) || 0; 
+                    titulo = "Adultos (21-24)"; 
+                    break;
+                case 'kids': 
+                    mensu = parseFloat(datos.KPT_SEM) || 0; 
+                    sab = parseFloat(datos.KPT_SAB) || 0; 
+                    lib = parseFloat(datos.Libros_KIDS) || 0; 
+                    titulo = "Kids"; 
+                    break;
+                case 'pteen': 
+                    mensu = parseFloat(datos.KPT_SEM) || 0; 
+                    sab = parseFloat(datos.KPT_SAB) || 0; 
+                    lib = parseFloat(datos.Libros_PTEEN) || 0; 
+                    titulo = "Pre-Teens"; 
+                    break;
+            }
+
             if (mensu > 0 || sab > 0) tienePrecio = true;
+            
             if (tienePrecio) {
-                html = `<div class="caja-info"><span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span><div class="info-grid">${ins>0?`<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>`:''}${lib>0?`<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>`:''}${mensu>0?`<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>`:''}${sab>0?`<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>`:''}</div></div>`;
-                texto = [`Programa: ${titulo}`,`Zona: ${datos.Zona||'A'}`,ins>0?`Inscripción: ${formatearMoneda(ins)}`:null,lib>0?`Libro: ${formatearMoneda(lib)}`:null,mensu>0?`Mensualidad Free Friday: ${formatearMoneda(mensu)}`:null,sab>0?`Mensualidad Sabatina: ${formatearMoneda(sab)}`:null].filter(Boolean).join("\n");
+                // Se separó el HTML en varias líneas para mejorar la lectura y el mantenimiento
+                html = `
+                    <div class="caja-info">
+                        <span class="info-label">
+                            <i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}
+                        </span>
+                        <div class="info-grid">
+                            ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
+                            ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
+                            ${mensu > 0 ? `<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
+                            ${sab > 0 ? `<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
+                        </div>
+                    </div>`;
+                    
+                texto = [
+                    `Programa: ${titulo}`,
+                    `Zona: ${datos.Zona || 'A'}`,
+                    ins > 0 ? `Inscripción: ${formatearMoneda(ins)}` : null,
+                    lib > 0 ? `Libro: ${formatearMoneda(lib)}` : null,
+                    mensu > 0 ? `Mensualidad Free Friday: ${formatearMoneda(mensu)}` : null,
+                    sab > 0 ? `Mensualidad Sabatina: ${formatearMoneda(sab)}` : null
+                ].filter(Boolean).join("\n");
             }
         } else {
             let total = 0, titulo = "";
-            if (programa === 'toefl') { total = parseFloat(datos.TOEFL_ITP_PRE)||0; titulo = "PAGO ÚNICO TOEFL ITP"; }
-            else if (programa === 'tkt') { total = parseFloat(datos.TKT)||0; titulo = "PAGO ÚNICO TKT"; }
-            else if (programa === 'icc') { total = parseFloat(datos.ICC_FF)||0; titulo = "PAGO ÚNICO ICC"; }
+            switch (programa) {
+                case 'toefl': total = parseFloat(datos.TOEFL_ITP_PRE) || 0; titulo = "PAGO ÚNICO TOEFL ITP"; break;
+                case 'tkt': total = parseFloat(datos.TKT) || 0; titulo = "PAGO ÚNICO TKT"; break;
+                case 'icc': total = parseFloat(datos.ICC_FF) || 0; titulo = "PAGO ÚNICO ICC"; break;
+            }
+
             if (total > 0) tienePrecio = true;
+
             if (tienePrecio) {
-                html = `<div class="caja-info" style="border-left:4px solid var(--hh-yellow); text-align:center;"><span class="info-label">${escaparHTML(titulo)}</span><div style="font-size:2.1em;font-weight:900;margin:12px 0;">${formatearMoneda(total)}</div><span class="info-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span></div>`;
-                texto = [`Programa: ${titulo}`,`Total: ${formatearMoneda(total)}`,`Todo incluido`].join("\n");
+                html = `
+                    <div class="caja-info" style="border-left:4px solid var(--hh-yellow); text-align:center;">
+                        <span class="info-label">${escaparHTML(titulo)}</span>
+                        <div style="font-size:2.1em;font-weight:900;margin:12px 0;">${formatearMoneda(total)}</div>
+                        <span class="info-label" style="font-size:0.75em;">
+                            <i class="fas fa-check-circle"></i> Todo incluido
+                        </span>
+                    </div>`;
+                texto = [`Programa: ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
             }
         }
+        
         if (!tienePrecio) {
             html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
             texto = "Precios no definidos";
         }
         return { html, texto, tienePrecio };
     }
+
     function mostrarNotificacion(mensaje) {
-        let container = document.querySelector('.toast-container') || (() => { let c = document.createElement('div'); c.className = 'toast-container'; c.style.position='fixed'; c.style.bottom='30px'; c.style.left='50%'; c.style.transform='translateX(-50%)'; c.style.zIndex='9999'; document.body.appendChild(c); return c; })();
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            container.style.position = 'fixed';
+            container.style.bottom = '30px';
+            container.style.left = '50%';
+            container.style.transform = 'translateX(-50%)';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+        }
+        
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 2800);
     }
+
     async function copiarAlPortapapeles(texto) {
-        try { await navigator.clipboard.writeText(texto); mostrarNotificacion("Resumen copiado"); }
-        catch { const area = document.createElement("textarea"); area.value = texto; area.style.position="fixed"; area.style.opacity="0"; document.body.appendChild(area); area.select(); document.execCommand("copy"); document.body.removeChild(area); mostrarNotificacion("Resumen copiado con éxito"); }
+        try { 
+            await navigator.clipboard.writeText(texto); 
+            mostrarNotificacion("Resumen copiado con éxito"); 
+        } catch { 
+            // Fallback para navegadores más antiguos
+            const area = document.createElement("textarea"); 
+            area.value = texto; 
+            area.style.position = "fixed"; 
+            area.style.opacity = "0"; 
+            document.body.appendChild(area); 
+            area.select(); 
+            document.execCommand("copy"); 
+            document.body.removeChild(area); 
+            mostrarNotificacion("Resumen copiado con éxito"); 
+        }
     }
+
     function toggleDarkMode() {
         const body = document.body;
         const isLight = body.getAttribute('data-theme') === 'light';
@@ -733,11 +815,13 @@
         document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
         document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
     }
+
     function toggleHelp(forceState) {
         const widget = document.getElementById('helpWidget');
         const shouldOpen = typeof forceState === 'boolean' ? forceState : !widget.classList.contains('open');
         widget.classList.toggle('open', shouldOpen);
     }
+
     function actualizarCotizacion(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -748,6 +832,7 @@
         const cotizacion = obtenerCotizacion(datos, programa);
         contenedor.innerHTML = cotizacion.html;
     }
+
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -757,7 +842,7 @@
         const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
-       
+        
         let textoBase = [
             `Instituto: ${datos.Nombre || 'N/D'}`,
             director ? `Director: ${director}` : null,
@@ -765,24 +850,35 @@
             `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
             cotizacion.texto
         ].filter(Boolean).join("\n");
-       
-        if (classType === "franquicia") textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
+        
+        if (classType === "franquicia") {
+            textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
+        }
         copiarAlPortapapeles(textoBase);
     }
+
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
-        if (!lista.length) { contenedor.innerHTML = ""; contenedor.style.display = "none"; return; }
+        if (!lista.length) { 
+            contenedor.innerHTML = ""; 
+            contenedor.style.display = "none"; 
+            return; 
+        }
         contenedor.innerHTML = lista.map(item => `
-            <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))}">
+            <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))} ">
                 ${escaparHTML(item.Nombre || "Sin nombre")}
                 <span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span>
             </div>
         `).join("");
         contenedor.style.display = "block";
     }
+
     function actualizarSugerencias() {
         const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value);
-        if (!busqueda) { document.getElementById("sugerencias").style.display = "none"; return; }
+        if (!busqueda) { 
+            document.getElementById("sugerencias").style.display = "none"; 
+            return; 
+        }
         const sugerencias = todosLosDatos
             .filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda))
             .sort((a,b) => {
@@ -792,26 +888,31 @@
             .slice(0, 12);
         renderSugerencias(sugerencias);
     }
+
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
         buscarInstituto();
     }
+
     function buscarInstituto() {
         const texto = document.getElementById('textoBusqueda').value.trim();
         const busqueda = normalizarTexto(texto);
         document.getElementById("sugerencias").style.display = "none";
+        
         if (!busqueda) {
             document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
             return;
         }
+        
         const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
         let htmlTotal = "";
+        
         resultados.forEach((encontrado, index) => {
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             const classType = tipo.includes("franquicia") ? "franchise" : "own";
-           
+            
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director) {
@@ -821,6 +922,7 @@
                     <div class="info-value" style="font-size: 1.05em; margin-top: 6px;">${escaparHTML(director)}</div>
                 </div>`;
             }
+            
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="caja-info franchise" style="margin:18px 0;">
                     <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
@@ -830,15 +932,18 @@
                         <div class="info-item" style="grid-column:span 2;"><span class="info-label">Email</span><span class="info-value" style="font-size:0.92em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
                     </div>
                 </div>` : "";
+                
             let enlaceHtml = "";
             let linkUrl = (encontrado.Wiki||"").toString().trim();
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
+            
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
                 enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir wiki</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
             }
+            
             htmlTotal += `
                 <div class="result-card">
                     <div class="instituto-header">
@@ -861,51 +966,73 @@
                         <option value="icc">ICC</option>
                     </select>
                     <div id="precios-${index}"></div>
-                   
+                    
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
                         ${enlaceHtml}
                     </div>
                 </div>`;
         });
+        
         document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
+
+    // MEJORA: Carga en paralelo de los Excels
     window.onload = async function() {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
         spinner.style.display = 'block';
-        for (const archivo of archivosA_Cargar) {
-            try {
+        
+        try {
+            // Usamos Promise.all para cargar todos los archivos al mismo tiempo
+            const promesas = archivosA_Cargar.map(async (archivo) => {
                 const response = await fetch(archivo);
-                if (!response.ok) throw new Error(`Error ${response.status}`);
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
                 const arrayBuffer = await response.arrayBuffer();
                 const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                const json = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
+                return XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
+            });
+
+            const resultados = await Promise.all(promesas);
+            
+            // Concatenamos todos los resultados una vez que todas las promesas terminan
+            resultados.forEach(json => {
                 todosLosDatos = todosLosDatos.concat(json);
-            } catch (e) {
-                console.error("Error cargando " + archivo, e);
-                status.innerHTML = "❌ Error al cargar algunos datos.";
-            }
+            });
+
+            status.innerHTML = "✅ Base de datos lista.";
+        } catch (e) {
+            console.error("Error cargando archivos Excel: ", e);
+            status.innerHTML = "❌ Error al cargar algunos datos.";
+        } finally {
+            spinner.style.display = 'none';
+            baseCargada = true;
         }
-        spinner.style.display = 'none';
-        baseCargada = true;
-        if (!status.innerHTML.includes("Error")) status.innerHTML = "✅ Base de datos lista.";
     };
+
     document.addEventListener('DOMContentLoaded', () => {
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');
+        
         textoBusqueda.addEventListener('input', actualizarSugerencias);
+        
         textoBusqueda.addEventListener('keydown', e => {
             if (e.key === 'Enter') buscarInstituto();
             if (e.key === 'Escape') sugerencias.style.display = 'none';
         });
+        
         sugerencias.addEventListener("click", e => {
             const item = e.target.closest(".sugerencia-item");
             if (item) seleccionarSugerencia(item.getAttribute("data-nombre"));
         });
+        
         document.addEventListener("click", e => {
-            if (!document.querySelector(".busqueda-wrap").contains(e.target)) sugerencias.style.display = "none";
+            const busquedaWrap = document.querySelector(".busqueda-wrap");
+            if (busquedaWrap && !busquedaWrap.contains(e.target)) {
+                sugerencias.style.display = "none";
+            }
+            
             const helpWidget = document.getElementById('helpWidget');
             if (helpWidget && !helpWidget.contains(e.target)) {
                 helpWidget.classList.remove('open');

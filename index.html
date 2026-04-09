@@ -689,13 +689,13 @@
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
             if (programa === 'adults') { mensu = parseFloat(datos.Adults_FF)||0; sab = parseFloat(datos.Adults_SAB)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (1-20)"; }
-            else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos Pro (21-24)"; }
+            else if (programa === 'pro') { mensu = parseFloat(datos.Adults_PRO_FF)||0; lib = parseFloat(datos.Libros_Adults)||0; titulo = "Adultos (21-24)"; }
             else if (programa === 'kids') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_KIDS)||0; titulo = "Kids"; }
             else if (programa === 'pteen') { mensu = parseFloat(datos.KPT_SEM)||0; sab = parseFloat(datos.KPT_SAB)||0; lib = parseFloat(datos.Libros_PTEEN)||0; titulo = "Pre-Teens"; }
             if (mensu > 0 || sab > 0) tienePrecio = true;
             if (tienePrecio) {
                 html = `<div class="caja-info"><span class="info-label"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}</span><div class="info-grid">${ins>0?`<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>`:''}${lib>0?`<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>`:''}${mensu>0?`<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>`:''}${sab>0?`<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>`:''}</div></div>`;
-                texto = [`Programa: ${titulo}`,`Zona: ${datos.Zona||'A'}`,ins>0?`Inscripción: ${formatearMoneda(ins)}`:null,lib>0?`Libro: ${formatearMoneda(lib)}`:null,mensu>0?`Mensualidad FF/SEM: ${formatearMoneda(mensu)}`:null,sab>0?`Mensualidad Sabatina: ${formatearMoneda(sab)}`:null].filter(Boolean).join("\n");
+                texto = [`Programa: ${titulo}`,`Zona: ${datos.Zona||'A'}`,ins>0?`Inscripción: ${formatearMoneda(ins)}`:null,lib>0?`Libro: ${formatearMoneda(lib)}`:null,mensu>0?`Mensualidad Free Friday: ${formatearMoneda(mensu)}`:null,sab>0?`Mensualidad Sabatina: ${formatearMoneda(sab)}`:null].filter(Boolean).join("\n");
             }
         } else {
             let total = 0, titulo = "";

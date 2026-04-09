@@ -12,6 +12,8 @@
             --hh-black: #000000;
             --hh-white: #FFFFFF;
             --hh-red: #cc1e3d;
+            --hh-green: #198754;
+            --hh-blue: #0d6efd;
             --bg: var(--hh-yellow);
             --card-bg: rgba(255,255,255,0.92);
             --text: var(--hh-black);
@@ -28,7 +30,7 @@
             --shadow-soft: 0 12px 30px rgba(0,0,0,0.08);
             --shadow-lift: 0 30px 70px rgba(0,0,0,0.18);
             --radius-lg: 32px;
-            --radius-md: 24px;
+            --radius-md: 20px;
             --radius-sm: 16px;
         }
       
@@ -69,25 +71,17 @@
             position: fixed;
             inset: -80px;                    
             z-index: -2;
-            background: linear-gradient(135deg,
-                rgba(255,234,0,0.75) 0%,
-                rgba(255,244,170,0.45) 50%,
-                rgba(255,234,0,0.75) 100%);
+            background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
             animation: waveFloat 28s ease-in-out infinite;
         }
 
         [data-theme="dark"] .wave-bg {
-            background: linear-gradient(135deg,
-                rgba(20,20,20,0.95) 0%,
-                rgba(35,35,35,0.75) 50%,
-                rgba(20,20,20,0.95) 100%);
+            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
             inset: -80px;                    
         }
 
         [data-theme="dark"] .wave-bg::before {
-            background: radial-gradient(circle at 30% 20%,
-                rgba(255, 234, 0, 0.22) 0%,
-                transparent 65%);
+            background: radial-gradient(circle at 30% 20%, rgba(255, 234, 0, 0.22) 0%, transparent 65%);
         }
         @keyframes waveFloat {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
@@ -128,12 +122,8 @@
             text-transform: uppercase;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .header-title h1:hover {
-            transform: scale(1.04);
-        }
-        .header-title h1 span {
-            color: inherit;
-        }
+        .header-title h1:hover { transform: scale(1.04); }
+        
         .dark-mode-toggle {
             display: inline-flex;
             align-items: center;
@@ -153,9 +143,7 @@
             transform: scale(1.08) translateY(-2px);
             box-shadow: var(--shadow-lift);
         }
-        .dark-mode-toggle:active {
-            transform: scale(0.95);
-        }
+        .dark-mode-toggle:active { transform: scale(0.95); }
         .contenedor {
             width: 100%;
             max-width: 640px;
@@ -169,8 +157,7 @@
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             backdrop-filter: blur(28px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .seccion:hover {
             transform: translateY(-6px);
@@ -179,11 +166,11 @@
         label {
             display: block;
             margin-bottom: 12px;
-            font-weight: 800;
+            font-weight: 900;
             color: var(--text);
-            font-size: 0.88em;
+            font-size: 0.85em;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.8px;
             opacity: 0.85;
         }
         .busqueda-wrap {
@@ -206,7 +193,6 @@
         }
         input[type="text"] {
             width: 100%;
-            /* Modificado para darle espacio a la X */
             padding: 18px 50px 18px 58px; 
             border: 2px solid var(--input-border);
             border-radius: 28px;
@@ -220,12 +206,10 @@
         }
         input[type="text"]:focus {
             border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22),
-                        inset 0 4px 12px rgba(0,0,0,0.04);
+            box-shadow: 0 0 0 5px rgba(255,234,0,0.22), inset 0 4px 12px rgba(0,0,0,0.04);
             transform: translateY(-3px) scale(1.02);
         }
 
-        /* ===== ESTILOS DEL BOTÓN LIMPIAR (X) ===== */
         .btn-limpiar {
             position: absolute;
             right: 18px;
@@ -242,15 +226,8 @@
             transition: all 0.3s ease;
             padding: 8px;
         }
-        .btn-limpiar.visible {
-            opacity: 0.45;
-            visibility: visible;
-        }
-        .btn-limpiar.visible:hover {
-            opacity: 1;
-            transform: translateY(-50%) scale(1.15);
-            color: var(--hh-red);
-        }
+        .btn-limpiar.visible { opacity: 0.45; visibility: visible; }
+        .btn-limpiar.visible:hover { opacity: 1; transform: translateY(-50%) scale(1.15); color: var(--hh-red); }
 
         .btn-buscar {
             width: 100%;
@@ -268,13 +245,9 @@
             box-shadow: 0 14px 28px rgba(0,0,0,0.22);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .btn-buscar:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 22px 40px rgba(0,0,0,0.28);
-        }
-        .btn-buscar:active {
-            transform: scale(0.96);
-        }
+        .btn-buscar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 40px rgba(0,0,0,0.28); }
+        .btn-buscar:active { transform: scale(0.96); }
+        
         select.btn-buscar {
             width: 100%;
             background: var(--input-bg);
@@ -282,7 +255,7 @@
             border-radius: 24px;
             padding: 16px 18px;
             font-weight: 700;
-            margin-bottom: 18px;
+            margin-bottom: 0px; /* Removido margen inferior porque ahora está dentro de un contenedor */
             box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
             appearance: none;
             color: var(--text) !important;
@@ -291,17 +264,9 @@
             background-repeat: no-repeat;
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        select.btn-buscar:focus {
-            border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22);
-            transform: translateY(-2px);
-        }
-        select.btn-buscar option {
-            color: var(--text) !important;
-            background-color: var(--card-bg) !important;
-            padding: 12px 18px;
-            font-weight: 700;
-        }
+        select.btn-buscar:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 5px rgba(255,234,0,0.22); transform: translateY(-2px); }
+        select.btn-buscar option { color: var(--text) !important; background-color: var(--card-bg) !important; padding: 12px 18px; font-weight: 700; }
+
         #resultado {
             margin-top: 16px;
             display: flex;
@@ -311,7 +276,7 @@
         }
         .result-card {
             background: var(--card-bg);
-            padding: 28px 26px;
+            padding: 32px 28px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
             position: relative;
@@ -321,10 +286,7 @@
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-        .result-card:hover {
-            transform: translateY(-12px) scale(1.015);
-            box-shadow: var(--shadow-lift);
-        }
+        .result-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lift); }
         @keyframes cardPop {
             from { opacity: 0; transform: translateY(40px) scale(0.92); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -342,14 +304,16 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }
         .instituto-nombre {
-            font-size: 1.42em;
+            font-size: 1.6em;
             font-weight: 900;
             letter-spacing: -0.6px;
             line-height: 1.1;
         }
+        
+        /* Insignias de Tipo */
         .type-badge {
             padding: 7px 16px;
             border-radius: 999px;
@@ -357,48 +321,58 @@
             font-weight: 900;
             color: var(--hh-white);
             letter-spacing: 0.6px;
-            margin-top: 6px;
+            margin-top: 8px;
+            display: inline-block;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
         }
-        .type-badge.own { background: linear-gradient(180deg, #111, #000); }
-        .type-badge.franchise { background: linear-gradient(180deg, #dd2447, #cc1e3d); }
-        .caja-info {
-            margin-top: 18px;
-            padding: 20px;
-            border-radius: var(--radius-md);
+        .type-badge.own { background: var(--hh-green); }
+        .type-badge.consolidado { background: var(--hh-blue); }
+        .type-badge.franchise { background: var(--hh-red); }
+
+        /* Paneles Agrupados Modernizados */
+        .panel-gris {
             background: var(--info-box);
             border: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
+            border-radius: var(--radius-md);
+            padding: 22px;
+            margin-top: 20px;
+            margin-bottom: 24px;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 18px;
-            margin-top: 12px;
-        }
-        .info-item { transition: transform 0.3s ease; }
-        .info-item:hover { transform: translateY(-3px); }
-        .info-label {
-            color: #888;
-            font-weight: 800;
-            font-size: 0.76em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .info-value {
-            font-weight: 900;
-            font-size: 1.12em;
-            word-break: break-word;
-        }
-        .caja-info.franchise {
+        .panel-franchise {
             background: var(--franchise-bg);
             border-left: 5px solid var(--hh-red);
         }
+        
+        /* Cuadrícula Simétrica */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 24px;
+        }
+        .data-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .data-label {
+            font-size: 0.72em;
+            font-weight: 800;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .data-label i { margin-right: 6px; font-size: 1.1em; color: var(--text); opacity: 0.6; }
+        .data-val {
+            font-weight: 900;
+            color: var(--text);
+            font-size: 1.25em;
+            word-break: break-word;
+        }
+
         .caja-alerta {
-            margin-top: 18px;
-            padding: 16px 18px;
+            margin-top: 20px;
+            margin-bottom: 24px;
+            padding: 18px 20px;
             background: var(--alert-bg);
             color: var(--alert-text);
             border-radius: var(--radius-md);
@@ -409,45 +383,34 @@
             font-size: 0.95em;
             border: 1px solid rgba(204,30,61,0.15);
         }
+
+        /* Botones de Acción */
         .buttons-wrapper {
-            margin-top: 24px;
+            margin-top: 32px;
             display: flex;
             flex-direction: column;
             gap: 14px;
         }
         .btn-wiki, .btn-copiar {
             width: 100%;
-            padding: 17px 22px;
+            padding: 18px 22px;
             border-radius: 28px;
             font-weight: 900;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.7px;
+            letter-spacing: 0.8px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 12px 28px rgba(0,0,0,0.18);
             display: inline-block;
             text-decoration: none;
         }
-        .btn-wiki {
-            background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
-            color: var(--hh-black);
-            border: 2px solid var(--hh-black);
-        }
-        .btn-wiki:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 20px 38px rgba(255,234,0,0.35);
-        }
-        .btn-copiar {
-            background: linear-gradient(180deg, var(--hh-red), #b81a34);
-            color: white;
-            border: none;
-        }
-        .btn-copiar:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 20px 38px rgba(204,30,61,0.35);
-        }
-        .btn-wiki:active, .btn-copiar:active { transform: scale(0.94); }
+        .btn-copiar { background: var(--hh-red); color: white; border: none; }
+        .btn-copiar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(204,30,61,0.35); }
+        .btn-wiki { background: var(--hh-yellow); color: var(--hh-black); border: 2px solid var(--hh-black); }
+        .btn-wiki:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(255,234,0,0.35); }
+        .btn-wiki:active, .btn-copiar:active { transform: scale(0.96); }
+
         #loadingSpinner {
             display: none;
             position: absolute;
@@ -458,6 +421,7 @@
             animation: iosSpin 1.2s linear infinite;
         }
         @keyframes iosSpin { 100% { transform: rotate(360deg); } }
+
         .sugerencias {
             display: none;
             position: absolute;
@@ -481,13 +445,8 @@
             transition: background 0.25s ease;
         }
         .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
-        .sugerencia-sub {
-            display: block;
-            margin-top: 4px;
-            font-size: 0.82em;
-            font-weight: 600;
-            opacity: 0.7;
-        }
+        .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.82em; font-weight: 600; opacity: 0.7; }
+        
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -497,10 +456,7 @@
             box-shadow: 0 16px 32px rgba(0,0,0,0.3);
             animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-        [data-theme="dark"] .toast {
-            background: var(--hh-yellow);
-            color: #000;
-        }
+        [data-theme="dark"] .toast { background: var(--hh-yellow); color: #000; }
         @keyframes iosToast {
             0% { transform: translateY(80px) scale(0.7); opacity: 0; }
             15% { transform: translateY(0) scale(1.05); opacity: 1; }
@@ -518,111 +474,18 @@
         }
 
         /* ===== Botón de ayuda flotante ===== */
-        .help-widget {
-            position: fixed;
-            right: 18px;
-            bottom: 18px;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 12px;
-        }
-        .help-btn {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            font-size: 1.3rem;
-            font-weight: 900;
-            background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
-            color: #000;
-            box-shadow: 0 14px 30px rgba(0,0,0,0.22);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .help-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 20px 38px rgba(0,0,0,0.28);
-        }
+        .help-widget { position: fixed; right: 18px; bottom: 18px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .help-btn { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg, var(--hh-yellow), #ffe600); color: #000; box-shadow: 0 14px 30px rgba(0,0,0,0.22); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .help-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 20px 38px rgba(0,0,0,0.28); }
         .help-btn:active { transform: scale(0.95); }
-        .help-panel {
-            width: min(320px, calc(100vw - 36px));
-            background: var(--card-bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 22px;
-            box-shadow: var(--shadow-lift);
-            backdrop-filter: blur(24px);
-            padding: 16px 16px 14px;
-            transform-origin: bottom right;
-            transform: translateY(12px) scale(0.95);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.22s ease;
-        }
-        .help-widget.open .help-panel {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0) scale(1);
-        }
-        .help-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 900;
-            font-size: 1rem;
-            margin-bottom: 8px;
-            color: var(--header-text);
-        }
-        .help-text {
-            margin: 0;
-            line-height: 1.45;
-            font-size: 0.95rem;
-            font-weight: 600;
-            opacity: 0.92;
-        }
-        .help-email {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 12px;
-            border-radius: 14px;
-            background: rgba(255,234,0,0.18);
-            font-weight: 800;
-            word-break: break-word;
-        }
-        .help-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            background: transparent;
-            color: var(--text);
-            opacity: 0.65;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        .help-close:hover {
-            opacity: 1;
-            transform: scale(1.08);
-        }
-        .help-panel::before {
-            content: "";
-            position: absolute;
-            right: 18px;
-            bottom: -8px;
-            width: 16px;
-            height: 16px;
-            background: var(--card-bg);
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            transform: rotate(45deg);
-        }
+        .help-panel { width: min(320px, calc(100vw - 36px)); background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow-lift); backdrop-filter: blur(24px); padding: 16px 16px 14px; transform-origin: bottom right; transform: translateY(12px) scale(0.95); opacity: 0; pointer-events: none; transition: all 0.22s ease; }
+        .help-widget.open .help-panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+        .help-title { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1rem; margin-bottom: 8px; color: var(--header-text); }
+        .help-text { margin: 0; line-height: 1.45; font-size: 0.95rem; font-weight: 600; opacity: 0.92; }
+        .help-email { display: inline-block; margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(255,234,0,0.18); font-weight: 800; word-break: break-word; }
+        .help-close { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer; background: transparent; color: var(--text); opacity: 0.65; transition: opacity 0.2s ease, transform 0.2s ease; }
+        .help-close:hover { opacity: 1; transform: scale(1.08); }
+        .help-panel::before { content: ""; position: absolute; right: 18px; bottom: -8px; width: 16px; height: 16px; background: var(--card-bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
 
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
@@ -724,44 +587,25 @@
             let mensu = 0, sab = 0, lib = 0, titulo = "";
             
             switch (programa) {
-                case 'adults': 
-                    mensu = parseFloat(datos.Adults_FF) || 0; 
-                    sab = parseFloat(datos.Adults_SAB) || 0; 
-                    lib = parseFloat(datos.Libros_Adults) || 0; 
-                    titulo = "Adultos (1-20)"; 
-                    break;
-                case 'pro': 
-                    mensu = parseFloat(datos.Adults_PRO_FF) || 0; 
-                    lib = parseFloat(datos.Libros_Adults) || 0; 
-                    titulo = "Adultos (21-24)"; 
-                    break;
-                case 'kids': 
-                    mensu = parseFloat(datos.KPT_SEM) || 0; 
-                    sab = parseFloat(datos.KPT_SAB) || 0; 
-                    lib = parseFloat(datos.Libros_KIDS) || 0; 
-                    titulo = "Kids"; 
-                    break;
-                case 'pteen': 
-                    mensu = parseFloat(datos.KPT_SEM) || 0; 
-                    sab = parseFloat(datos.KPT_SAB) || 0; 
-                    lib = parseFloat(datos.Libros_PTEEN) || 0; 
-                    titulo = "Pre-Teens"; 
-                    break;
+                case 'adults': mensu = parseFloat(datos.Adults_FF) || 0; sab = parseFloat(datos.Adults_SAB) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (1-20)"; break;
+                case 'pro': mensu = parseFloat(datos.Adults_PRO_FF) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (21-24)"; break;
+                case 'kids': mensu = parseFloat(datos.KPT_SEM) || 0; sab = parseFloat(datos.KPT_SAB) || 0; lib = parseFloat(datos.Libros_KIDS) || 0; titulo = "Kids"; break;
+                case 'pteen': mensu = parseFloat(datos.KPT_SEM) || 0; sab = parseFloat(datos.KPT_SAB) || 0; lib = parseFloat(datos.Libros_PTEEN) || 0; titulo = "Pre-Teens"; break;
             }
 
             if (mensu > 0 || sab > 0) tienePrecio = true;
             
             if (tienePrecio) {
                 html = `
-                    <div class="caja-info">
-                        <span class="info-label">
-                            <i class="fas fa-tags"></i> ${escaparHTML(titulo)} | Zona ${escaparHTML(datos.Zona || 'A')}
+                    <div class="panel-gris">
+                        <span class="data-label" style="display:block; margin-bottom:16px;">
+                            <i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(datos.Zona || 'A')}
                         </span>
-                        <div class="info-grid">
-                            ${ins > 0 ? `<div class="info-item"><span class="info-label">Inscripción</span><span class="info-value">${formatearMoneda(ins)}</span></div>` : ''}
-                            ${lib > 0 ? `<div class="info-item"><span class="info-label">Libro</span><span class="info-value">${formatearMoneda(lib)}</span></div>` : ''}
-                            ${mensu > 0 ? `<div class="info-item"><span class="info-label">Mensualidad FF/SEM</span><span class="info-value">${formatearMoneda(mensu)}</span></div>` : ''}
-                            ${sab > 0 ? `<div class="info-item"><span class="info-label">Mensualidad Sabatina</span><span class="info-value">${formatearMoneda(sab)}</span></div>` : ''}
+                        <div class="grid-2x2">
+                            ${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}
+                            ${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}
+                            ${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}
+                            ${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}
                         </div>
                     </div>`;
                     
@@ -786,10 +630,10 @@
 
             if (tienePrecio) {
                 html = `
-                    <div class="caja-info" style="border-left:4px solid var(--hh-yellow); text-align:center;">
-                        <span class="info-label">${escaparHTML(titulo)}</span>
-                        <div style="font-size:2.1em;font-weight:900;margin:12px 0;">${formatearMoneda(total)}</div>
-                        <span class="info-label" style="font-size:0.75em;">
+                    <div class="panel-gris" style="border-left:5px solid var(--hh-yellow); text-align:center;">
+                        <span class="data-label" style="display:block; margin-bottom:8px;">${escaparHTML(titulo)}</span>
+                        <div style="font-size:2.2em; font-weight:900; margin:12px 0;">${formatearMoneda(total)}</div>
+                        <span class="data-label" style="font-size:0.75em;">
                             <i class="fas fa-check-circle"></i> Todo incluido
                         </span>
                     </div>`;
@@ -872,7 +716,11 @@
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
         const tipo = (datos.Tipo || "").toLowerCase();
-        const classType = tipo.includes("franquicia") ? "franquicia" : "propio";
+        
+        let labelTipo = "Propia";
+        if (tipo.includes("franquicia")) labelTipo = "Franquicia";
+        else if (tipo.includes("consolidado")) labelTipo = "Consolidado";
+        
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
         
@@ -880,17 +728,16 @@
             `Instituto: ${datos.Nombre || 'N/D'}`,
             director ? `Director: ${director}` : null,
             `Tipo: ${datos.Tipo || 'Instituto'}`,
-            `Categoría: ${classType === "franquicia" ? "Franquicia" : "Propio"}`,
+            `Categoría: ${labelTipo}`,
             cotizacion.texto
         ].filter(Boolean).join("\n");
         
-        if (classType === "franquicia") {
+        if (labelTipo === "Franquicia") {
             textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
         }
         copiarAlPortapapeles(textoBase);
     }
 
-    // ===== FUNCIÓN NUEVA: LIMPIAR BÚSQUEDA =====
     function limpiarBusqueda() {
         const input = document.getElementById('textoBusqueda');
         input.value = '';
@@ -916,7 +763,6 @@
         contenedor.style.display = "block";
     }
 
-    // ===== ACTUALIZADO PARA MOSTRAR/OCULTAR LA 'X' =====
     function actualizarSugerencias() {
         const inputVal = document.getElementById('textoBusqueda').value;
         const busqueda = normalizarTexto(inputVal);
@@ -945,7 +791,6 @@
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
-        // Actualizamos la X cuando se selecciona algo
         document.getElementById('btnLimpiar').classList.add('visible'); 
         buscarInstituto();
     }
@@ -966,25 +811,36 @@
         resultados.forEach((encontrado, index) => {
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
-            const classType = tipo.includes("franquicia") ? "franchise" : "own";
+            
+            // Lógica para color de insignia
+            let classType = "own";
+            let labelTipo = "Propia";
+            
+            if (tipo.includes("franquicia")) {
+                classType = "franchise";
+                labelTipo = "Franquicia";
+            } else if (tipo.includes("consolidado")) {
+                classType = "consolidado";
+                labelTipo = "Consolidado";
+            }
             
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director) {
                 directorHtml = `
-                <div class="caja-info" style="margin: 14px 0 18px 0; padding: 14px 20px; border-left: 4px solid var(--hh-yellow);">
-                    <span class="info-label"><i class="fas fa-user-tie"></i> Director de Instituto</span>
-                    <div class="info-value" style="font-size: 1.05em; margin-top: 6px;">${escaparHTML(director)}</div>
+                <div class="panel-gris">
+                    <span class="data-label"><i class="fas fa-user-tie"></i> Director de Instituto</span>
+                    <div class="data-val" style="margin-top: 6px; font-size: 1.1em; text-transform: uppercase;">${escaparHTML(director)}</div>
                 </div>`;
             }
             
             let franquiciaHtml = classType === "franchise" ? `
-                <div class="caja-info franchise" style="margin:18px 0;">
-                    <span class="info-label" style="margin-bottom:8px;display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
-                    <div class="info-grid">
-                        <div class="info-item"><span class="info-label">Coordinador</span><span class="info-value">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div>
-                        <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div>
-                        <div class="info-item" style="grid-column:span 2;"><span class="info-label">Email</span><span class="info-value" style="font-size:0.92em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
+                <div class="panel-gris panel-franchise">
+                    <span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
+                    <div class="grid-2x2">
+                        <div class="data-stack"><span class="data-label">Coordinador</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div>
+                        <div class="data-stack"><span class="data-label">Teléfono</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div>
+                        <div class="data-stack" style="grid-column: span 2;"><span class="data-label">Email</span><span class="data-val" style="font-size: 0.95em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
                     </div>
                 </div>` : "";
                 
@@ -994,36 +850,41 @@
             
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">Abrir wiki</a>`;
+                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">ABRIR WIKI</a>`;
             } else if (classType !== "franchise") {
-                enlaceHtml = `<div style="text-align:center;margin-top:24px;padding:14px;background:var(--info-box);border-radius:18px;font-weight:700;color:var(--text);opacity:0.75;"><i class="fas fa-info-circle"></i> Sin wiki disponible</div>`;
+                enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--info-box); border-radius:18px; font-weight:800; color:var(--text); opacity:0.65;"><i class="fas fa-info-circle"></i> SIN WIKI DISPONIBLE</div>`;
             }
             
             htmlTotal += `
                 <div class="result-card">
                     <div class="instituto-header">
                         <div>
-                            <span class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</span><br>
-                            <span class="type-badge ${classType}">${escaparHTML(encontrado.Tipo||'Instituto')}</span>
+                            <div class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</div>
+                            <span class="type-badge ${classType}">${labelTipo}</span>
                         </div>
-                        <i class="fas fa-school" style="font-size:1.8em;opacity:0.3;"></i>
+                        <i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i>
                     </div>
+                    
                     ${directorHtml}
                     ${franquiciaHtml}
-                    <label style="font-size:0.75em;opacity:0.8;">Selecciona Programa:</label>
-                    <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
-                        <option value="adults">Adultos (1-20)</option>
-                        <option value="pro">Adultos Pro (21-24)</option>
-                        <option value="kids">Kids</option>
-                        <option value="pteen">Pre-Teens</option>
-                        <option value="toefl">TOEFL ITP</option>
-                        <option value="tkt">TKT</option>
-                        <option value="icc">ICC</option>
-                    </select>
+                    
+                    <div style="margin-top: 24px; margin-bottom: 24px;">
+                        <label>Selecciona Programa:</label>
+                        <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
+                            <option value="adults">Adultos (1-20)</option>
+                            <option value="pro">Adultos Pro (21-24)</option>
+                            <option value="kids">Kids</option>
+                            <option value="pteen">Pre-Teens</option>
+                            <option value="toefl">TOEFL ITP</option>
+                            <option value="tkt">TKT</option>
+                            <option value="icc">ICC</option>
+                        </select>
+                    </div>
+
                     <div id="precios-${index}"></div>
                     
                     <div class="buttons-wrapper">
-                        <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar resumen</button>
+                        <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>
                         ${enlaceHtml}
                     </div>
                 </div>`;

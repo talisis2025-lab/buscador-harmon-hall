@@ -7,7 +7,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* [Tus estilos CSS se mantienen intactos, están excelentes] */
         :root {
             --hh-yellow: #FFEA00;
             --hh-black: #000000;
@@ -66,7 +65,7 @@
             flex-direction: column;
             align-items: center;
         }
-           .wave-bg {
+        .wave-bg {
             position: fixed;
             inset: -80px;                    
             z-index: -2;
@@ -207,7 +206,8 @@
         }
         input[type="text"] {
             width: 100%;
-            padding: 18px 22px 18px 58px;
+            /* Modificado para darle espacio a la X */
+            padding: 18px 50px 18px 58px; 
             border: 2px solid var(--input-border);
             border-radius: 28px;
             outline: none;
@@ -224,6 +224,34 @@
                         inset 0 4px 12px rgba(0,0,0,0.04);
             transform: translateY(-3px) scale(1.02);
         }
+
+        /* ===== ESTILOS DEL BOTÓN LIMPIAR (X) ===== */
+        .btn-limpiar {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text);
+            opacity: 0;
+            visibility: hidden;
+            cursor: pointer;
+            font-size: 1.2em;
+            z-index: 10;
+            transition: all 0.3s ease;
+            padding: 8px;
+        }
+        .btn-limpiar.visible {
+            opacity: 0.45;
+            visibility: visible;
+        }
+        .btn-limpiar.visible:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.15);
+            color: var(--hh-red);
+        }
+
         .btn-buscar {
             width: 100%;
             padding: 18px 24px;
@@ -621,10 +649,16 @@
         <i id="loadingSpinner" class="fas fa-spinner"></i>
         <span id="statusCarga">Conectando base de datos… ⏳</span>
     </div>
-    <div class="seccion">
+    
+    <div class="seccion" style="position: relative; z-index: 100;">
         <label>Buscador de Institutos</label>
         <div class="busqueda-wrap">
             <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
+            
+            <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
+                <i class="fas fa-times"></i>
+            </button>
+
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
@@ -645,7 +679,8 @@
             Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
         </p>
         <div class="help-email">
-            <i class="fab fa-microsoft"></i> tu.correo@dominio.com </div>
+            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx 
+        </div>
     </div>
     <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
         ?
@@ -717,7 +752,6 @@
             if (mensu > 0 || sab > 0) tienePrecio = true;
             
             if (tienePrecio) {
-                // Se separó el HTML en varias líneas para mejorar la lectura y el mantenimiento
                 html = `
                     <div class="caja-info">
                         <span class="info-label">
@@ -795,7 +829,6 @@
             await navigator.clipboard.writeText(texto); 
             mostrarNotificacion("Resumen copiado con éxito"); 
         } catch { 
-            // Fallback para navegadores más antiguos
             const area = document.createElement("textarea"); 
             area.value = texto; 
             area.style.position = "fixed"; 
@@ -857,6 +890,16 @@
         copiarAlPortapapeles(textoBase);
     }
 
+    // ===== FUNCIÓN NUEVA: LIMPIAR BÚSQUEDA =====
+    function limpiarBusqueda() {
+        const input = document.getElementById('textoBusqueda');
+        input.value = '';
+        document.getElementById('sugerencias').style.display = 'none';
+        document.getElementById('btnLimpiar').classList.remove('visible');
+        document.getElementById('resultado').innerHTML = '';
+        input.focus();
+    }
+
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
         if (!lista.length) { 
@@ -873,8 +916,18 @@
         contenedor.style.display = "block";
     }
 
+    // ===== ACTUALIZADO PARA MOSTRAR/OCULTAR LA 'X' =====
     function actualizarSugerencias() {
-        const busqueda = normalizarTexto(document.getElementById('textoBusqueda').value);
+        const inputVal = document.getElementById('textoBusqueda').value;
+        const busqueda = normalizarTexto(inputVal);
+        
+        const btnLimpiar = document.getElementById('btnLimpiar');
+        if (inputVal.length > 0) {
+            btnLimpiar.classList.add('visible');
+        } else {
+            btnLimpiar.classList.remove('visible');
+        }
+
         if (!busqueda) { 
             document.getElementById("sugerencias").style.display = "none"; 
             return; 
@@ -892,6 +945,8 @@
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
+        // Actualizamos la X cuando se selecciona algo
+        document.getElementById('btnLimpiar').classList.add('visible'); 
         buscarInstituto();
     }
 
@@ -978,14 +1033,12 @@
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
 
-    // MEJORA: Carga en paralelo de los Excels
     window.onload = async function() {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
         spinner.style.display = 'block';
         
         try {
-            // Usamos Promise.all para cargar todos los archivos al mismo tiempo
             const promesas = archivosA_Cargar.map(async (archivo) => {
                 const response = await fetch(archivo);
                 if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
@@ -996,7 +1049,6 @@
 
             const resultados = await Promise.all(promesas);
             
-            // Concatenamos todos los resultados una vez que todas las promesas terminan
             resultados.forEach(json => {
                 todosLosDatos = todosLosDatos.concat(json);
             });

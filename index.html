@@ -955,7 +955,7 @@
             }
         });
 
-       // --- INICIO EASTER EGG  ---
+       // --- INICIO EASTER EGG (Día/Noche Edition) ---
         const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
@@ -967,10 +967,15 @@
                 clearTimeout(temporizadorClicks);
 
                 if (contadorClicks === 3) {
-                    // Usando tu archivo local fnaf.mp3
-                    const sonidoConfeti = new Audio('fnaf.mp3');
-                    sonidoConfeti.volume = 1.0; 
-                    sonidoConfeti.play().catch(err => console.log('Error al reproducir fnaf.mp3:', err));
+                    const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
+                    
+                    // Elegimos el archivo y el volumen dependiendo del modo
+                    let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
+                    const sonidoEasterEgg = new Audio(archivoAudio);
+                    
+                    sonidoEasterEgg.volume = modoNocheActivo ? 0.6 : 1.0; 
+                    
+                    sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
 
                     if (window.confetti) {
                         confetti({
@@ -978,7 +983,9 @@
                             spread: 90,
                             origin: { y: 0.5 },
                             zIndex: 10000,
-                            colors: ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff']
+                            colors: modoNocheActivo 
+                                ? ['#cc1e3d', '#000000', '#ffffff'] // Confeti rojo, negro y blanco en la noche
+                                : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] // Confeti normal en el día
                         });
                     }
                     contadorClicks = 0; 

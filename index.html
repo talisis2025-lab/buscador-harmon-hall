@@ -967,11 +967,9 @@
                 clearTimeout(temporizadorClicks);
 
                 if (contadorClicks === 3) {
-                    // Sonido de "Party Popper" (mixkit free sound)
-                    const sonidoConfeti = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
-                    sonidoConfeti.volume = 0.6;
-                    sonidoConfeti.play().catch(err => console.log('El navegador bloqueó el audio', err));
-
+                    // Sonido de la nariz de Freddy Fazbear
+                    const sonidoConfeti = new Audio('https://www.myinstants.com/media/sounds/freddy-nose.mp3');
+                    sonidoConfeti.volume = 1.0; 
                     // Confeti con colores de Harmon Hall
                     if (window.confetti) {
                         confetti({

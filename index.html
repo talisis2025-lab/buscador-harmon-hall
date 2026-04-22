@@ -955,7 +955,7 @@
             }
         });
 
-       // --- INICIO EASTER EGG (Día/Noche Edition) ---
+// --- INICIO EASTER EGG (Con duración controlada) ---
         const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
@@ -969,13 +969,27 @@
                 if (contadorClicks === 3) {
                     const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
                     
-                    // Elegimos el archivo y el volumen dependiendo del modo
                     let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-                    const sonidoEasterEgg = new Audio(archivoAudio);
+                    // --- CONFIGURA AQUÍ LA DURACIÓN ---
+                    let duracionSegundos = modoNocheActivo ? 1.5 : 1.5; 
                     
+                    const sonidoEasterEgg = new Audio(archivoAudio);
                     sonidoEasterEgg.volume = modoNocheActivo ? 0.6 : 1.0; 
                     
                     sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
+
+                    // Función para cortar el sonido después del tiempo definido
+                    setTimeout(() => {
+                        const fadeOut = setInterval(() => {
+                            if (sonidoEasterEgg.volume > 0.1) {
+                                sonidoEasterEgg.volume -= 0.1;
+                            } else {
+                                sonidoEasterEgg.pause();
+                                sonidoEasterEgg.currentTime = 0; // Reinicia el audio
+                                clearInterval(fadeOut);
+                            }
+                        }, 50); // Baja el volumen cada 50ms
+                    }, duracionSegundos * 1000);
 
                     if (window.confetti) {
                         confetti({
@@ -984,8 +998,8 @@
                             origin: { y: 0.5 },
                             zIndex: 10000,
                             colors: modoNocheActivo 
-                                ? ['#cc1e3d', '#000000', '#ffffff'] // Confeti rojo, negro y blanco en la noche
-                                : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] // Confeti normal en el día
+                                ? ['#cc1e3d', '#000000', '#ffffff'] 
+                                : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff']
                         });
                     }
                     contadorClicks = 0; 

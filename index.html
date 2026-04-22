@@ -6,6 +6,7 @@
     <title>Harmon Hall - Buscador</title>
     <link rel="icon" type="image/jpeg" href="https://strat-branding.com/wp-content/uploads/2022/04/sb-harmon-hall.jpg">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -34,7 +35,7 @@
             --radius-md: 20px;
             --radius-sm: 16px;
         }
-      
+        
         [data-theme="dark"] {
             --bg: #0a0a0a;
             --card-bg: rgba(30,30,30,0.92);
@@ -122,6 +123,7 @@
             line-height: 1;
             text-transform: uppercase;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
         }
         .header-title h1:hover { transform: scale(1.04); }
         
@@ -256,7 +258,7 @@
             border-radius: 24px;
             padding: 16px 18px;
             font-weight: 700;
-            margin-bottom: 0px; /* Removido margen inferior porque ahora está dentro de un contenedor */
+            margin-bottom: 0px; 
             box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
             appearance: none;
             color: var(--text) !important;
@@ -501,7 +503,7 @@
 <div class="wave-bg"></div>
 <div class="header">
     <div class="logo-section">
-        <div class="header-title"><h1>Harmon <span>Hall</span></h1></div>
+        <div class="header-title"><h1 id="logoHH">Harmon <span>Hall</span></h1></div>
     </div>
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">
         <i id="darkModeIcon" class="fas fa-moon"></i>
@@ -952,6 +954,43 @@
                 helpWidget.classList.remove('open');
             }
         });
+
+        // --- INICIO EASTER EGG ---
+        const logoHH = document.getElementById('logoHH');
+        let contadorClicks = 0;
+        let temporizadorClicks = null;
+
+        if (logoHH) {
+            logoHH.style.cursor = 'pointer'; // Indicador visual sutil
+            logoHH.addEventListener('click', () => {
+                contadorClicks++;
+                clearTimeout(temporizadorClicks);
+
+                if (contadorClicks === 3) {
+                    // Sonido de "Party Popper" (mixkit free sound)
+                    const sonidoConfeti = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+                    sonidoConfeti.volume = 0.6;
+                    sonidoConfeti.play().catch(err => console.log('El navegador bloqueó el audio', err));
+
+                    // Confeti con colores de Harmon Hall
+                    if (window.confetti) {
+                        confetti({
+                            particleCount: 150,
+                            spread: 90,
+                            origin: { y: 0.5 },
+                            zIndex: 10000,
+                            colors: ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff']
+                        });
+                    }
+                    contadorClicks = 0; 
+                } else {
+                    temporizadorClicks = setTimeout(() => {
+                        contadorClicks = 0;
+                    }, 800); // Tienes 800ms para hacer los 3 clicks seguidos
+                }
+            });
+        }
+        // --- FIN EASTER EGG ---
     });
 </script>
 </body>

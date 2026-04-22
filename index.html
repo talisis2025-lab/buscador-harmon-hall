@@ -967,9 +967,9 @@
                 clearTimeout(temporizadorClicks);
 
                 if (contadorClicks === 3) {
-                    // Sonido de la nariz de Freddy Fazbear
-                    const sonidoConfeti = new Audio('https://www.myinstants.com/media/sounds/freddy-nose.mp3');
-                    sonidoConfeti.volume = 1.0; 
+                    //FNAF
+                    const sonidoConfeti = new Audio('https://api.allorigins.win/raw?url=https://www.myinstants.com/media/sounds/freddy-nose.mp3');
+                    sonidoConfeti.volume = 1.0;
                     // Confeti con colores de Harmon Hall
                     if (window.confetti) {
                         confetti({
@@ -984,7 +984,7 @@
                 } else {
                     temporizadorClicks = setTimeout(() => {
                         contadorClicks = 0;
-                    }, 800); // Tienes 800ms para hacer los 3 clicks seguidos
+                    }, 800); 
                 }
             });
         }

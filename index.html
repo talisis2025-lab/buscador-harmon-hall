@@ -955,22 +955,23 @@
             }
         });
 
-        // --- INICIO EASTER EGG ---
+       // --- INICIO EASTER EGG  ---
         const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
 
         if (logoHH) {
-            logoHH.style.cursor = 'pointer'; // Indicador visual sutil
+            logoHH.style.cursor = 'pointer'; 
             logoHH.addEventListener('click', () => {
                 contadorClicks++;
                 clearTimeout(temporizadorClicks);
 
                 if (contadorClicks === 3) {
-                    //FNAF
-                    const sonidoConfeti = new Audio('https://api.allorigins.win/raw?url=https://www.myinstants.com/media/sounds/freddy-nose.mp3');
-                    sonidoConfeti.volume = 1.0;
-                    // Confeti con colores de Harmon Hall
+                    // Usando tu archivo local fnaf.mp3
+                    const sonidoConfeti = new Audio('fnaf.mp3');
+                    sonidoConfeti.volume = 1.0; 
+                    sonidoConfeti.play().catch(err => console.log('Error al reproducir fnaf.mp3:', err));
+
                     if (window.confetti) {
                         confetti({
                             particleCount: 150,

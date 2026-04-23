@@ -727,18 +727,35 @@
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
         
-        let textoBase = [
-            `Instituto: ${datos.Nombre || 'N/D'}`,
-            director ? `Director: ${director}` : null,
-            `Tipo: ${datos.Tipo || 'Instituto'}`,
-            `Categoría: ${labelTipo}`,
-            cotizacion.texto
-        ].filter(Boolean).join("\n");
-        
+        let textoFinal = "";
+
         if (labelTipo === "Franquicia") {
-            textoBase += `\n\nContacto Franquicia:\nCoordinador: ${datos.NOMBRE2 || "N/D"}\nTeléfono: ${datos.TELÉFONOS || datos.TELEFONOS || "N/D"}\nEmail: ${datos.EMAIL3 || datos.EMAIL || "N/D"}`;
+            // NUEVO FORMATO PARA FRANQUICIAS
+            const tel = datos.TELÉFONOS || datos.TELEFONOS || "(Sin teléfono)";
+            const coord = datos.NOMBRE2 || "(Sin coordinador)";
+            const email = datos.EMAIL3 || datos.EMAIL || "";
+            
+            textoFinal = `Muy bien, te comento que contamos con varios institutos que no han subido información actualizada en el sistema, así que de momento no tenemos datos sobre sus cursos, horarios, grupos ni costos presenciales. Sin embargo, con gusto te comparto los datos de contacto del instituto para que puedan brindarte atención directa:
+ 
+📞 Teléfono: ${tel}
+👤 Coordinador: ${coord}${email ? ' / ' + email : ''}
+📍 Dirección: 
+ 
+⏰ Horario de atención: de 9:00 am a 5:00 pm.
+ 
+Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
+        } else {
+            // FORMATO ESTÁNDAR PARA PROPIOS/CONSOLIDADOS
+            textoFinal = [
+                `Instituto: ${datos.Nombre || 'N/D'}`,
+                director ? `Director: ${director}` : null,
+                `Tipo: ${datos.Tipo || 'Instituto'}`,
+                `Categoría: ${labelTipo}`,
+                cotizacion.texto
+            ].filter(Boolean).join("\n");
         }
-        copiarAlPortapapeles(textoBase);
+
+        copiarAlPortapapeles(textoFinal);
     }
 
     function limpiarBusqueda() {
@@ -955,7 +972,7 @@
             }
         });
 
-// --- INICIO EASTER EGG (Con duración controlada) ---
+        // --- INICIO EASTER EGG (Con duración controlada) ---
         const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
@@ -974,7 +991,7 @@
                     let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
                     
                     const sonidoEasterEgg = new Audio(archivoAudio);
-                    sonidoEasterEgg.volume = modoNocheActivo ? 1.0 : 1.0; 
+                    sonidoEasterEgg.volume = 1.0; 
                     
                     sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
 
@@ -985,7 +1002,7 @@
                                 sonidoEasterEgg.volume -= 0.1;
                             } else {
                                 sonidoEasterEgg.pause();
-                                sonidoEasterEgg.currentTime = 0; // Reinicia el audio
+                                sonidoEasterEgg.currentTime = 0; 
                                 clearInterval(fadeOut);
                             }
                         }, 50); // Baja el volumen cada 50ms

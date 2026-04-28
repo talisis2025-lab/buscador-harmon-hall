@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Variables de Tema */
         :root {
             --hh-yellow: #FFEA00;
             --hh-black: #000000;
@@ -53,6 +54,8 @@
             --shadow-soft: 0 12px 30px rgba(0,0,0,0.35);
             --shadow-lift: 0 30px 70px rgba(0,0,0,0.55);
         }
+
+        /* Estilos Generales */
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -69,6 +72,8 @@
             flex-direction: column;
             align-items: center;
         }
+
+        /* Fondo Animado */
         .wave-bg {
             position: fixed;
             inset: -80px;                    
@@ -76,12 +81,10 @@
             background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
             animation: waveFloat 28s ease-in-out infinite;
         }
-
         [data-theme="dark"] .wave-bg {
             background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
             inset: -80px;                    
         }
-
         [data-theme="dark"] .wave-bg::before {
             background: radial-gradient(circle at 30% 20%, rgba(255, 234, 0, 0.22) 0%, transparent 65%);
         }
@@ -100,6 +103,8 @@
             0%, 100% { opacity: 0.35; transform: scale(1); }
             50% { opacity: 0.55; transform: scale(1.08); }
         }
+
+        /* Encabezado */
         .header {
             width: 100%;
             max-width: 1100px;
@@ -127,6 +132,7 @@
         }
         .header-title h1:hover { transform: scale(1.04); }
         
+        /* Botón Dark Mode */
         .dark-mode-toggle {
             display: inline-flex;
             align-items: center;
@@ -147,6 +153,8 @@
             box-shadow: var(--shadow-lift);
         }
         .dark-mode-toggle:active { transform: scale(0.95); }
+
+        /* Contenedores Principales */
         .contenedor {
             width: 100%;
             max-width: 640px;
@@ -176,6 +184,8 @@
             letter-spacing: 0.8px;
             opacity: 0.85;
         }
+
+        /* Barra de Búsqueda */
         .busqueda-wrap {
             position: relative;
             z-index: 200;
@@ -212,7 +222,6 @@
             box-shadow: 0 0 0 5px rgba(255,234,0,0.22), inset 0 4px 12px rgba(0,0,0,0.04);
             transform: translateY(-3px) scale(1.02);
         }
-
         .btn-limpiar {
             position: absolute;
             right: 18px;
@@ -232,6 +241,7 @@
         .btn-limpiar.visible { opacity: 0.45; visibility: visible; }
         .btn-limpiar.visible:hover { opacity: 1; transform: translateY(-50%) scale(1.15); color: var(--hh-red); }
 
+        /* Botones Principales */
         .btn-buscar {
             width: 100%;
             padding: 18px 24px;
@@ -270,6 +280,7 @@
         select.btn-buscar:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 5px rgba(255,234,0,0.22); transform: translateY(-2px); }
         select.btn-buscar option { color: var(--text) !important; background-color: var(--card-bg) !important; padding: 12px 18px; font-weight: 700; }
 
+        /* Resultados y Tarjetas */
         #resultado {
             margin-top: 16px;
             display: flex;
@@ -332,7 +343,7 @@
         .type-badge.consolidado { background: var(--hh-blue); }
         .type-badge.franchise { background: var(--hh-red); }
 
-        /* Paneles Agrupados Modernizados */
+        /* Paneles de Datos */
         .panel-gris {
             background: var(--info-box);
             border: 1px solid var(--border);
@@ -345,8 +356,6 @@
             background: var(--franchise-bg);
             border-left: 5px solid var(--hh-red);
         }
-        
-        /* Cuadrícula Simétrica */
         .grid-2x2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -372,6 +381,7 @@
             word-break: break-word;
         }
 
+        /* Alertas y Estados Vacíos */
         .caja-alerta {
             margin-top: 20px;
             margin-bottom: 24px;
@@ -386,8 +396,17 @@
             font-size: 0.95em;
             border: 1px solid rgba(204,30,61,0.15);
         }
+        .empty-state {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 32px 24px;
+            text-align: center;
+            font-weight: 800;
+            box-shadow: var(--shadow-soft);
+            color: var(--alert-text);
+        }
 
-        /* Botones de Acción */
+        /* Botones de Acción Internos */
         .buttons-wrapper {
             margin-top: 32px;
             display: flex;
@@ -414,6 +433,7 @@
         .btn-wiki:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(255,234,0,0.35); }
         .btn-wiki:active, .btn-copiar:active { transform: scale(0.96); }
 
+        /* Loader de Estado */
         #loadingSpinner {
             display: none;
             position: absolute;
@@ -425,6 +445,7 @@
         }
         @keyframes iosSpin { 100% { transform: rotate(360deg); } }
 
+        /* Menú de Sugerencias */
         .sugerencias {
             display: none;
             position: absolute;
@@ -450,6 +471,7 @@
         .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
         .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.82em; font-weight: 600; opacity: 0.7; }
         
+        /* Notificaciones (Toast) */
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -466,17 +488,8 @@
             85% { transform: translateY(0) scale(1); }
             100% { transform: translateY(40px) scale(0.9); opacity: 0; }
         }
-        .empty-state {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 32px 24px;
-            text-align: center;
-            font-weight: 800;
-            box-shadow: var(--shadow-soft);
-            color: var(--alert-text);
-        }
 
-        /* ===== Botón de ayuda flotante ===== */
+        /* Widget Flotante de Ayuda */
         .help-widget { position: fixed; right: 18px; bottom: 18px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         .help-btn { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg, var(--hh-yellow), #ffe600); color: #000; box-shadow: 0 14px 30px rgba(0,0,0,0.22); transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .help-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 20px 38px rgba(0,0,0,0.28); }
@@ -490,6 +503,7 @@
         .help-close:hover { opacity: 1; transform: scale(1.08); }
         .help-panel::before { content: ""; position: absolute; right: 18px; bottom: -8px; width: 16px; height: 16px; background: var(--card-bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
 
+        /* Responsividad */
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
             .seccion { padding: 24px 20px; }
@@ -501,6 +515,7 @@
 </head>
 <body data-theme="light">
 <div class="wave-bg"></div>
+
 <div class="header">
     <div class="logo-section">
         <div class="header-title"><h1 id="logoHH">Harmon <span>Hall</span></h1></div>
@@ -510,6 +525,7 @@
         <span>Noche</span>
     </div>
 </div>
+
 <div class="contenedor">
     <div class="seccion" style="text-align: center; padding: 18px 24px; position:relative;">
         <i id="loadingSpinner" class="fas fa-spinner"></i>
@@ -529,6 +545,7 @@
         </div>
         <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
     </div>
+
     <div id="resultado"></div>
 </div>
 
@@ -554,21 +571,30 @@
 </div>
 
 <script>
+    // Variables Globales
     let todosLosDatos = [];
     let baseCargada = false;
-    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
+    
+    // Configuración de Base de Datos (SharePoint Institucional)
+    const archivosA_Cargar = [
+        'https://talisis-my.sharepoint.com/personal/abraham_quintero_unid_mx/_layouts/15/download.aspx?UniqueId=8563b7ce-ab11-466e-b956-91c6c3e5a98d'
+    ];
 
+    // Utilidades de Texto y Formato
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
     }
+    
     function escaparHTML(texto) {
         return (texto ?? "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
     }
+    
     function formatearMoneda(valor) {
         const numero = Number(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
     }
 
+    // Extracción de Datos
     function obtenerDirector(obj) {
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
@@ -582,6 +608,7 @@
         return "";
     }
 
+    // Procesamiento de Cotizaciones y Precios
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
@@ -651,6 +678,7 @@
         return { html, texto, tienePrecio };
     }
 
+    // Sistema de Notificaciones (Toasts)
     function mostrarNotificacion(mensaje) {
         let container = document.querySelector('.toast-container');
         if (!container) {
@@ -671,6 +699,7 @@
         setTimeout(() => toast.remove(), 2800);
     }
 
+    // Copiado al Portapapeles
     async function copiarAlPortapapeles(texto) {
         try { 
             await navigator.clipboard.writeText(texto); 
@@ -688,6 +717,7 @@
         }
     }
 
+    // Alternador de Tema (Día/Noche)
     function toggleDarkMode() {
         const body = document.body;
         const isLight = body.getAttribute('data-theme') === 'light';
@@ -696,12 +726,14 @@
         document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
     }
 
+    // Control de Widget de Ayuda
     function toggleHelp(forceState) {
         const widget = document.getElementById('helpWidget');
         const shouldOpen = typeof forceState === 'boolean' ? forceState : !widget.classList.contains('open');
         widget.classList.toggle('open', shouldOpen);
     }
 
+    // Actualización Dinámica de Precios en Interfaz
     function actualizarCotizacion(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -713,6 +745,7 @@
         contenedor.innerHTML = cotizacion.html;
     }
 
+    // Estructuración de Resumen para Copiar
     function copiarResumen(index) {
         const selector = document.getElementById(`select-${index}`);
         if (!selector) return;
@@ -730,7 +763,6 @@
         let textoFinal = "";
 
         if (labelTipo === "Franquicia") {
-            // NUEVO FORMATO PARA FRANQUICIAS
             const tel = datos.TELÉFONOS || datos.TELEFONOS || "(Sin teléfono)";
             const coord = datos.NOMBRE2 || "(Sin coordinador)";
             const email = datos.EMAIL3 || datos.EMAIL || "";
@@ -745,7 +777,6 @@
  
 Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
         } else {
-            // FORMATO ESTÁNDAR PARA PROPIOS/CONSOLIDADOS
             textoFinal = [
                 `Instituto: ${datos.Nombre || 'N/D'}`,
                 director ? `Director: ${director}` : null,
@@ -758,6 +789,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         copiarAlPortapapeles(textoFinal);
     }
 
+    // Limpieza de Búsqueda
     function limpiarBusqueda() {
         const input = document.getElementById('textoBusqueda');
         input.value = '';
@@ -767,6 +799,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         input.focus();
     }
 
+    // Renderizado de Sugerencias en Buscador
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
         if (!lista.length) { 
@@ -783,6 +816,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         contenedor.style.display = "block";
     }
 
+    // Control de Sugerencias al Escribir
     function actualizarSugerencias() {
         const inputVal = document.getElementById('textoBusqueda').value;
         const busqueda = normalizarTexto(inputVal);
@@ -808,6 +842,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         renderSugerencias(sugerencias);
     }
 
+    // Selección de Sugerencia
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
@@ -815,6 +850,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         buscarInstituto();
     }
 
+    // Ejecución de Búsqueda de Instituto
     function buscarInstituto() {
         const texto = document.getElementById('textoBusqueda').value.trim();
         const busqueda = normalizarTexto(texto);
@@ -832,7 +868,6 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             
-            // Lógica para color de insignia
             let classType = "own";
             let labelTipo = "Propia";
             
@@ -914,6 +949,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
 
+    // Inicialización y Carga de Archivos Excel
     window.onload = async function() {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
@@ -937,13 +973,14 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             status.innerHTML = "✅ Base de datos lista.";
         } catch (e) {
             console.error("Error cargando archivos Excel: ", e);
-            status.innerHTML = "❌ Error al cargar algunos datos.";
+            status.innerHTML = "❌ Error al cargar algunos datos. Revisa el acceso al enlace.";
         } finally {
             spinner.style.display = 'none';
             baseCargada = true;
         }
     };
 
+    // Listeners de Eventos (Teclado y Clics)
     document.addEventListener('DOMContentLoaded', () => {
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');
@@ -972,7 +1009,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             }
         });
 
-        // --- INICIO EASTER EGG (Con duración controlada) ---
+        // Easter Egg
         const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
@@ -987,7 +1024,6 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
                     
                     let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-                    // --- CONFIGURA AQUÍ LA DURACIÓN ---
                     let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
                     
                     const sonidoEasterEgg = new Audio(archivoAudio);
@@ -995,7 +1031,6 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     
                     sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
 
-                    // Función para cortar el sonido después del tiempo definido
                     setTimeout(() => {
                         const fadeOut = setInterval(() => {
                             if (sonidoEasterEgg.volume > 0.1) {
@@ -1005,7 +1040,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                                 sonidoEasterEgg.currentTime = 0; 
                                 clearInterval(fadeOut);
                             }
-                        }, 50); // Baja el volumen cada 50ms
+                        }, 50); 
                     }, duracionSegundos * 1000);
 
                     if (window.confetti) {
@@ -1027,7 +1062,6 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 }
             });
         }
-        // --- FIN EASTER EGG ---
     });
 </script>
 </body>

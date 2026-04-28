@@ -35,7 +35,7 @@
             --radius-md: 20px;
             --radius-sm: 16px;
         }
-        
+        
         [data-theme="dark"] {
             --bg: #0a0a0a;
             --card-bg: rgba(30,30,30,0.92);
@@ -71,7 +71,7 @@
         }
         .wave-bg {
             position: fixed;
-            inset: -80px;                    
+            inset: -80px;                    
             z-index: -2;
             background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
             animation: waveFloat 28s ease-in-out infinite;
@@ -79,7 +79,7 @@
 
         [data-theme="dark"] .wave-bg {
             background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
-            inset: -80px;                    
+            inset: -80px;                    
         }
 
         [data-theme="dark"] .wave-bg::before {
@@ -126,7 +126,7 @@
             user-select: none;
         }
         .header-title h1:hover { transform: scale(1.04); }
-        
+        
         .dark-mode-toggle {
             display: inline-flex;
             align-items: center;
@@ -196,7 +196,7 @@
         }
         input[type="text"] {
             width: 100%;
-            padding: 18px 50px 18px 58px; 
+            padding: 18px 50px 18px 58px; 
             border: 2px solid var(--input-border);
             border-radius: 28px;
             outline: none;
@@ -250,7 +250,7 @@
         }
         .btn-buscar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 40px rgba(0,0,0,0.28); }
         .btn-buscar:active { transform: scale(0.96); }
-        
+        
         select.btn-buscar {
             width: 100%;
             background: var(--input-bg);
@@ -258,7 +258,7 @@
             border-radius: 24px;
             padding: 16px 18px;
             font-weight: 700;
-            margin-bottom: 0px; 
+            margin-bottom: 0px; 
             box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
             appearance: none;
             color: var(--text) !important;
@@ -315,7 +315,7 @@
             letter-spacing: -0.6px;
             line-height: 1.1;
         }
-        
+        
         /* Insignias de Tipo */
         .type-badge {
             padding: 7px 16px;
@@ -345,7 +345,7 @@
             background: var(--franchise-bg);
             border-left: 5px solid var(--hh-red);
         }
-        
+        
         /* Cuadrícula Simétrica */
         .grid-2x2 {
             display: grid;
@@ -449,7 +449,7 @@
         }
         .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
         .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.82em; font-weight: 600; opacity: 0.7; }
-        
+        
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -515,12 +515,12 @@
         <i id="loadingSpinner" class="fas fa-spinner"></i>
         <span id="statusCarga">Conectando base de datos… ⏳</span>
     </div>
-    
+    
     <div class="seccion" style="position: relative; z-index: 100;">
         <label>Buscador de Institutos</label>
         <div class="busqueda-wrap">
             <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
-            
+            
             <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
                 <i class="fas fa-times"></i>
             </button>
@@ -545,7 +545,7 @@
             Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
         </p>
         <div class="help-email">
-            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx 
+            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx 
         </div>
     </div>
     <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
@@ -585,10 +585,10 @@
     function obtenerCotizacion(datos, programa) {
         const ins = parseFloat(datos.Inscripcion) || 0;
         let html = "", texto = "", tienePrecio = false;
-        
+        
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
-            
+            
             switch (programa) {
                 case 'adults': mensu = parseFloat(datos.Adults_FF) || 0; sab = parseFloat(datos.Adults_SAB) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (1-20)"; break;
                 case 'pro': mensu = parseFloat(datos.Adults_PRO_FF) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (21-24)"; break;
@@ -597,7 +597,7 @@
             }
 
             if (mensu > 0 || sab > 0) tienePrecio = true;
-            
+            
             if (tienePrecio) {
                 html = `
                     <div class="panel-gris">
@@ -611,7 +611,7 @@
                             ${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}
                         </div>
                     </div>`;
-                    
+                    
                 texto = [
                     `Programa: ${titulo}`,
                     `Zona: ${datos.Zona || 'A'}`,
@@ -643,7 +643,7 @@
                 texto = [`Programa: ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
             }
         }
-        
+        
         if (!tienePrecio) {
             html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
             texto = "Precios no definidos";
@@ -663,7 +663,7 @@
             container.style.zIndex = '9999';
             document.body.appendChild(container);
         }
-        
+        
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
@@ -672,19 +672,19 @@
     }
 
     async function copiarAlPortapapeles(texto) {
-        try { 
-            await navigator.clipboard.writeText(texto); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
-        } catch { 
-            const area = document.createElement("textarea"); 
-            area.value = texto; 
-            area.style.position = "fixed"; 
-            area.style.opacity = "0"; 
-            document.body.appendChild(area); 
-            area.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(area); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
+        try { 
+            await navigator.clipboard.writeText(texto); 
+            mostrarNotificacion("Resumen copiado con éxito"); 
+        } catch { 
+            const area = document.createElement("textarea"); 
+            area.value = texto; 
+            area.style.position = "fixed"; 
+            area.style.opacity = "0"; 
+            document.body.appendChild(area); 
+            area.select(); 
+            document.execCommand("copy"); 
+            document.body.removeChild(area); 
+            mostrarNotificacion("Resumen copiado con éxito"); 
         }
     }
 
@@ -719,14 +719,14 @@
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
         const tipo = (datos.Tipo || "").toLowerCase();
-        
+        
         let labelTipo = "Propia";
         if (tipo.includes("franquicia")) labelTipo = "Franquicia";
         else if (tipo.includes("consolidado")) labelTipo = "Consolidado";
-        
+        
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
-        
+        
         let textoFinal = "";
 
         if (labelTipo === "Franquicia") {
@@ -734,15 +734,15 @@
             const tel = datos.TELÉFONOS || datos.TELEFONOS || "(Sin teléfono)";
             const coord = datos.NOMBRE2 || "(Sin coordinador)";
             const email = datos.EMAIL3 || datos.EMAIL || "";
-            
+            
             textoFinal = `Muy bien, te comento que contamos con varios institutos que no han subido información actualizada en el sistema, así que de momento no tenemos datos sobre sus cursos, horarios, grupos ni costos presenciales. Sin embargo, con gusto te comparto los datos de contacto del instituto para que puedan brindarte atención directa:
- 
+ 
 📞 Teléfono: ${tel}
 👤 Coordinador: ${coord}${email ? ' / ' + email : ''}
-📍 Dirección: 
- 
+📍 Dirección: 
+ 
 ⏰ Horario de atención: de 9:00 am a 5:00 pm.
- 
+ 
 Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
         } else {
             // FORMATO ESTÁNDAR PARA PROPIOS/CONSOLIDADOS
@@ -769,10 +769,10 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
 
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
-        if (!lista.length) { 
-            contenedor.innerHTML = ""; 
-            contenedor.style.display = "none"; 
-            return; 
+        if (!lista.length) { 
+            contenedor.innerHTML = ""; 
+            contenedor.style.display = "none"; 
+            return; 
         }
         contenedor.innerHTML = lista.map(item => `
             <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))} ">
@@ -786,7 +786,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     function actualizarSugerencias() {
         const inputVal = document.getElementById('textoBusqueda').value;
         const busqueda = normalizarTexto(inputVal);
-        
+        
         const btnLimpiar = document.getElementById('btnLimpiar');
         if (inputVal.length > 0) {
             btnLimpiar.classList.add('visible');
@@ -794,9 +794,9 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             btnLimpiar.classList.remove('visible');
         }
 
-        if (!busqueda) { 
-            document.getElementById("sugerencias").style.display = "none"; 
-            return; 
+        if (!busqueda) { 
+            document.getElementById("sugerencias").style.display = "none"; 
+            return; 
         }
         const sugerencias = todosLosDatos
             .filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda))
@@ -811,7 +811,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
-        document.getElementById('btnLimpiar').classList.add('visible'); 
+        document.getElementById('btnLimpiar').classList.add('visible'); 
         buscarInstituto();
     }
 
@@ -819,23 +819,23 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         const texto = document.getElementById('textoBusqueda').value.trim();
         const busqueda = normalizarTexto(texto);
         document.getElementById("sugerencias").style.display = "none";
-        
+        
         if (!busqueda) {
             document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
             return;
         }
-        
+        
         const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
         let htmlTotal = "";
-        
+        
         resultados.forEach((encontrado, index) => {
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
-            
+            
             // Lógica para color de insignia
             let classType = "own";
             let labelTipo = "Propia";
-            
+            
             if (tipo.includes("franquicia")) {
                 classType = "franchise";
                 labelTipo = "Franquicia";
@@ -843,7 +843,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 classType = "consolidado";
                 labelTipo = "Consolidado";
             }
-            
+            
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director) {
@@ -853,7 +853,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     <div class="data-val" style="margin-top: 6px; font-size: 1.1em; text-transform: uppercase;">${escaparHTML(director)}</div>
                 </div>`;
             }
-            
+            
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="panel-gris panel-franchise">
                     <span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
@@ -863,18 +863,18 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                         <div class="data-stack" style="grid-column: span 2;"><span class="data-label">Email</span><span class="data-val" style="font-size: 0.95em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
                     </div>
                 </div>` : "";
-                
+                
             let enlaceHtml = "";
             let linkUrl = (encontrado.Wiki||"").toString().trim();
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
-            
+            
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
                 enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">ABRIR WIKI</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--info-box); border-radius:18px; font-weight:800; color:var(--text); opacity:0.65;"><i class="fas fa-info-circle"></i> SIN WIKI DISPONIBLE</div>`;
             }
-            
+            
             htmlTotal += `
                 <div class="result-card">
                     <div class="instituto-header">
@@ -884,10 +884,10 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                         </div>
                         <i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i>
                     </div>
-                    
+                    
                     ${directorHtml}
                     ${franquiciaHtml}
-                    
+                    
                     <div style="margin-top: 24px; margin-bottom: 24px;">
                         <label>Selecciona Programa:</label>
                         <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
@@ -902,14 +902,14 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     </div>
 
                     <div id="precios-${index}"></div>
-                    
+                    
                     <div class="buttons-wrapper">
                         <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>
                         ${enlaceHtml}
                     </div>
                 </div>`;
         });
-        
+        
         document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
@@ -918,7 +918,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
         spinner.style.display = 'block';
-        
+        
         try {
             const promesas = archivosA_Cargar.map(async (archivo) => {
                 const response = await fetch(archivo);
@@ -929,7 +929,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             });
 
             const resultados = await Promise.all(promesas);
-            
+            
             resultados.forEach(json => {
                 todosLosDatos = todosLosDatos.concat(json);
             });
@@ -947,25 +947,25 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     document.addEventListener('DOMContentLoaded', () => {
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');
-        
+        
         textoBusqueda.addEventListener('input', actualizarSugerencias);
-        
+        
         textoBusqueda.addEventListener('keydown', e => {
             if (e.key === 'Enter') buscarInstituto();
             if (e.key === 'Escape') sugerencias.style.display = 'none';
         });
-        
+        
         sugerencias.addEventListener("click", e => {
             const item = e.target.closest(".sugerencia-item");
             if (item) seleccionarSugerencia(item.getAttribute("data-nombre"));
         });
-        
+        
         document.addEventListener("click", e => {
             const busquedaWrap = document.querySelector(".busqueda-wrap");
             if (busquedaWrap && !busquedaWrap.contains(e.target)) {
                 sugerencias.style.display = "none";
             }
-            
+            
             const helpWidget = document.getElementById('helpWidget');
             if (helpWidget && !helpWidget.contains(e.target)) {
                 helpWidget.classList.remove('open');
@@ -978,21 +978,21 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         let temporizadorClicks = null;
 
         if (logoHH) {
-            logoHH.style.cursor = 'pointer'; 
+            logoHH.style.cursor = 'pointer'; 
             logoHH.addEventListener('click', () => {
                 contadorClicks++;
                 clearTimeout(temporizadorClicks);
 
                 if (contadorClicks === 3) {
                     const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
-                    
+                    
                     let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
                     // --- CONFIGURA AQUÍ LA DURACIÓN ---
-                    let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
-                    
+                    let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
+                    
                     const sonidoEasterEgg = new Audio(archivoAudio);
-                    sonidoEasterEgg.volume = 0.6; 
-                    
+                    sonidoEasterEgg.volume = 0.6; 
+                    
                     sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
 
                     // Función para cortar el sonido después del tiempo definido
@@ -1002,7 +1002,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                                 sonidoEasterEgg.volume -= 0.1;
                             } else {
                                 sonidoEasterEgg.pause();
-                                sonidoEasterEgg.currentTime = 0; 
+                                sonidoEasterEgg.currentTime = 0; 
                                 clearInterval(fadeOut);
                             }
                         }, 50); // Baja el volumen cada 50ms
@@ -1014,16 +1014,16 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                             spread: 90,
                             origin: { y: 0.5 },
                             zIndex: 10000,
-                            colors: modoNocheActivo 
-                                ? ['#cc1e3d', '#000000', '#ffffff'] 
+                            colors: modoNocheActivo 
+                                ? ['#cc1e3d', '#000000', '#ffffff'] 
                                 : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff']
                         });
                     }
-                    contadorClicks = 0; 
+                    contadorClicks = 0; 
                 } else {
                     temporizadorClicks = setTimeout(() => {
                         contadorClicks = 0;
-                    }, 800); 
+                    }, 800); 
                 }
             });
         }

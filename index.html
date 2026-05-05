@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Colores Base */
+            /* Colores Base -  */
             --bg-color: #F5F5F7;
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.4);
@@ -113,7 +113,7 @@
             z-index: 10;
         }
 
-        /* Header UI */
+        /* Header UI - Logo Original */
         .header {
             display: flex;
             justify-content: space-between;
@@ -121,21 +121,25 @@
             margin-bottom: 40px;
             padding: 0 10px;
         }
-        .logo-section h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin: 0;
-            cursor: pointer;
-            user-select: none;
+        .logo-section {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 14px;
         }
-        .logo-section span {
-            color: var(--text-secondary);
-            font-weight: 500;
+        .header-title h1 {
+            margin: 0;
+            font-size: clamp(2.1rem, 5vw, 2.8rem);
+            font-weight: 900;
+            color: var(--text-primary);
+            letter-spacing: -1.8px;
+            line-height: 1;
+            text-transform: uppercase;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            cursor: pointer; /* Para el easter egg */
         }
+        .header-title h1:hover { transform: scale(1.04); }
+        
         .dark-mode-toggle {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -334,7 +338,7 @@
         .type-badge.consolidado { background: var(--accent-blue); }
         .type-badge.franchise { background: var(--accent-red); }
 
-        /* Paneles de Información */
+        /* Paneles de Información (Widgets iOS) */
         .panel-gris {
             background: var(--panel-bg);
             border: 1px solid var(--border-soft);
@@ -569,7 +573,10 @@
     <div class="contenedor">
         <div class="header">
             <div class="logo-section">
-                <h1 id="logoHH">Harmon<span>Hall</span></h1>
+                <!-- LOGO ORIGINAL RESTAURADO -->
+                <div class="header-title">
+                    <h1 id="logoHH">Harmon <span>Hall</span></h1>
+                </div>
             </div>
             <div class="dark-mode-toggle" onclick="toggleDarkMode()">
                 <i id="darkModeIcon" class="fas fa-moon"></i>
@@ -1058,7 +1065,6 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         let temporizadorClicks = null;
 
         if (logoHH) {
-            logoHH.style.cursor = 'pointer'; 
             logoHH.addEventListener('click', () => {
                 contadorClicks++;
                 clearTimeout(temporizadorClicks);

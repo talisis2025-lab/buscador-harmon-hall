@@ -3,306 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmon Hall - Buscador</title>
+    <title>Harmon Hall - Búsqueda</title>
     <link rel="icon" type="image/jpeg" href="https://strat-branding.com/wp-content/uploads/2022/04/sb-harmon-hall.jpg">
+    <!-- Dependencias -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fuente premium (Inter) para un look Apple -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --hh-yellow: #FFEA00;
-            --hh-black: #000000;
-            --hh-white: #FFFFFF;
-            --hh-red: #cc1e3d;
-            --hh-green: #198754;
-            --hh-blue: #0d6efd;
-            --bg: var(--hh-yellow);
-            --card-bg: rgba(255,255,255,0.92);
-            --text: var(--hh-black);
-            --header-text: var(--hh-black);
-            --border: rgba(0,0,0,0.08);
-            --input-bg: rgba(255,255,255,0.95);
-            --input-border: rgba(0,0,0,0.12);
-            --info-box: rgba(245,245,245,0.85);
-            --alert-bg: #ffebee;
-            --alert-text: var(--hh-red);
-            --franchise-bg: rgba(255,240,240,0.92);
-            --franchise-border: rgba(204,30,61,0.25);
-            --shadow: 0 20px 60px rgba(0,0,0,0.12);
-            --shadow-soft: 0 12px 30px rgba(0,0,0,0.08);
-            --shadow-lift: 0 30px 70px rgba(0,0,0,0.18);
-            --radius-lg: 32px;
+            /* Colores Base - Estilo Apple */
+            --bg-color: #F5F5F7;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --input-bg: rgba(255, 255, 255, 0.85);
+            --input-border: rgba(0, 0, 0, 0.08);
+            --border-soft: rgba(0, 0, 0, 0.06);
+            --panel-bg: rgba(255, 255, 255, 0.6);
+            --accent-primary: #000000;
+            --accent-yellow: #FFEA00;
+            --accent-red: #FF3B30; /* iOS Red */
+            --accent-green: #34C759; /* iOS Green */
+            --accent-blue: #007AFF; /* iOS Blue */
+            
+            --radius-sm: 12px;
             --radius-md: 20px;
-            --radius-sm: 16px;
+            --radius-lg: 32px;
+            --radius-pill: 999px;
+            --transition-spring: 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         
         [data-theme="dark"] {
-            --bg: #0a0a0a;
-            --card-bg: rgba(30,30,30,0.92);
-            --text: #ffffff;
-            --header-text: var(--hh-yellow);
-            --border: rgba(255,255,255,0.08);
-            --input-bg: rgba(40,40,40,0.95);
-            --input-border: rgba(255,255,255,0.15);
-            --info-box: rgba(45,45,45,0.85);
-            --alert-bg: #4a151b;
-            --alert-text: #ff8a9f;
-            --franchise-bg: rgba(60,20,25,0.92);
-            --franchise-border: rgba(204,30,61,0.35);
-            --shadow: 0 20px 60px rgba(0,0,0,0.45);
-            --shadow-soft: 0 12px 30px rgba(0,0,0,0.35);
-            --shadow-lift: 0 30px 70px rgba(0,0,0,0.55);
+            --bg-color: #000000;
+            --glass-bg: rgba(28, 28, 30, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --text-primary: #F5F5F7;
+            --text-secondary: #A1A1A6;
+            --input-bg: rgba(44, 44, 46, 0.7);
+            --input-border: rgba(255, 255, 255, 0.12);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --panel-bg: rgba(44, 44, 46, 0.5);
+            --accent-primary: var(--accent-yellow);
         }
-        * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             margin: 0;
-            padding: 24px 16px;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             min-height: 100vh;
-            transition: background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
-            overflow-x: hidden;
-            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-        .wave-bg {
-            position: fixed;
-            inset: -80px;                    
-            z-index: -2;
-            background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
-            animation: waveFloat 28s ease-in-out infinite;
-        }
-
-        [data-theme="dark"] .wave-bg {
-            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
-            inset: -80px;                    
-        }
-
-        [data-theme="dark"] .wave-bg::before {
-            background: radial-gradient(circle at 30% 20%, rgba(255, 234, 0, 0.22) 0%, transparent 65%);
-        }
-        @keyframes waveFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(30px, -30px) rotate(1deg); }
-        }
-        .wave-bg::before {
-            content: "";
-            position: absolute;
-            inset: -200px;
-            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 60%);
-            animation: subtlePulse 18s ease-in-out infinite;
-        }
-        @keyframes subtlePulse {
-            0%, 100% { opacity: 0.35; transform: scale(1); }
-            50% { opacity: 0.55; transform: scale(1.08); }
-        }
-        .header {
-            width: 100%;
-            max-width: 1100px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 8px 28px;
-            margin-bottom: 12px;
-        }
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .header-title h1 {
-            margin: 0;
-            font-size: clamp(2.1rem, 5vw, 2.8rem);
-            font-weight: 900;
-            color: var(--header-text);
-            letter-spacing: -1.8px;
-            line-height: 1;
-            text-transform: uppercase;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            user-select: none;
-        }
-        .header-title h1:hover { transform: scale(1.04); }
-        
-        .dark-mode-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.92em;
-            font-weight: 800;
-            background: var(--card-bg);
-            padding: 12px 20px;
-            border-radius: 999px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            user-select: none;
-        }
-        .dark-mode-toggle:hover {
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: var(--shadow-lift);
-        }
-        .dark-mode-toggle:active { transform: scale(0.95); }
-        .contenedor {
-            width: 100%;
-            max-width: 640px;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            transition: background-color 0.6s ease;
             position: relative;
         }
-        .seccion {
-            margin-bottom: 28px;
-            padding: 32px 28px;
+
+        /* Ambient Background Orbs */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(255, 234, 0, 0.4);
+            top: -100px; left: -100px;
+        }
+        .orb-2 {
+            width: 500px; height: 500px;
+            background: rgba(0, 122, 255, 0.15);
+            bottom: -150px; right: -100px;
+            animation-delay: -5s;
+        }
+        [data-theme="dark"] .orb-1 { background: rgba(255, 234, 0, 0.15); }
+        [data-theme="dark"] .orb-2 { background: rgba(255, 59, 48, 0.15); }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 60px) scale(1.1); }
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 680px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header UI */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+        .logo-section h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin: 0;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logo-section span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .dark-mode-toggle {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 10px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: var(--transition-spring);
+        }
+        .dark-mode-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
             border-radius: var(--radius-lg);
-            background: var(--card-bg);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(28px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 32px;
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 24px;
+            transition: var(--transition-spring);
         }
-        .seccion:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-lift);
-        }
-        label {
+
+        /* Buscador Spotlight */
+        .search-label {
             display: block;
-            margin-bottom: 12px;
-            font-weight: 900;
-            color: var(--text);
-            font-size: 0.85em;
+            font-size: 0.85rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            opacity: 0.85;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
         }
         .busqueda-wrap {
             position: relative;
-            z-index: 200;
+            width: 100%;
         }
-        .busqueda-wrap::before {
-            content: "\f002";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
+        .busqueda-wrap i.fa-search {
             position: absolute;
-            left: 22px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text);
-            opacity: 0.45;
-            font-size: 1.1em;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
             z-index: 2;
-            transition: all 0.3s ease;
         }
         input[type="text"] {
             width: 100%;
-            padding: 18px 50px 18px 58px; 
-            border: 2px solid var(--input-border);
-            border-radius: 28px;
-            outline: none;
             background: var(--input-bg);
-            color: var(--text);
-            font-size: 1.08em;
+            border: 1.5px solid var(--input-border);
+            padding: 20px 50px 20px 54px;
+            border-radius: var(--radius-md);
+            font-size: 1.15rem;
             font-weight: 500;
-            box-shadow: inset 0 4px 12px rgba(0,0,0,0.04);
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--text-primary);
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
         }
         input[type="text"]:focus {
-            border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22), inset 0 4px 12px rgba(0,0,0,0.04);
-            transform: translateY(-3px) scale(1.02);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(255, 234, 0, 0.15);
         }
-
         .btn-limpiar {
             position: absolute;
-            right: 18px;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
+            background: rgba(0,0,0,0.05);
             border: none;
-            color: var(--text);
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
             opacity: 0;
             visibility: hidden;
-            cursor: pointer;
-            font-size: 1.2em;
-            z-index: 10;
-            transition: all 0.3s ease;
-            padding: 8px;
+            transition: all 0.2s ease;
+            display: grid;
+            place-items: center;
         }
-        .btn-limpiar.visible { opacity: 0.45; visibility: visible; }
-        .btn-limpiar.visible:hover { opacity: 1; transform: translateY(-50%) scale(1.15); color: var(--hh-red); }
+        [data-theme="dark"] .btn-limpiar { background: rgba(255,255,255,0.1); }
+        .btn-limpiar.visible { opacity: 1; visibility: visible; }
+        .btn-limpiar:hover { background: var(--text-primary); color: var(--bg-color); }
 
         .btn-buscar {
             width: 100%;
-            padding: 18px 24px;
-            background: linear-gradient(180deg, #111111 0%, #000000 100%);
-            color: var(--hh-white);
+            background: var(--text-primary);
+            color: var(--bg-color);
             border: none;
-            border-radius: 28px;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 1.05em;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 16px;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.22);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .btn-buscar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 40px rgba(0,0,0,0.28); }
-        .btn-buscar:active { transform: scale(0.96); }
-        
-        select.btn-buscar {
-            width: 100%;
-            background: var(--input-bg);
-            border: 2px solid var(--input-border);
-            border-radius: 24px;
-            padding: 16px 18px;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
             font-weight: 700;
-            margin-bottom: 0px; 
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
-            appearance: none;
-            color: var(--text) !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-position: right 18px center;
-            background-repeat: no-repeat;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        select.btn-buscar:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 5px rgba(255,234,0,0.22); transform: translateY(-2px); }
-        select.btn-buscar option { color: var(--text) !important; background-color: var(--card-bg) !important; padding: 12px 18px; font-weight: 700; }
-
-        #resultado {
             margin-top: 16px;
+            cursor: pointer;
+            transition: var(--transition-spring);
+        }
+        .btn-buscar:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .btn-buscar:active { transform: scale(0.97); }
+
+        /* Sugerencias Dropdown */
+        .sugerencias {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0; right: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--glass-shadow);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sugerencia-item {
+            padding: 16px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-soft);
+            transition: background 0.2s ease;
+        }
+        .sugerencia-item:last-child { border-bottom: none; }
+        .sugerencia-item:hover { background: rgba(128,128,128,0.1); }
+        .sugerencia-sub { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
+
+        /* Select Styling (Apple style) */
+        select.btn-buscar {
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: 1.5px solid var(--input-border);
+            text-align: left;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 16px;
+        }
+        select.btn-buscar:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* Result Cards */
+        #resultado {
             display: flex;
             flex-direction: column;
-            gap: 28px;
-            padding-bottom: 120px;
+            gap: 24px;
+            padding-bottom: 100px;
         }
         .result-card {
-            background: var(--card-bg);
-            padding: 32px 28px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            position: relative;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            backdrop-filter: blur(24px);
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
-        .result-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lift); }
-        @keyframes cardPop {
-            from { opacity: 0; transform: translateY(40px) scale(0.92); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
         }
-        .result-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 6px;
-            width: 100%;
-            background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
-        }
+
         .instituto-header {
             display: flex;
             justify-content: space-between;
@@ -310,47 +315,44 @@
             margin-bottom: 24px;
         }
         .instituto-nombre {
-            font-size: 1.6em;
-            font-weight: 900;
-            letter-spacing: -0.6px;
-            line-height: 1.1;
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
         }
-        
-        /* Insignias de Tipo */
+        .badge-container { display: flex; gap: 8px; flex-wrap: wrap; }
         .type-badge {
-            padding: 7px 16px;
-            border-radius: 999px;
-            font-size: 0.73em;
-            font-weight: 900;
-            color: var(--hh-white);
-            letter-spacing: 0.6px;
-            margin-top: 8px;
-            display: inline-block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff;
+            text-transform: uppercase;
         }
-        .type-badge.own { background: var(--hh-green); }
-        .type-badge.consolidado { background: var(--hh-blue); }
-        .type-badge.franchise { background: var(--hh-red); }
+        .type-badge.own { background: var(--accent-green); }
+        .type-badge.consolidado { background: var(--accent-blue); }
+        .type-badge.franchise { background: var(--accent-red); }
 
-        /* Paneles Agrupados Modernizados */
+        /* Paneles de Información (Widgets iOS) */
         .panel-gris {
-            background: var(--info-box);
-            border: 1px solid var(--border);
+            background: var(--panel-bg);
+            border: 1px solid var(--border-soft);
             border-radius: var(--radius-md);
-            padding: 22px;
-            margin-top: 20px;
-            margin-bottom: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
         }
         .panel-franchise {
-            background: var(--franchise-bg);
-            border-left: 5px solid var(--hh-red);
+            background: rgba(255, 59, 48, 0.05);
+            border: 1px solid rgba(255, 59, 48, 0.15);
         }
-        
-        /* Cuadrícula Simétrica */
         .grid-2x2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px 24px;
+            gap: 16px;
         }
         .data-stack {
             display: flex;
@@ -358,200 +360,255 @@
             gap: 4px;
         }
         .data-label {
-            font-size: 0.72em;
-            font-weight: 800;
-            color: #888;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .data-label i { margin-right: 6px; font-size: 1.1em; color: var(--text); opacity: 0.6; }
         .data-val {
-            font-weight: 900;
-            color: var(--text);
-            font-size: 1.25em;
-            word-break: break-word;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .price-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .caja-alerta {
-            margin-top: 20px;
-            margin-bottom: 24px;
-            padding: 18px 20px;
-            background: var(--alert-bg);
-            color: var(--alert-text);
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+            padding: 16px;
             border-radius: var(--radius-md);
-            font-weight: 800;
+            font-weight: 600;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 0.95em;
-            border: 1px solid rgba(204,30,61,0.15);
+            margin-bottom: 16px;
         }
 
         /* Botones de Acción */
         .buttons-wrapper {
-            margin-top: 32px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
+            margin-top: 24px;
         }
-        .btn-wiki, .btn-copiar {
+        .btn-copiar, .btn-wiki {
             width: 100%;
-            padding: 18px 22px;
-            border-radius: 28px;
-            font-weight: 900;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
-            display: inline-block;
-            text-decoration: none;
-        }
-        .btn-copiar { background: var(--hh-red); color: white; border: none; }
-        .btn-copiar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(204,30,61,0.35); }
-        .btn-wiki { background: var(--hh-yellow); color: var(--hh-black); border: 2px solid var(--hh-black); }
-        .btn-wiki:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(255,234,0,0.35); }
-        .btn-wiki:active, .btn-copiar:active { transform: scale(0.96); }
-
-        #loadingSpinner {
-            display: none;
-            position: absolute;
-            top: 28px;
-            right: 28px;
-            font-size: 1.4em;
-            color: var(--text);
-            animation: iosSpin 1.2s linear infinite;
-        }
-        @keyframes iosSpin { 100% { transform: rotate(360deg); } }
-
-        .sugerencias {
-            display: none;
-            position: absolute;
-            top: calc(100% + 12px);
-            left: 0;
-            right: 0;
-            z-index: 9999;
-            background: var(--card-bg);
-            border-radius: 28px;
-            box-shadow: var(--shadow-lift);
-            backdrop-filter: blur(24px);
-            overflow: hidden;
-            max-height: 340px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-        }
-        .sugerencia-item {
-            padding: 16px 22px;
-            cursor: pointer;
+            padding: 16px;
+            border-radius: var(--radius-md);
             font-weight: 700;
-            transition: background 0.25s ease;
-        }
-        .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
-        .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.82em; font-weight: 600; opacity: 0.7; }
-        
-        .toast {
-            background: rgba(0,0,0,0.88);
-            color: var(--hh-yellow);
-            padding: 14px 26px;
-            border-radius: 999px;
-            font-weight: 900;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
-            animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        [data-theme="dark"] .toast { background: var(--hh-yellow); color: #000; }
-        @keyframes iosToast {
-            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
-            15% { transform: translateY(0) scale(1.05); opacity: 1; }
-            85% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(40px) scale(0.9); opacity: 0; }
-        }
-        .empty-state {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 32px 24px;
+            font-size: 0.95rem;
             text-align: center;
-            font-weight: 800;
-            box-shadow: var(--shadow-soft);
-            color: var(--alert-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition-spring);
+            border: none;
+        }
+        .btn-copiar {
+            background: var(--text-primary);
+            color: var(--bg-color);
+        }
+        .btn-wiki {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-soft);
+        }
+        .btn-copiar:hover, .btn-wiki:hover { transform: scale(0.98); }
+        .btn-wiki:hover { background: var(--border-soft); }
+
+        /* Loader & Toast */
+        .status-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        #loadingSpinner { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .toast-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            padding: 14px 24px;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: dynamicIsland 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes dynamicIsland {
+            0% { transform: scale(0.5); opacity: 0; border-radius: 40px; }
+            15% { transform: scale(1.05); opacity: 1; }
+            25% { transform: scale(1); }
+            85% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.8) translateY(20px); opacity: 0; }
         }
 
-        /* ===== Botón de ayuda flotante ===== */
-        .help-widget { position: fixed; right: 18px; bottom: 18px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
-        .help-btn { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg, var(--hh-yellow), #ffe600); color: #000; box-shadow: 0 14px 30px rgba(0,0,0,0.22); transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .help-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 20px 38px rgba(0,0,0,0.28); }
-        .help-btn:active { transform: scale(0.95); }
-        .help-panel { width: min(320px, calc(100vw - 36px)); background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow-lift); backdrop-filter: blur(24px); padding: 16px 16px 14px; transform-origin: bottom right; transform: translateY(12px) scale(0.95); opacity: 0; pointer-events: none; transition: all 0.22s ease; }
-        .help-widget.open .help-panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-        .help-title { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1rem; margin-bottom: 8px; color: var(--header-text); }
-        .help-text { margin: 0; line-height: 1.45; font-size: 0.95rem; font-weight: 600; opacity: 0.92; }
-        .help-email { display: inline-block; margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(255,234,0,0.18); font-weight: 800; word-break: break-word; }
-        .help-close { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer; background: transparent; color: var(--text); opacity: 0.65; transition: opacity 0.2s ease, transform 0.2s ease; }
-        .help-close:hover { opacity: 1; transform: scale(1.08); }
-        .help-panel::before { content: ""; position: absolute; right: 18px; bottom: -8px; width: 16px; height: 16px; background: var(--card-bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
 
-        @media (max-width: 768px) {
-            body { padding: 16px 12px; }
-            .seccion { padding: 24px 20px; }
-            .result-card { padding: 24px 20px; }
-            .help-widget { right: 12px; bottom: 12px; }
-            .help-panel { width: min(300px, calc(100vw - 24px)); }
+        /* Help Widget Floating */
+        .help-widget {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 16px;
+        }
+        .help-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: var(--transition-spring);
+            display: grid;
+            place-items: center;
+        }
+        .help-btn:hover { transform: scale(1.1); }
+        .help-panel {
+            width: 320px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--glass-shadow);
+            transform-origin: bottom right;
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .help-widget.open .help-panel {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+        .help-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .help-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
+        .help-email {
+            background: var(--input-bg);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .help-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: rgba(128,128,128,0.1);
+            border: none;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 20px 16px; }
+            .glass-card { padding: 24px; }
+            .instituto-nombre { font-size: 1.4rem; }
+            .grid-2x2 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body data-theme="light">
-<div class="wave-bg"></div>
-<div class="header">
-    <div class="logo-section">
-        <div class="header-title"><h1 id="logoHH">Harmon <span>Hall</span></h1></div>
+    <!-- Fondos de Orbes Ambientales -->
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
     </div>
-    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <i id="darkModeIcon" class="fas fa-moon"></i>
-        <span>Noche</span>
-    </div>
-</div>
-<div class="contenedor">
-    <div class="seccion" style="text-align: center; padding: 18px 24px; position:relative;">
-        <i id="loadingSpinner" class="fas fa-spinner"></i>
-        <span id="statusCarga">Conectando base de datos… ⏳</span>
-    </div>
-    
-    <div class="seccion" style="position: relative; z-index: 100;">
-        <label>Buscador de Institutos</label>
-        <div class="busqueda-wrap">
-            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
-            
-            <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
-                <i class="fas fa-times"></i>
-            </button>
 
-            <div id="sugerencias" class="sugerencias"></div>
+    <div class="contenedor">
+        <div class="header">
+            <div class="logo-section">
+                <h1 id="logoHH">Harmon<span>Hall</span></h1>
+            </div>
+            <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <i id="darkModeIcon" class="fas fa-moon"></i>
+                <span>Noche</span>
+            </div>
         </div>
-        <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
-    </div>
-    <div id="resultado"></div>
-</div>
 
-<div class="help-widget" id="helpWidget" aria-live="polite">
-    <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
-        <button class="help-close" type="button" onclick="toggleHelp(false)" aria-label="Cerrar ayuda">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="help-title">
-            <i class="fas fa-circle-question"></i>
-            <span>Dudas o sugerencias</span>
+        <div class="glass-card status-container">
+            <i id="loadingSpinner" class="fas fa-spinner"></i>
+            <span id="statusCarga">Conectando base de datos...</span>
         </div>
-        <p class="help-text">
-            Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
-        </p>
-        <div class="help-email">
-            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx 
+
+        <div class="glass-card">
+            <label class="search-label">Buscador de Institutos</label>
+            <div class="busqueda-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catarina..." autocomplete="off" onfocus="this.select()">
+                <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div id="sugerencias" class="sugerencias"></div>
+            </div>
+            <button class="btn-buscar" onclick="buscarInstituto()">Buscar</button>
         </div>
+
+        <div id="resultado"></div>
     </div>
-    <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
-        ?
-    </button>
-</div>
+
+    <!-- Help Widget (Floating) -->
+    <div class="help-widget" id="helpWidget">
+        <div class="help-panel" id="helpPanel">
+            <button class="help-close" onclick="toggleHelp(false)"><i class="fas fa-times"></i></button>
+            <div class="help-title"><i class="fas fa-info-circle"></i> Dudas o sugerencias</div>
+            <p class="help-text">Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.</p>
+            <div class="help-email"><i class="fab fa-microsoft"></i> abraham.quintero@unid.mx</div>
+        </div>
+        <button class="help-btn" onclick="toggleHelp()"><i class="fas fa-question"></i></button>
+    </div>
 
 <script>
     let todosLosDatos = [];
@@ -601,14 +658,15 @@
             if (tienePrecio) {
                 html = `
                     <div class="panel-gris">
-                        <span class="data-label" style="display:block; margin-bottom:16px;">
-                            <i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(datos.Zona || 'A')}
-                        </span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <span class="data-label"><i class="fas fa-layer-group"></i> ${escaparHTML(titulo)}</span>
+                            <span class="type-badge" style="background:var(--border-soft); color:var(--text-primary); font-size:0.65rem;">ZONA ${escaparHTML(datos.Zona || 'A')}</span>
+                        </div>
                         <div class="grid-2x2">
-                            ${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}
-                            ${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}
-                            ${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}
-                            ${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}
+                            ${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="price-val">${formatearMoneda(ins)}</span></div>` : ''}
+                            ${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="price-val">${formatearMoneda(lib)}</span></div>` : ''}
+                            ${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="price-val">${formatearMoneda(mensu)}</span></div>` : ''}
+                            ${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="price-val">${formatearMoneda(sab)}</span></div>` : ''}
                         </div>
                     </div>`;
                     
@@ -624,28 +682,28 @@
         } else {
             let total = 0, titulo = "";
             switch (programa) {
-                case 'toefl': total = parseFloat(datos.TOEFL_ITP_PRE) || 0; titulo = "PAGO ÚNICO TOEFL ITP"; break;
-                case 'tkt': total = parseFloat(datos.TKT) || 0; titulo = "PAGO ÚNICO TKT"; break;
-                case 'icc': total = parseFloat(datos.ICC_FF) || 0; titulo = "PAGO ÚNICO ICC"; break;
+                case 'toefl': total = parseFloat(datos.TOEFL_ITP_PRE) || 0; titulo = "TOEFL ITP"; break;
+                case 'tkt': total = parseFloat(datos.TKT) || 0; titulo = "TKT"; break;
+                case 'icc': total = parseFloat(datos.ICC_FF) || 0; titulo = "ICC"; break;
             }
 
             if (total > 0) tienePrecio = true;
 
             if (tienePrecio) {
                 html = `
-                    <div class="panel-gris" style="border-left:5px solid var(--hh-yellow); text-align:center;">
-                        <span class="data-label" style="display:block; margin-bottom:8px;">${escaparHTML(titulo)}</span>
-                        <div style="font-size:2.2em; font-weight:900; margin:12px 0;">${formatearMoneda(total)}</div>
-                        <span class="data-label" style="font-size:0.75em;">
+                    <div class="panel-gris" style="text-align:center; padding: 32px 20px;">
+                        <span class="data-label" style="display:block; margin-bottom:8px;">PAGO ÚNICO ${escaparHTML(titulo)}</span>
+                        <div style="font-size:2.5rem; font-weight:800; letter-spacing:-1px; margin:12px 0;">${formatearMoneda(total)}</div>
+                        <span class="data-label" style="font-size:0.75em; color:var(--accent-green);">
                             <i class="fas fa-check-circle"></i> Todo incluido
                         </span>
                     </div>`;
-                texto = [`Programa: ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
+                texto = [`Programa: Pago Único ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
             }
         }
         
         if (!tienePrecio) {
-            html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
+            html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos para este programa.</div>`;
             texto = "Precios no definidos";
         }
         return { html, texto, tienePrecio };
@@ -656,25 +714,20 @@
         if (!container) {
             container = document.createElement('div');
             container.className = 'toast-container';
-            container.style.position = 'fixed';
-            container.style.bottom = '30px';
-            container.style.left = '50%';
-            container.style.transform = 'translateX(-50%)';
-            container.style.zIndex = '9999';
             document.body.appendChild(container);
         }
         
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
+        toast.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent-green)"></i> ${escaparHTML(mensaje)}`;
         container.appendChild(toast);
-        setTimeout(() => toast.remove(), 2800);
+        setTimeout(() => toast.remove(), 3200);
     }
 
     async function copiarAlPortapapeles(texto) {
         try { 
             await navigator.clipboard.writeText(texto); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
+            mostrarNotificacion("Copiado al portapapeles"); 
         } catch { 
             const area = document.createElement("textarea"); 
             area.value = texto; 
@@ -684,7 +737,7 @@
             area.select(); 
             document.execCommand("copy"); 
             document.body.removeChild(area); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
+            mostrarNotificacion("Copiado al portapapeles"); 
         }
     }
 
@@ -710,7 +763,16 @@
         const contenedor = document.getElementById(`precios-${index}`);
         if (!contenedor) return;
         const cotizacion = obtenerCotizacion(datos, programa);
-        contenedor.innerHTML = cotizacion.html;
+        
+        // Animación suave de cambio
+        contenedor.style.opacity = '0';
+        contenedor.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            contenedor.innerHTML = cotizacion.html;
+            contenedor.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+            contenedor.style.opacity = '1';
+            contenedor.style.transform = 'scale(1)';
+        }, 150);
     }
 
     function copiarResumen(index) {
@@ -730,7 +792,6 @@
         let textoFinal = "";
 
         if (labelTipo === "Franquicia") {
-            // NUEVO FORMATO PARA FRANQUICIAS
             const tel = datos.TELÉFONOS || datos.TELEFONOS || "(Sin teléfono)";
             const coord = datos.NOMBRE2 || "(Sin coordinador)";
             const email = datos.EMAIL3 || datos.EMAIL || "";
@@ -745,7 +806,6 @@
  
 Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
         } else {
-            // FORMATO ESTÁNDAR PARA PROPIOS/CONSOLIDADOS
             textoFinal = [
                 `Instituto: ${datos.Nombre || 'N/D'}`,
                 director ? `Director: ${director}` : null,
@@ -776,7 +836,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         }
         contenedor.innerHTML = lista.map(item => `
             <div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))} ">
-                ${escaparHTML(item.Nombre || "Sin nombre")}
+                <div style="font-weight: 700;">${escaparHTML(item.Nombre || "Sin nombre")}</div>
                 <span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span>
             </div>
         `).join("");
@@ -804,12 +864,12 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
                 return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
             })
-            .slice(0, 12);
+            .slice(0, 8); // Reducido a 8 para un look más limpio
         renderSugerencias(sugerencias);
     }
 
     function seleccionarSugerencia(nombre) {
-        document.getElementById('textoBusqueda').value = nombre;
+        document.getElementById('textoBusqueda').value = nombre.trim();
         document.getElementById("sugerencias").style.display = "none";
         document.getElementById('btnLimpiar').classList.add('visible'); 
         buscarInstituto();
@@ -821,7 +881,11 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         document.getElementById("sugerencias").style.display = "none";
         
         if (!busqueda) {
-            document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
+            document.getElementById('resultado').innerHTML = `
+                <div class="glass-card empty-state">
+                    <i class="fas fa-search" style="font-size:2rem; margin-bottom:16px; opacity:0.3;"></i>
+                    <p>Escribe el nombre de un instituto para comenzar.</p>
+                </div>`;
             return;
         }
         
@@ -832,16 +896,13 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = (encontrado.Tipo || "").toLowerCase();
             
-            // Lógica para color de insignia
             let classType = "own";
             let labelTipo = "Propia";
             
             if (tipo.includes("franquicia")) {
-                classType = "franchise";
-                labelTipo = "Franquicia";
+                classType = "franchise"; labelTipo = "Franquicia";
             } else if (tipo.includes("consolidado")) {
-                classType = "consolidado";
-                labelTipo = "Consolidado";
+                classType = "consolidado"; labelTipo = "Consolidado";
             }
             
             const director = obtenerDirector(encontrado);
@@ -850,17 +911,17 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 directorHtml = `
                 <div class="panel-gris">
                     <span class="data-label"><i class="fas fa-user-tie"></i> Director de Instituto</span>
-                    <div class="data-val" style="margin-top: 6px; font-size: 1.1em; text-transform: uppercase;">${escaparHTML(director)}</div>
+                    <div class="data-val" style="margin-top: 4px;">${escaparHTML(director)}</div>
                 </div>`;
             }
             
             let franquiciaHtml = classType === "franchise" ? `
                 <div class="panel-gris panel-franchise">
-                    <span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
+                    <span class="data-label" style="margin-bottom:12px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span>
                     <div class="grid-2x2">
-                        <div class="data-stack"><span class="data-label">Coordinador</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div>
-                        <div class="data-stack"><span class="data-label">Teléfono</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div>
-                        <div class="data-stack" style="grid-column: span 2;"><span class="data-label">Email</span><span class="data-val" style="font-size: 0.95em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
+                        <div class="data-stack"><span class="data-label">Coordinador</span><span class="data-val">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div>
+                        <div class="data-stack"><span class="data-label">Teléfono</span><span class="data-val">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div>
+                        <div class="data-stack" style="grid-column: span 2;"><span class="data-label">Email</span><span class="data-val" style="font-size: 0.9rem;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div>
                     </div>
                 </div>` : "";
                 
@@ -870,26 +931,30 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">ABRIR WIKI</a>`;
+                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki"><i class="fas fa-external-link-alt"></i> Abrir Wiki</a>`;
             } else if (classType !== "franchise") {
-                enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--info-box); border-radius:18px; font-weight:800; color:var(--text); opacity:0.65;"><i class="fas fa-info-circle"></i> SIN WIKI DISPONIBLE</div>`;
+                enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--border-soft); border-radius:var(--radius-md); font-weight:600; font-size:0.9rem; color:var(--text-secondary);"><i class="fas fa-info-circle"></i> Wiki no disponible</div>`;
             }
             
             htmlTotal += `
-                <div class="result-card">
+                <div class="glass-card result-card" style="animation-delay: ${index * 0.1}s">
                     <div class="instituto-header">
                         <div>
                             <div class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</div>
-                            <span class="type-badge ${classType}">${labelTipo}</span>
+                            <div class="badge-container">
+                                <span class="type-badge ${classType}">${labelTipo}</span>
+                            </div>
                         </div>
-                        <i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i>
+                        <div style="width: 48px; height: 48px; border-radius: 16px; background: var(--border-soft); display:grid; place-items:center; color: var(--text-secondary);">
+                            <i class="fas fa-school" style="font-size:1.4rem;"></i>
+                        </div>
                     </div>
                     
                     ${directorHtml}
                     ${franquiciaHtml}
                     
-                    <div style="margin-top: 24px; margin-bottom: 24px;">
-                        <label>Selecciona Programa:</label>
+                    <div style="margin: 24px 0;">
+                        <label class="search-label" style="margin-bottom:8px;">Programa a cotizar</label>
                         <select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})">
                             <option value="adults">Adultos (1-20)</option>
                             <option value="pro">Adultos Pro (21-24)</option>
@@ -901,16 +966,21 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                         </select>
                     </div>
 
-                    <div id="precios-${index}"></div>
+                    <div id="precios-${index}" style="min-height: 120px;"></div>
                     
                     <div class="buttons-wrapper">
-                        <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>
+                        <button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> Copiar Resumen</button>
                         ${enlaceHtml}
                     </div>
                 </div>`;
         });
         
-        document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
+        document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `
+            <div class="glass-card empty-state">
+                <i class="fas fa-ghost" style="font-size:2rem; margin-bottom:16px; opacity:0.3;"></i>
+                <p>No se encontraron resultados para "${escaparHTML(texto)}".</p>
+            </div>`;
+            
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
 
@@ -934,12 +1004,23 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 todosLosDatos = todosLosDatos.concat(json);
             });
 
-            status.innerHTML = "✅ Base de datos lista.";
+            spinner.className = "fas fa-check-circle";
+            spinner.style.animation = "none";
+            spinner.style.color = "var(--accent-green)";
+            status.innerHTML = "Base de datos sincronizada";
+            
+            // Ocultar status despues de un momento para mayor limpieza
+            setTimeout(() => {
+                document.querySelector('.status-container').style.display = 'none';
+            }, 2000);
+
         } catch (e) {
             console.error("Error cargando archivos Excel: ", e);
-            status.innerHTML = "❌ Error al cargar algunos datos.";
+            spinner.className = "fas fa-exclamation-circle";
+            spinner.style.animation = "none";
+            spinner.style.color = "var(--accent-red)";
+            status.innerHTML = "Error de conexión";
         } finally {
-            spinner.style.display = 'none';
             baseCargada = true;
         }
     };
@@ -972,7 +1053,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             }
         });
 
-        // --- INICIO EASTER EGG (Con duración controlada) ---
+        // --- INICIO EASTER EGG ---
         const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
@@ -987,15 +1068,13 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
                     
                     let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-                    // --- CONFIGURA AQUÍ LA DURACIÓN ---
                     let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
                     
                     const sonidoEasterEgg = new Audio(archivoAudio);
                     sonidoEasterEgg.volume = 0.6; 
                     
-                    sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
+                    sonidoEasterEgg.play().catch(err => console.log('Easter Egg Audio no pudo reproducirse.'));
 
-                    // Función para cortar el sonido después del tiempo definido
                     setTimeout(() => {
                         const fadeOut = setInterval(() => {
                             if (sonidoEasterEgg.volume > 0.1) {
@@ -1005,18 +1084,18 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                                 sonidoEasterEgg.currentTime = 0; 
                                 clearInterval(fadeOut);
                             }
-                        }, 50); // Baja el volumen cada 50ms
+                        }, 50);
                     }, duracionSegundos * 1000);
 
                     if (window.confetti) {
                         confetti({
                             particleCount: 150,
                             spread: 90,
-                            origin: { y: 0.5 },
+                            origin: { y: 0.4 },
                             zIndex: 10000,
                             colors: modoNocheActivo 
-                                ? ['#cc1e3d', '#000000', '#ffffff'] 
-                                : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff']
+                                ? ['#FF3B30', '#000000', '#ffffff'] 
+                                : ['#FFEA00', '#FF3B30', '#34C759', '#007AFF', '#ffffff']
                         });
                     }
                     contadorClicks = 0; 

@@ -1,921 +1,1477 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmon Hall - Buscador</title>
-    <link rel="icon" type="image/jpeg" href="https://strat-branding.com/wp-content/uploads/2022/04/sb-harmon-hall.jpg">
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --hh-yellow: #FFEA00;
-            --hh-black: #000000;
-            --hh-white: #FFFFFF;
-            --hh-red: #cc1e3d;
-            --hh-green: #198754;
-            --hh-blue: #0d6efd;
-            --bg: var(--hh-yellow);
-            --card-bg: rgba(255,255,255,0.92);
-            --text: var(--hh-black);
-            --header-text: var(--hh-black);
-            --border: rgba(0,0,0,0.08);
-            --input-bg: rgba(255,255,255,0.95);
-            --input-border: rgba(0,0,0,0.12);
-            --info-box: rgba(245,245,245,0.85);
-            --alert-bg: #ffebee;
-            --alert-text: var(--hh-red);
-            --franchise-bg: rgba(255,240,240,0.92);
-            --franchise-border: rgba(204,30,61,0.25);
-            --shadow: 0 20px 60px rgba(0,0,0,0.12);
-            --shadow-soft: 0 12px 30px rgba(0,0,0,0.08);
-            --shadow-lift: 0 30px 70px rgba(0,0,0,0.18);
-            --radius-lg: 32px;
-            --radius-md: 20px;
-            --radius-sm: 16px;
-        }
-        
-        [data-theme="dark"] {
-            --bg: #0a0a0a;
-            --card-bg: rgba(30,30,30,0.92);
-            --text: #ffffff;
-            --header-text: var(--hh-yellow);
-            --border: rgba(255,255,255,0.08);
-            --input-bg: rgba(40,40,40,0.95);
-            --input-border: rgba(255,255,255,0.15);
-            --info-box: rgba(45,45,45,0.85);
-            --alert-bg: #4a151b;
-            --alert-text: #ff8a9f;
-            --franchise-bg: rgba(60,20,25,0.92);
-            --franchise-border: rgba(204,30,61,0.35);
-            --shadow: 0 20px 60px rgba(0,0,0,0.45);
-            --shadow-soft: 0 12px 30px rgba(0,0,0,0.35);
-            --shadow-lift: 0 30px 70px rgba(0,0,0,0.55);
-        }
-        * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 24px 16px;
-            min-height: 100vh;
-            transition: background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
-            overflow-x: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .wave-bg {
-            position: fixed;
-            inset: -80px;                    
-            z-index: -2;
-            background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
-            animation: waveFloat 28s ease-in-out infinite;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-hh-secure-v1' https://cdn.jsdelivr.net; style-src 'self' 'nonce-hh-secure-v1' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com data:; img-src 'self' data: https://strat-branding.com; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script';">
 
-        [data-theme="dark"] .wave-bg {
-            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
-            inset: -80px;                    
-        }
+  <title>Harmon Hall - Buscador Seguro</title>
+  <link rel="icon" type="image/jpeg" href="https://strat-branding.com/wp-content/uploads/2022/04/sb-harmon-hall.jpg" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <script nonce="hh-secure-v1" src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script nonce="hh-secure-v1" src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-        [data-theme="dark"] .wave-bg::before {
-            background: radial-gradient(circle at 30% 20%, rgba(255, 234, 0, 0.22) 0%, transparent 65%);
-        }
-        @keyframes waveFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(30px, -30px) rotate(1deg); }
-        }
-        .wave-bg::before {
-            content: "";
-            position: absolute;
-            inset: -200px;
-            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 60%);
-            animation: subtlePulse 18s ease-in-out infinite;
-        }
-        @keyframes subtlePulse {
-            0%, 100% { opacity: 0.35; transform: scale(1); }
-            50% { opacity: 0.55; transform: scale(1.08); }
-        }
-        .header {
-            width: 100%;
-            max-width: 1100px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 8px 28px;
-            margin-bottom: 12px;
-        }
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .header-title h1 {
-            margin: 0;
-            font-size: clamp(2.1rem, 5vw, 2.8rem);
-            font-weight: 900;
-            color: var(--header-text);
-            letter-spacing: -1.8px;
-            line-height: 1;
-            text-transform: uppercase;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            user-select: none;
-        }
-        .header-title h1:hover { transform: scale(1.04); }
-        
-        .dark-mode-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.92em;
-            font-weight: 800;
-            background: var(--card-bg);
-            padding: 12px 20px;
-            border-radius: 999px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            user-select: none;
-        }
-        .dark-mode-toggle:hover {
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: var(--shadow-lift);
-        }
-        .dark-mode-toggle:active { transform: scale(0.95); }
-        .contenedor {
-            width: 100%;
-            max-width: 640px;
-            position: relative;
-        }
-        .seccion {
-            margin-bottom: 28px;
-            padding: 32px 28px;
-            border-radius: var(--radius-lg);
-            background: var(--card-bg);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(28px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .seccion:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-lift);
-        }
-        label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 900;
-            color: var(--text);
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            opacity: 0.85;
-        }
-        .busqueda-wrap {
-            position: relative;
-            z-index: 200;
-        }
-        .busqueda-wrap::before {
-            content: "\f002";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            position: absolute;
-            left: 22px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text);
-            opacity: 0.45;
-            font-size: 1.1em;
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 18px 50px 18px 58px; 
-            border: 2px solid var(--input-border);
-            border-radius: 28px;
-            outline: none;
-            background: var(--input-bg);
-            color: var(--text);
-            font-size: 1.08em;
-            font-weight: 500;
-            box-shadow: inset 0 4px 12px rgba(0,0,0,0.04);
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        input[type="text"]:focus {
-            border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 5px rgba(255,234,0,0.22), inset 0 4px 12px rgba(0,0,0,0.04);
-            transform: translateY(-3px) scale(1.02);
-        }
+  <style nonce="hh-secure-v1">
+    :root {
+      --hh-yellow: #ffea00;
+      --hh-black: #000;
+      --hh-white: #fff;
+      --hh-red: #cc1e3d;
+      --hh-green: #198754;
+      --hh-blue: #0d6efd;
+      --bg: var(--hh-yellow);
+      --card-bg: rgba(255,255,255,.94);
+      --text: var(--hh-black);
+      --header-text: var(--hh-black);
+      --border: rgba(0,0,0,.1);
+      --input-bg: rgba(255,255,255,.96);
+      --input-border: rgba(0,0,0,.14);
+      --info-box: rgba(245,245,245,.9);
+      --alert-bg: #ffebee;
+      --alert-text: var(--hh-red);
+      --franchise-bg: rgba(255,240,240,.94);
+      --franchise-border: rgba(204,30,61,.28);
+      --shadow: 0 20px 60px rgba(0,0,0,.12);
+      --shadow-soft: 0 12px 30px rgba(0,0,0,.08);
+      --shadow-lift: 0 30px 70px rgba(0,0,0,.18);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+    }
 
-        .btn-limpiar {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text);
-            opacity: 0;
-            visibility: hidden;
-            cursor: pointer;
-            font-size: 1.2em;
-            z-index: 10;
-            transition: all 0.3s ease;
-            padding: 8px;
-        }
-        .btn-limpiar.visible { opacity: 0.45; visibility: visible; }
-        .btn-limpiar.visible:hover { opacity: 1; transform: translateY(-50%) scale(1.15); color: var(--hh-red); }
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --card-bg: rgba(30,30,30,.94);
+      --text: #fff;
+      --header-text: var(--hh-yellow);
+      --border: rgba(255,255,255,.1);
+      --input-bg: rgba(40,40,40,.96);
+      --input-border: rgba(255,255,255,.16);
+      --info-box: rgba(45,45,45,.9);
+      --alert-bg: #4a151b;
+      --alert-text: #ff8a9f;
+      --franchise-bg: rgba(60,20,25,.94);
+      --franchise-border: rgba(204,30,61,.38);
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --shadow-soft: 0 12px 30px rgba(0,0,0,.35);
+      --shadow-lift: 0 30px 70px rgba(0,0,0,.55);
+    }
 
-        .btn-buscar {
-            width: 100%;
-            padding: 18px 24px;
-            background: linear-gradient(180deg, #111111 0%, #000000 100%);
-            color: var(--hh-white);
-            border: none;
-            border-radius: 28px;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 1.05em;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 16px;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.22);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .btn-buscar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 40px rgba(0,0,0,0.28); }
-        .btn-buscar:active { transform: scale(0.96); }
-        
-        select.btn-buscar {
-            width: 100%;
-            background: var(--input-bg);
-            border: 2px solid var(--input-border);
-            border-radius: 24px;
-            padding: 16px 18px;
-            font-weight: 700;
-            margin-bottom: 0px; 
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
-            appearance: none;
-            color: var(--text) !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-position: right 18px center;
-            background-repeat: no-repeat;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        select.btn-buscar:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 5px rgba(255,234,0,0.22); transform: translateY(-2px); }
-        select.btn-buscar option { color: var(--text) !important; background-color: var(--card-bg) !important; padding: 12px 18px; font-weight: 700; }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
 
-        #resultado {
-            margin-top: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-            padding-bottom: 120px;
-        }
-        .result-card {
-            background: var(--card-bg);
-            padding: 32px 28px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            position: relative;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            backdrop-filter: blur(24px);
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        .result-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lift); }
-        @keyframes cardPop {
-            from { opacity: 0; transform: translateY(40px) scale(0.92); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .result-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 6px;
-            width: 100%;
-            background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
-        }
-        .instituto-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 24px;
-        }
-        .instituto-nombre {
-            font-size: 1.6em;
-            font-weight: 900;
-            letter-spacing: -0.6px;
-            line-height: 1.1;
-        }
-        
-        .type-badge {
-            padding: 7px 16px;
-            border-radius: 999px;
-            font-size: 0.73em;
-            font-weight: 900;
-            color: var(--hh-white);
-            letter-spacing: 0.6px;
-            margin-top: 8px;
-            display: inline-block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        .type-badge.own { background: var(--hh-green); }
-        .type-badge.consolidado { background: var(--hh-blue); }
-        .type-badge.franchise { background: var(--hh-red); }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px 16px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        .panel-gris {
-            background: var(--info-box);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 22px;
-            margin-top: 20px;
-            margin-bottom: 24px;
-        }
-        .panel-franchise {
-            background: var(--franchise-bg);
-            border-left: 5px solid var(--hh-red);
-        }
-        
-        .grid-2x2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 24px;
-        }
-        .data-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .data-label {
-            font-size: 0.72em;
-            font-weight: 800;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .data-label i { margin-right: 6px; font-size: 1.1em; color: var(--text); opacity: 0.6; }
-        .data-val {
-            font-weight: 900;
-            color: var(--text);
-            font-size: 1.25em;
-            word-break: break-word;
-        }
+    .wave-bg {
+      position: fixed;
+      inset: -80px;
+      z-index: -2;
+      background: linear-gradient(135deg, rgba(255,234,0,.75), rgba(255,244,170,.45), rgba(255,234,0,.75));
+      animation: waveFloat 28s ease-in-out infinite;
+    }
 
-        .caja-alerta {
-            margin-top: 20px;
-            margin-bottom: 24px;
-            padding: 18px 20px;
-            background: var(--alert-bg);
-            color: var(--alert-text);
-            border-radius: var(--radius-md);
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95em;
-            border: 1px solid rgba(204,30,61,0.15);
-        }
+    [data-theme="dark"] .wave-bg {
+      background: linear-gradient(135deg, rgba(20,20,20,.95), rgba(35,35,35,.75), rgba(20,20,20,.95));
+    }
 
-        .buttons-wrapper {
-            margin-top: 32px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .btn-wiki, .btn-copiar {
-            width: 100%;
-            padding: 18px 22px;
-            border-radius: 28px;
-            font-weight: 900;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
-            display: inline-block;
-            text-decoration: none;
-        }
-        .btn-copiar { background: var(--hh-red); color: white; border: none; }
-        .btn-copiar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(204,30,61,0.35); }
-        .btn-wiki { background: var(--hh-yellow); color: var(--hh-black); border: 2px solid var(--hh-black); }
-        .btn-wiki:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(255,234,0,0.35); }
-        .btn-wiki:active, .btn-copiar:active { transform: scale(0.96); }
+    .wave-bg::before {
+      content: "";
+      position: absolute;
+      inset: -200px;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), transparent 60%);
+      animation: subtlePulse 18s ease-in-out infinite;
+    }
 
-        #loadingSpinner {
-            display: none;
-            position: absolute;
-            top: 28px;
-            right: 28px;
-            font-size: 1.4em;
-            color: var(--text);
-            animation: iosSpin 1.2s linear infinite;
-        }
-        @keyframes iosSpin { 100% { transform: rotate(360deg); } }
+    [data-theme="dark"] .wave-bg::before {
+      background: radial-gradient(circle at 30% 20%, rgba(255,234,0,.22), transparent 65%);
+    }
 
-        .sugerencias {
-            display: none;
-            position: absolute;
-            top: calc(100% + 12px);
-            left: 0;
-            right: 0;
-            z-index: 9999;
-            background: var(--card-bg);
-            border-radius: 28px;
-            box-shadow: var(--shadow-lift);
-            backdrop-filter: blur(24px);
-            overflow: hidden;
-            max-height: 340px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-        }
-        .sugerencia-item {
-            padding: 16px 22px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: background 0.25s ease;
-        }
-        .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
-        .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.82em; font-weight: 600; opacity: 0.7; }
-        
-        .toast {
-            background: rgba(0,0,0,0.88);
-            color: var(--hh-yellow);
-            padding: 14px 26px;
-            border-radius: 999px;
-            font-weight: 900;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
-            animation: iosToast 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        [data-theme="dark"] .toast { background: var(--hh-yellow); color: #000; }
-        @keyframes iosToast {
-            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
-            15% { transform: translateY(0) scale(1.05); opacity: 1; }
-            85% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(40px) scale(0.9); opacity: 0; }
-        }
-        .empty-state {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 32px 24px;
-            text-align: center;
-            font-weight: 800;
-            box-shadow: var(--shadow-soft);
-            color: var(--alert-text);
-        }
+    @keyframes waveFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, -30px) rotate(1deg); }
+    }
 
-        .help-widget { position: fixed; right: 18px; bottom: 18px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
-        .help-btn { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg, var(--hh-yellow), #ffe600); color: #000; box-shadow: 0 14px 30px rgba(0,0,0,0.22); transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .help-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 20px 38px rgba(0,0,0,0.28); }
-        .help-btn:active { transform: scale(0.95); }
-        .help-panel { width: min(320px, calc(100vw - 36px)); background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow-lift); backdrop-filter: blur(24px); padding: 16px 16px 14px; transform-origin: bottom right; transform: translateY(12px) scale(0.95); opacity: 0; pointer-events: none; transition: all 0.22s ease; }
-        .help-widget.open .help-panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-        .help-title { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1rem; margin-bottom: 8px; color: var(--header-text); }
-        .help-text { margin: 0; line-height: 1.45; font-size: 0.95rem; font-weight: 600; opacity: 0.92; }
-        .help-email { display: inline-block; margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(255,234,0,0.18); font-weight: 800; word-break: break-word; }
-        .help-close { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer; background: transparent; color: var(--text); opacity: 0.65; transition: opacity 0.2s ease, transform 0.2s ease; }
-        .help-close:hover { opacity: 1; transform: scale(1.08); }
-        .help-panel::before { content: ""; position: absolute; right: 18px; bottom: -8px; width: 16px; height: 16px; background: var(--card-bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
+    @keyframes subtlePulse {
+      0%, 100% { opacity: .35; transform: scale(1); }
+      50% { opacity: .55; transform: scale(1.08); }
+    }
 
-        @media (max-width: 768px) {
-            body { padding: 16px 12px; }
-            .seccion { padding: 24px 20px; }
-            .result-card { padding: 24px 20px; }
-            .help-widget { right: 12px; bottom: 12px; }
-            .help-panel { width: min(300px, calc(100vw - 24px)); }
-        }
-    </style>
+    .header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 8px 28px;
+      margin-bottom: 12px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 900;
+      color: var(--header-text);
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      user-select: none;
+    }
+
+    .dark-mode-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .92rem;
+      font-weight: 800;
+      background: var(--card-bg);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .contenedor {
+      width: 100%;
+      max-width: 640px;
+      position: relative;
+    }
+
+    .seccion, .result-card {
+      margin-bottom: 28px;
+      padding: 30px 26px;
+      border-radius: var(--radius-lg);
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+    }
+
+    .status-section {
+      text-align: center;
+      padding: 18px 24px;
+      position: relative;
+      font-weight: 800;
+    }
+
+    #loadingSpinner {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      font-size: 1.2rem;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 900;
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      opacity: .85;
+    }
+
+    .busqueda-wrap {
+      position: relative;
+      z-index: 200;
+    }
+
+    .busqueda-wrap::before {
+      content: "\f002";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      left: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: .45;
+      z-index: 2;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 18px 50px 18px 58px;
+      border: 2px solid var(--input-border);
+      border-radius: 28px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 1.05rem;
+      font-weight: 500;
+      box-shadow: inset 0 4px 12px rgba(0,0,0,.04);
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--hh-yellow);
+      box-shadow: 0 0 0 5px rgba(255,234,0,.22), inset 0 4px 12px rgba(0,0,0,.04);
+    }
+
+    .btn-limpiar {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: 0;
+      color: var(--text);
+      opacity: 0;
+      visibility: hidden;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 8px;
+    }
+
+    .btn-limpiar.visible {
+      opacity: .55;
+      visibility: visible;
+    }
+
+    .btn-buscar, .btn-copiar, .btn-wiki {
+      width: 100%;
+      padding: 18px 22px;
+      border-radius: 28px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-buscar {
+      background: linear-gradient(180deg, #111, #000);
+      color: var(--hh-white);
+      border: 0;
+      margin-top: 16px;
+    }
+
+    select.btn-buscar {
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      color: var(--text);
+      box-shadow: inset 0 3px 10px rgba(0,0,0,.06);
+      appearance: none;
+      text-transform: none;
+    }
+
+    .btn-copiar {
+      background: var(--hh-red);
+      color: #fff;
+      border: 0;
+    }
+
+    .btn-wiki {
+      background: var(--hh-yellow);
+      color: var(--hh-black);
+      border: 2px solid var(--hh-black);
+    }
+
+    .sugerencias {
+      display: none;
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lift);
+      backdrop-filter: blur(24px);
+      overflow: hidden;
+      max-height: 340px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+    }
+
+    .sugerencia-item {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: var(--text);
+      border: 0;
+      padding: 16px 22px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .sugerencia-item:hover, .sugerencia-item:focus {
+      background: rgba(255,234,0,.18);
+      outline: none;
+    }
+
+    .sugerencia-sub {
+      display: block;
+      margin-top: 4px;
+      font-size: .82rem;
+      font-weight: 600;
+      opacity: .7;
+    }
+
+    #resultado {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding-bottom: 120px;
+    }
+
+    .result-card {
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+      animation: cardPop .45s ease forwards;
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 6px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
+    }
+
+    @keyframes cardPop {
+      from { opacity: 0; transform: translateY(24px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .instituto-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .instituto-nombre {
+      font-size: 1.5rem;
+      font-weight: 900;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    .card-icon {
+      font-size: 1.7rem;
+      opacity: .3;
+      padding-top: 4px;
+    }
+
+    .type-badge {
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: .73rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: .6px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .type-badge.own { background: var(--hh-green); }
+    .type-badge.consolidado { background: var(--hh-blue); }
+    .type-badge.franchise { background: var(--hh-red); }
+
+    .panel-gris {
+      background: var(--info-box);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-top: 20px;
+      margin-bottom: 24px;
+    }
+
+    .panel-franchise {
+      background: var(--franchise-bg);
+      border-left: 5px solid var(--hh-red);
+    }
+
+    .private-note {
+      margin: 8px 0 0;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+
+    .data-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .data-label {
+      font-size: .72rem;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .data-label i {
+      margin-right: 6px;
+      color: var(--text);
+      opacity: .6;
+    }
+
+    .data-val {
+      font-weight: 900;
+      color: var(--text);
+      font-size: 1.2rem;
+      word-break: break-word;
+    }
+
+    .price-heading {
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .price-single {
+      border-left: 5px solid var(--hh-yellow);
+      text-align: center;
+    }
+
+    .price-total {
+      font-size: 2rem;
+      font-weight: 900;
+      margin: 12px 0;
+    }
+
+    .caja-alerta {
+      margin-top: 20px;
+      margin-bottom: 24px;
+      padding: 18px 20px;
+      background: var(--alert-bg);
+      color: var(--alert-text);
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(204,30,61,.15);
+    }
+
+    .program-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .buttons-wrapper {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .no-wiki {
+      text-align: center;
+      padding: 16px;
+      background: var(--info-box);
+      border-radius: 18px;
+      font-weight: 800;
+      opacity: .65;
+    }
+
+    .empty-state {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+      font-weight: 800;
+      box-shadow: var(--shadow-soft);
+      color: var(--alert-text);
+    }
+
+    .help-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .help-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+      font-weight: 900;
+      background: linear-gradient(180deg, var(--hh-yellow), #ffe600);
+      color: #000;
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+
+    .help-panel {
+      width: min(320px, calc(100vw - 36px));
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow-lift);
+      backdrop-filter: blur(24px);
+      padding: 16px 16px 14px;
+      transform-origin: bottom right;
+      transform: translateY(12px) scale(.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: all .22s ease;
+      position: relative;
+    }
+
+    .help-widget.open .help-panel {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .help-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--header-text);
+    }
+
+    .help-text {
+      margin: 0;
+      line-height: 1.45;
+      font-size: .95rem;
+      font-weight: 600;
+      opacity: .92;
+    }
+
+    .help-email {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,234,0,.18);
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .help-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text);
+      opacity: .65;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: grid;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(0,0,0,.88);
+      color: var(--hh-yellow);
+      padding: 14px 26px;
+      border-radius: 999px;
+      font-weight: 900;
+      box-shadow: 0 16px 32px rgba(0,0,0,.3);
+      animation: toastOut 2.8s ease forwards;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    [data-theme="dark"] .toast {
+      background: var(--hh-yellow);
+      color: #000;
+    }
+
+    @keyframes toastOut {
+      0% { transform: translateY(60px) scale(.8); opacity: 0; }
+      15% { transform: translateY(0) scale(1); opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(30px) scale(.95); opacity: 0; }
+    }
+
+    .clipboard-proxy {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      opacity: 0;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 16px 12px; }
+      .header { align-items: flex-start; }
+      .seccion, .result-card { padding: 24px 20px; }
+      .grid-2x2 { grid-template-columns: 1fr; }
+      .help-widget { right: 12px; bottom: 12px; }
+    }
+  </style>
 </head>
+
 <body data-theme="light">
-<div class="wave-bg"></div>
-<div class="header">
-    <div class="logo-section">
-        <div class="header-title"><h1 id="logoHH">Harmon <span>Hall</span></h1></div>
-    </div>
-    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <i id="darkModeIcon" class="fas fa-moon"></i>
-        <span>Noche</span>
-    </div>
-</div>
-<div class="contenedor">
-    <div class="seccion" style="text-align: center; padding: 18px 24px; position:relative;">
-        <i id="loadingSpinner" class="fas fa-spinner"></i>
-        <span id="statusCarga">Conectando base de datos… ⏳</span>
-    </div>
-    
-    <div class="seccion" style="position: relative; z-index: 100;">
-        <label>Buscador de Institutos</label>
-        <div class="busqueda-wrap">
-            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
-            <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
-                <i class="fas fa-times"></i>
-            </button>
-            <div id="sugerencias" class="sugerencias"></div>
-        </div>
-        <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
-    </div>
-    <div id="resultado"></div>
-</div>
+  <div class="wave-bg" aria-hidden="true"></div>
 
-<div class="help-widget" id="helpWidget" aria-live="polite">
-    <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
-        <button class="help-close" type="button" onclick="toggleHelp(false)" aria-label="Cerrar ayuda">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="help-title">
-            <i class="fas fa-circle-question"></i>
-            <span>Dudas o sugerencias</span>
-        </div>
-        <p class="help-text">
-            Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
-        </p>
-        <div class="help-email">
-            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx 
-        </div>
+  <header class="header">
+    <div class="header-title">
+      <h1 id="logoHH">Harmon <span>Hall</span></h1>
     </div>
-    <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
-        ?
+
+    <button id="themeToggle" class="dark-mode-toggle" type="button">
+      <i id="darkModeIcon" class="fas fa-moon" aria-hidden="true"></i>
+      <span id="themeLabel">Noche</span>
     </button>
-</div>
+  </header>
 
-<script>
-    let todosLosDatos = [];
-    let baseCargada = false;
-    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
+  <main class="contenedor">
+    <section class="seccion status-section" aria-live="polite">
+      <i id="loadingSpinner" class="fas fa-spinner" aria-hidden="true" hidden></i>
+      <span id="statusCarga">Conectando base de datos... espera</span>
+    </section>
 
-    function normalizarTexto(texto) {
-        return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-    }
-    function escaparHTML(texto) {
-        return (texto ?? "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-    }
-    function formatearMoneda(valor) {
-        const numero = Number(valor) || 0;
-        return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
-    }
+    <section class="seccion">
+      <label for="textoBusqueda">Buscador de Institutos</label>
+      <div class="busqueda-wrap">
+        <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80">
+        <button id="btnLimpiar" class="btn-limpiar" type="button" aria-label="Limpiar búsqueda">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <div id="sugerencias" class="sugerencias"></div>
+      </div>
+      <button id="searchButton" class="btn-buscar" type="button">Buscar Ahora</button>
+    </section>
 
-    function obtenerDirector(obj) {
-        if (!obj || typeof obj !== "object") return "";
-        for (let key in obj) {
-            if (typeof key === "string" && key.toLowerCase().includes("director")) {
-                const valor = obj[key];
-                if (valor && valor.toString().trim() !== "") {
-                    return valor.toString().trim();
-                }
+    <section id="resultado" aria-live="polite"></section>
+  </main>
+
+  <aside class="help-widget" id="helpWidget">
+    <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
+      <button id="helpClose" class="help-close" type="button" aria-label="Cerrar ayuda">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+      <div class="help-title">
+        <i class="fas fa-circle-question" aria-hidden="true"></i>
+        <span>Dudas o sugerencias</span>
+      </div>
+      <p class="help-text">Usa el canal interno autorizado para reportar cambios o dudas.</p>
+      <div class="help-email">
+        <i class="fab fa-microsoft" aria-hidden="true"></i>
+        Canal interno de Teams
+      </div>
+    </div>
+
+    <button id="helpToggle" class="help-btn" type="button" aria-label="Abrir ayuda">?</button>
+  </aside>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script nonce="hh-secure-v1">
+    (() => {
+      "use strict";
+
+      const CONFIG = Object.freeze({
+        DATA_FILES: ["database.xlsx", "database2.xlsx"],
+        SHOW_SENSITIVE_FIELDS: false,
+        MAX_FILE_BYTES: 5 * 1024 * 1024,
+        MAX_ROWS_PER_FILE: 5000,
+        MAX_RESULTS: 25,
+        MAX_SEARCH_CHARS: 80,
+        FETCH_TIMEOUT_MS: 12000,
+        MAX_PRICE: 1000000
+      });
+
+      const PUBLIC_FIELDS = new Set([
+        "Nombre",
+        "Tipo",
+        "Zona",
+        "Wiki",
+        "Inscripcion",
+        "Adults_FF",
+        "Adults_SAB",
+        "Adults_PRO_FF",
+        "Libros_Adults",
+        "KPT_SEM",
+        "KPT_SAB",
+        "Libros_KIDS",
+        "Libros_PTEEN",
+        "TOEFL_ITP_PRE",
+        "TKT",
+        "ICC_FF"
+      ]);
+
+      const SENSITIVE_FIELD_PATTERNS = [
+        /^EMAIL/i,
+        /^TEL/i,
+        /^NOMBRE2$/i,
+        /DIRECTOR/i,
+        /DIRECCI/i,
+        /PHONE/i,
+        /CEL/i
+      ];
+
+      const PROGRAMS = new Map([
+        ["adults", { title: "Adultos (1-20)", kind: "monthly", monthly: "Adults_FF", saturday: "Adults_SAB", book: "Libros_Adults" }],
+        ["pro", { title: "Adultos (21-24)", kind: "monthly", monthly: "Adults_PRO_FF", saturday: "", book: "Libros_Adults" }],
+        ["kids", { title: "Kids", kind: "monthly", monthly: "KPT_SEM", saturday: "KPT_SAB", book: "Libros_KIDS" }],
+        ["pteen", { title: "Pre-Teens", kind: "monthly", monthly: "KPT_SEM", saturday: "KPT_SAB", book: "Libros_PTEEN" }],
+        ["toefl", { title: "PAGO UNICO TOEFL ITP", kind: "single", total: "TOEFL_ITP_PRE" }],
+        ["tkt", { title: "PAGO UNICO TKT", kind: "single", total: "TKT" }],
+        ["icc", { title: "PAGO UNICO ICC", kind: "single", total: "ICC_FF" }]
+      ]);
+
+      const state = {
+        rows: [],
+        rowById: new Map(),
+        baseLoaded: false,
+        nextId: 1
+      };
+
+      const dom = {};
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function h(tag, options = {}, children = []) {
+        const element = document.createElement(tag);
+
+        for (const [key, value] of Object.entries(options)) {
+          if (value === undefined || value === null || value === false) continue;
+
+          if (key === "className") element.className = value;
+          else if (key === "text") element.textContent = String(value);
+          else if (key === "dataset") {
+            for (const [dataKey, dataValue] of Object.entries(value)) {
+              element.dataset[dataKey] = String(dataValue);
             }
+          } else if (key === "attrs") {
+            for (const [attr, attrValue] of Object.entries(value)) {
+              if (attrValue !== undefined && attrValue !== null && attrValue !== false) {
+                element.setAttribute(attr, String(attrValue));
+              }
+            }
+          } else if (key in element) {
+            element[key] = value;
+          } else {
+            element.setAttribute(key, String(value));
+          }
+        }
+
+        appendChildren(element, Array.isArray(children) ? children : [children]);
+        return element;
+      }
+
+      function appendChildren(parent, children) {
+        for (const child of children.flat(Infinity)) {
+          if (child === null || child === undefined || child === false) continue;
+          if (child instanceof Node) parent.appendChild(child);
+          else parent.appendChild(document.createTextNode(String(child)));
+        }
+      }
+
+      function icon(className) {
+        return h("i", { className, attrs: { "aria-hidden": "true" } });
+      }
+
+      function cleanText(value, maxLength = 180) {
+        return String(value ?? "")
+          .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, maxLength);
+      }
+
+      function normalizeText(value) {
+        return cleanText(value, CONFIG.MAX_SEARCH_CHARS)
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .trim();
+      }
+
+      function clipboardSafe(value) {
+        const text = cleanText(value, 400);
+        return /^[=+\-@]/.test(text) ? "'" + text : text;
+      }
+
+      function toNumber(value) {
+        const parsed = Number(String(value ?? "").replace(/[^0-9.-]/g, ""));
+        if (!Number.isFinite(parsed) || parsed < 0 || parsed > CONFIG.MAX_PRICE) return 0;
+        return parsed;
+      }
+
+      function money(value) {
+        return "$" + toNumber(value).toLocaleString("es-MX", { maximumFractionDigits: 0 });
+      }
+
+      function shouldKeepField(key) {
+        if (PUBLIC_FIELDS.has(key)) return true;
+        return CONFIG.SHOW_SENSITIVE_FIELDS && SENSITIVE_FIELD_PATTERNS.some((pattern) => pattern.test(key));
+      }
+
+      function sanitizeRecord(raw) {
+        if (!raw || typeof raw !== "object") return null;
+
+        const record = {};
+        for (const [rawKey, rawValue] of Object.entries(raw)) {
+          const key = cleanText(rawKey, 80);
+          if (!shouldKeepField(key)) continue;
+          record[key] = cleanText(rawValue, key === "Wiki" ? 2048 : 220);
+        }
+
+        if (!record.Nombre) return null;
+        record.__id = "inst-" + state.nextId++;
+        return Object.freeze(record);
+      }
+
+      function getTypeInfo(row) {
+        const type = normalizeText(row.Tipo);
+
+        if (type.includes("franquicia")) {
+          return { className: "franchise", label: "Franquicia" };
+        }
+
+        if (type.includes("consolidado")) {
+          return { className: "consolidado", label: "Consolidado" };
+        }
+
+        return { className: "own", label: "Propia" };
+      }
+
+      function firstValue(row, keys) {
+        for (const key of keys) {
+          const value = cleanText(row[key], 220);
+          if (value) return value;
         }
         return "";
-    }
+      }
 
-    function obtenerCotizacion(datos, programa) {
-        const ins = parseFloat(datos.Inscripcion) || 0;
-        let html = "", texto = "", tienePrecio = false;
-        
-        if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
-            let mensu = 0, sab = 0, lib = 0, titulo = "";
-            
-            switch (programa) {
-                case 'adults': mensu = parseFloat(datos.Adults_FF) || 0; sab = parseFloat(datos.Adults_SAB) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (1-20)"; break;
-                case 'pro': mensu = parseFloat(datos.Adults_PRO_FF) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (21-24)"; break;
-                case 'kids': mensu = parseFloat(datos.KPT_SEM) || 0; sab = parseFloat(datos.KPT_SAB) || 0; lib = parseFloat(datos.Libros_KIDS) || 0; titulo = "Kids"; break;
-                case 'pteen': mensu = parseFloat(datos.KPT_SEM) || 0; sab = parseFloat(datos.KPT_SAB) || 0; lib = parseFloat(datos.Libros_PTEEN) || 0; titulo = "Pre-Teens"; break;
-            }
-
-            if (mensu > 0 || sab > 0) tienePrecio = true;
-            
-            if (tienePrecio) {
-                html = `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(datos.Zona || 'A')}</span><div class="grid-2x2">${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}</div></div>`;
-                texto = [
-                    `Programa: ${titulo}`,
-                    `Zona: ${datos.Zona || 'A'}`,
-                    ins > 0 ? `Inscripción: ${formatearMoneda(ins)}` : null,
-                    lib > 0 ? `Libro: ${formatearMoneda(lib)}` : null,
-                    mensu > 0 ? `Mensualidad Free Friday: ${formatearMoneda(mensu)}` : null,
-                    sab > 0 ? `Mensualidad Sabatina: ${formatearMoneda(sab)}` : null
-                ].filter(Boolean).join("\n");
-            }
-        } else {
-            let total = 0, titulo = "";
-            switch (programa) {
-                case 'toefl': total = parseFloat(datos.TOEFL_ITP_PRE) || 0; titulo = "PAGO ÚNICO TOEFL ITP"; break;
-                case 'tkt': total = parseFloat(datos.TKT) || 0; titulo = "PAGO ÚNICO TKT"; break;
-                case 'icc': total = parseFloat(datos.ICC_FF) || 0; titulo = "PAGO ÚNICO ICC"; break;
-            }
-
-            if (total > 0) tienePrecio = true;
-
-            if (tienePrecio) {
-                html = `<div class="panel-gris" style="border-left:5px solid var(--hh-yellow); text-align:center;"><span class="data-label" style="display:block; margin-bottom:8px;">${escaparHTML(titulo)}</span><div style="font-size:2.2em; font-weight:900; margin:12px 0;">${formatearMoneda(total)}</div><span class="data-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span></div>`;
-                texto = [`Programa: ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
-            }
+      function getDirector(row) {
+        if (!CONFIG.SHOW_SENSITIVE_FIELDS) return "";
+        for (const [key, value] of Object.entries(row)) {
+          if (/director/i.test(key)) {
+            const clean = cleanText(value, 220);
+            if (clean) return clean;
+          }
         }
-        
-        if (!tienePrecio) {
-            html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
-            texto = "Precios no definidos";
-        }
-        return { html, texto, tienePrecio };
-    }
+        return "";
+      }
 
-    function mostrarNotificacion(mensaje) {
-        let container = document.querySelector('.toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.className = 'toast-container';
-            container.style.position = 'fixed';
-            container.style.bottom = '30px';
-            container.style.left = '50%';
-            container.style.transform = 'translateX(-50%)';
-            container.style.zIndex = '9999';
-            document.body.appendChild(container);
-        }
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 2800);
-    }
+      function safeWikiUrl(value) {
+        const raw = cleanText(value, 2048);
+        const lower = raw.toLowerCase();
 
-    async function copiarAlPortapapeles(texto) {
-        try { 
-            await navigator.clipboard.writeText(texto); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
-        } catch { 
-            const area = document.createElement("textarea"); 
-            area.value = texto; 
-            area.style.position = "fixed"; 
-            area.style.opacity = "0"; 
-            document.body.appendChild(area); 
-            area.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(area); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
-        }
-    }
+        if (!raw || raw === "#" || lower === "n/a" || lower === "na" || lower === "0") return "";
+        if (/^(javascript|data|file|vbscript):/i.test(raw) || raw.startsWith("//")) return "";
 
-    function toggleDarkMode() {
-        const body = document.body;
-        const isLight = body.getAttribute('data-theme') === 'light';
-        body.setAttribute('data-theme', isLight ? 'dark' : 'light');
-        document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
-    }
-
-    function toggleHelp(forceState) {
-        const widget = document.getElementById('helpWidget');
-        const shouldOpen = typeof forceState === 'boolean' ? forceState : !widget.classList.contains('open');
-        widget.classList.toggle('open', shouldOpen);
-    }
-
-    function actualizarCotizacion(index) {
-        const selector = document.getElementById(`select-${index}`);
-        if (!selector) return;
-        const programa = selector.value;
-        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
-        const contenedor = document.getElementById(`precios-${index}`);
-        if (!contenedor) return;
-        const cotizacion = obtenerCotizacion(datos, programa);
-        contenedor.innerHTML = cotizacion.html;
-    }
-
-    function copiarResumen(index) {
-        const selector = document.getElementById(`select-${index}`);
-        if (!selector) return;
-        const programa = selector.value;
-        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
-        const tipo = (datos.Tipo || "").toLowerCase();
-        
-        let labelTipo = "Propia";
-        if (tipo.includes("franquicia")) labelTipo = "Franquicia";
-        else if (tipo.includes("consolidado")) labelTipo = "Consolidado";
-        
-        const cotizacion = obtenerCotizacion(datos, programa);
-        const director = obtenerDirector(datos);
-        
-        let textoFinal = "";
-
-        if (labelTipo === "Franquicia") {
-            const tel = datos.TELÉFONOS || datos.TELEFONOS || "(Sin teléfono)";
-            const coord = datos.NOMBRE2 || "(Sin coordinador)";
-            const email = datos.EMAIL3 || datos.EMAIL || "";
-            
-            textoFinal = `Muy bien, te comento que contamos con varios institutos que no han subido información actualizada en el sistema, así que de momento no tenemos datos sobre sus cursos, horarios, grupos ni costos presenciales. Sin embargo, con gusto te comparto los datos de contacto del instituto para que puedan brindarte atención directa:
- 
-📞 Teléfono: ${tel}
-👤 Coordinador: ${coord}${email ? ' / ' + email : ''}
-📍 Dirección: 
- 
-⏰ Horario de atención: de 9:00 am a 5:00 pm.
- 
-Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
-        } else {
-            textoFinal = [
-                `Instituto: ${datos.Nombre || 'N/D'}`,
-                director ? `Director: ${director}` : null,
-                `Tipo: ${datos.Tipo || 'Instituto'}`,
-                `Categoría: ${labelTipo}`,
-                cotizacion.texto
-            ].filter(Boolean).join("\n");
-        }
-
-        copiarAlPortapapeles(textoFinal);
-    }
-
-    function limpiarBusqueda() {
-        const input = document.getElementById('textoBusqueda');
-        input.value = '';
-        document.getElementById('sugerencias').style.display = 'none';
-        document.getElementById('btnLimpiar').classList.remove('visible');
-        document.getElementById('resultado').innerHTML = '';
-        input.focus();
-    }
-
-    function renderSugerencias(lista) {
-        const contenedor = document.getElementById("sugerencias");
-        if (!lista.length) { 
-            contenedor.innerHTML = ""; 
-            contenedor.style.display = "none"; 
-            return; 
-        }
-        contenedor.innerHTML = lista.map(item => `<div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))} ">${escaparHTML(item.Nombre || "Sin nombre")}<span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span></div>`).join("");
-        contenedor.style.display = "block";
-    }
-
-    function actualizarSugerencias() {
-        const inputVal = document.getElementById('textoBusqueda').value;
-        const busqueda = normalizarTexto(inputVal);
-        const btnLimpiar = document.getElementById('btnLimpiar');
-        if (inputVal.length > 0) {
-            btnLimpiar.classList.add('visible');
-        } else {
-            btnLimpiar.classList.remove('visible');
-        }
-        if (!busqueda) { 
-            document.getElementById("sugerencias").style.display = "none"; 
-            return; 
-        }
-        const sugerencias = todosLosDatos
-            .filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda))
-            .sort((a,b) => {
-                const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
-                return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
-            })
-            .slice(0, 12);
-        renderSugerencias(sugerencias);
-    }
-
-    function seleccionarSugerencia(nombre) {
-        document.getElementById('textoBusqueda').value = nombre;
-        document.getElementById("sugerencias").style.display = "none";
-        document.getElementById('btnLimpiar').classList.add('visible'); 
-        buscarInstituto();
-    }
-
-    function buscarInstituto() {
-        const texto = document.getElementById('textoBusqueda').value.trim();
-        const busqueda = normalizarTexto(texto);
-        document.getElementById("sugerencias").style.display = "none";
-        
-        if (!busqueda) {
-            document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
-            return;
-        }
-        
-        const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
-        let htmlTotal = "";
-        
-        resultados.forEach((encontrado, index) => {
-            const infoJson = encodeURIComponent(JSON.stringify(encontrado));
-            const tipo = (encontrado.Tipo || "").toLowerCase();
-            
-            let classType = "own";
-            let labelTipo = "Propia";
-            
-            if (tipo.includes("franquicia")) {
-                classType = "franchise";
-                labelTipo = "Franquicia";
-            } else if (tipo.includes("consolidado")) {
-                classType = "consolidado";
-                labelTipo = "Consolidado";
-            }
-            
-            const director = obtenerDirector(encontrado);
-            let directorHtml = "";
-            if (director) {
-                directorHtml = `<div class="panel-gris"><span class="data-label"><i class="fas fa-user-tie"></i> Director de Instituto</span><div class="data-val" style="margin-top: 6px; font-size: 1.1em; text-transform: uppercase;">${escaparHTML(director)}</div></div>`;
-            }
-            
-            let franquiciaHtml = classType === "franchise" ? `<div class="panel-gris panel-franchise"><span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span><div class="grid-2x2"><div class="data-stack"><span class="data-label">Coordinador</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div><div class="data-stack"><span class="data-label">Teléfono</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div><div class="data-stack" style="grid-column: span 2;"><span class="data-label">Email</span><span class="data-val" style="font-size: 0.95em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div></div></div>` : "";
-                
-            let enlaceHtml = "";
-            let linkUrl = (encontrado.Wiki||"").toString().trim();
-            let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
-            
-            if (classType !== "franchise" && tieneWiki) {
-                if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
-                enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">ABRIR WIKI</a>`;
-            } else if (classType !== "franchise") {
-                enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--info-box); border-radius:18px; font-weight:800; color:var(--text); opacity:0.65;"><i class="fas fa-info-circle"></i> SIN WIKI DISPONIBLE</div>`;
-            }
-            
-            htmlTotal += `<div class="result-card"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</div><span class="type-badge ${classType}">${labelTipo}</span></div><i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i></div>${directorHtml}${franquiciaHtml}<div style="margin-top: 24px; margin-bottom: 24px;"><label>Selecciona Programa:</label><select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div id="precios-${index}"></div><div class="buttons-wrapper"><button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>${enlaceHtml}</div></div>`;
-        });
-        
-        document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
-        if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
-    }
-
-    window.onload = async function() {
-        const spinner = document.getElementById('loadingSpinner');
-        const status = document.getElementById('statusCarga');
-        spinner.style.display = 'block';
-        
         try {
-            const promesas = archivosA_Cargar.map(async (archivo) => {
-                const response = await fetch(archivo);
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
-                const arrayBuffer = await response.arrayBuffer();
-                const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                return XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
-            });
+          const url = new URL(/^https?:\/\//i.test(raw) ? raw : "https://" + raw);
+          url.protocol = "https:";
+          url.username = "";
+          url.password = "";
+          return url.href;
+        } catch {
+          return "";
+        }
+      }
 
-            const resultados = await Promise.all(promesas);
-            resultados.forEach(json => { todosLosDatos = todosLosDatos.concat(json); });
-            status.innerHTML = "✅ Base de datos lista.";
-        } catch (e) {
-            console.error("Error cargando archivos Excel: ", e);
-            status.innerHTML = "❌ Error al cargar algunos datos.";
+      function metric(label, value, iconClass) {
+        const labelEl = h("span", { className: "data-label" });
+        if (iconClass) labelEl.append(icon(iconClass), " ");
+        labelEl.append(label);
+
+        return h("div", { className: "data-stack" }, [
+          labelEl,
+          h("span", { className: "data-val", text: value })
+        ]);
+      }
+
+      function buildQuote(row, programKey) {
+        const program = PROGRAMS.get(programKey) || PROGRAMS.get("adults");
+        const inscription = toNumber(row.Inscripcion);
+
+        if (program.kind === "monthly") {
+          const monthly = toNumber(row[program.monthly]);
+          const saturday = program.saturday ? toNumber(row[program.saturday]) : 0;
+          const book = toNumber(row[program.book]);
+          const hasPrice = monthly > 0 || saturday > 0;
+
+          if (!hasPrice) return emptyQuote();
+
+          const gridItems = [];
+          const textLines = [
+            "Programa: " + program.title,
+            "Zona: " + clipboardSafe(row.Zona || "A")
+          ];
+
+          if (inscription > 0) {
+            gridItems.push(metric("Inscripción", money(inscription)));
+            textLines.push("Inscripción: " + money(inscription));
+          }
+
+          if (book > 0) {
+            gridItems.push(metric("Libro", money(book)));
+            textLines.push("Libro: " + money(book));
+          }
+
+          if (monthly > 0) {
+            gridItems.push(metric("Mensualidad FF/SEM", money(monthly)));
+            textLines.push("Mensualidad Free Friday: " + money(monthly));
+          }
+
+          if (saturday > 0) {
+            gridItems.push(metric("Mensualidad Sabatina", money(saturday)));
+            textLines.push("Mensualidad Sabatina: " + money(saturday));
+          }
+
+          const heading = h("span", { className: "data-label price-heading" }, [
+            icon("fas fa-tags"),
+            " " + program.title + " | ZONA " + cleanText(row.Zona || "A", 30)
+          ]);
+
+          return {
+            element: h("div", { className: "panel-gris" }, [
+              heading,
+              h("div", { className: "grid-2x2" }, gridItems)
+            ]),
+            text: textLines.join("\n")
+          };
+        }
+
+        const total = toNumber(row[program.total]);
+        if (total <= 0) return emptyQuote();
+
+        return {
+          element: h("div", { className: "panel-gris price-single" }, [
+            h("span", { className: "data-label", text: program.title }),
+            h("div", { className: "price-total", text: money(total) }),
+            h("span", { className: "data-label" }, [
+              icon("fas fa-check-circle"),
+              " Todo incluido"
+            ])
+          ]),
+          text: ["Programa: " + program.title, "Total: " + money(total), "Todo incluido"].join("\n")
+        };
+      }
+
+      function emptyQuote() {
+        return {
+          element: h("div", { className: "caja-alerta" }, [
+            icon("fas fa-exclamation-triangle"),
+            h("span", { text: "Precios no definidos, valida la información." })
+          ]),
+          text: "Precios no definidos"
+        };
+      }
+
+      function setStatus(message, isError = false) {
+        dom.status.textContent = message;
+        dom.status.classList.toggle("status-error", isError);
+      }
+
+      function setLoading(isLoading) {
+        dom.spinner.hidden = !isLoading;
+      }
+
+      async function fetchWorkbook(fileName) {
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), CONFIG.FETCH_TIMEOUT_MS);
+
+        try {
+          const response = await fetch(fileName, {
+            cache: "no-store",
+            credentials: "same-origin",
+            referrerPolicy: "no-referrer",
+            signal: controller.signal,
+            headers: {
+              "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*"
+            }
+          });
+
+          if (!response.ok) throw new Error("fetch_failed");
+
+          const sizeHeader = Number(response.headers.get("content-length") || 0);
+          if (sizeHeader > CONFIG.MAX_FILE_BYTES) throw new Error("file_too_large");
+
+          const buffer = await response.arrayBuffer();
+          if (buffer.byteLength > CONFIG.MAX_FILE_BYTES) throw new Error("file_too_large");
+
+          const workbook = XLSX.read(new Uint8Array(buffer), {
+            type: "array",
+            cellFormula: false,
+            cellHTML: false,
+            cellNF: false,
+            cellStyles: false
+          });
+
+          const firstSheetName = workbook.SheetNames[0];
+          if (!firstSheetName) return [];
+
+          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], {
+            defval: "",
+            raw: false,
+            blankrows: false
+          });
+
+          return rows.slice(0, CONFIG.MAX_ROWS_PER_FILE);
         } finally {
-            spinner.style.display = 'none';
-            baseCargada = true;
+          window.clearTimeout(timeoutId);
         }
-    };
+      }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const textoBusqueda = document.getElementById('textoBusqueda');
-        const sugerencias = document.getElementById('sugerencias');
-        
-        textoBusqueda.addEventListener('input', actualizarSugerencias);
-        textoBusqueda.addEventListener('keydown', e => {
-            if (e.key === 'Enter') buscarInstituto();
-            if (e.key === 'Escape') sugerencias.style.display = 'none';
-        });
-        sugerencias.addEventListener("click", e => {
-            const item = e.target.closest(".sugerencia-item");
-            if (item) seleccionarSugerencia(item.getAttribute("data-nombre"));
-        });
-        document.addEventListener("click", e => {
-            const busquedaWrap = document.querySelector(".busqueda-wrap");
-            if (busquedaWrap && !busquedaWrap.contains(e.target)) sugerencias.style.display = "none";
-            const helpWidget = document.getElementById('helpWidget');
-            if (helpWidget && !helpWidget.contains(e.target)) helpWidget.classList.remove('open');
-        });
+      async function loadData() {
+        setLoading(true);
+        setStatus("Conectando base de datos... espera");
 
-        const logoHH = document.getElementById('logoHH');
-        let contadorClicks = 0;
-        let temporizadorClicks = null;
+        try {
+          if (!window.XLSX) throw new Error("xlsx_missing");
 
-        if (logoHH) {
-            logoHH.style.cursor = 'pointer'; 
-            logoHH.addEventListener('click', () => {
-                contadorClicks++;
-                clearTimeout(temporizadorClicks);
-                if (contadorClicks === 3) {
-                    const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
-                    let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-                    let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
-                    const sonidoEasterEgg = new Audio(archivoAudio);
-                    sonidoEasterEgg.volume = 0.6; 
-                    sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
-                    setTimeout(() => {
-                        const fadeOut = setInterval(() => {
-                            if (sonidoEasterEgg.volume > 0.1) {
-                                sonidoEasterEgg.volume -= 0.1;
-                            } else {
-                                sonidoEasterEgg.pause();
-                                sonidoEasterEgg.currentTime = 0; 
-                                clearInterval(fadeOut);
-                            }
-                        }, 50);
-                    }, duracionSegundos * 1000);
-                    if (window.confetti) {
-                        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, zIndex: 10000, colors: modoNocheActivo ? ['#cc1e3d', '#000000', '#ffffff'] : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] });
-                    }
-                    contadorClicks = 0; 
+          const files = await Promise.all(CONFIG.DATA_FILES.map(fetchWorkbook));
+          const cleanRows = files.flat().map(sanitizeRecord).filter(Boolean);
+
+          state.rows = cleanRows;
+          state.rowById.clear();
+          for (const row of cleanRows) state.rowById.set(row.__id, row);
+
+          state.baseLoaded = true;
+          setStatus("Base de datos pública lista: " + cleanRows.length + " registros.");
+        } catch {
+          state.baseLoaded = false;
+          setStatus("No se pudo cargar la base de datos pública.", true);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      function showToast(message) {
+        const toast = h("div", { className: "toast" }, [
+          icon("fas fa-check-circle"),
+          h("span", { text: message })
+        ]);
+
+        dom.toastContainer.appendChild(toast);
+        window.setTimeout(() => toast.remove(), 2800);
+      }
+
+      async function copyText(text) {
+        const clean = text.replace(/\r/g, "");
+
+        try {
+          if (!navigator.clipboard || !window.isSecureContext) throw new Error("clipboard_unavailable");
+          await navigator.clipboard.writeText(clean);
+          showToast("Resumen copiado con éxito");
+        } catch {
+          const area = h("textarea", { className: "clipboard-proxy", value: clean, attrs: { "aria-hidden": "true" } });
+          document.body.appendChild(area);
+          area.select();
+
+          try {
+            const copied = document.execCommand("copy");
+            showToast(copied ? "Resumen copiado con éxito" : "No se pudo copiar automáticamente");
+          } catch {
+            showToast("No se pudo copiar automáticamente");
+          } finally {
+            area.remove();
+          }
+        }
+      }
+
+      function clearSearch() {
+        dom.searchInput.value = "";
+        dom.suggestions.replaceChildren();
+        dom.suggestions.style.display = "none";
+        dom.clearButton.classList.remove("visible");
+        dom.results.replaceChildren();
+        dom.searchInput.focus();
+      }
+
+      function renderSuggestions(rows) {
+        dom.suggestions.replaceChildren();
+
+        if (!rows.length) {
+          dom.suggestions.style.display = "none";
+          return;
+        }
+
+        for (const row of rows) {
+          const type = cleanText(row.Tipo || "Instituto", 80);
+          const zone = row.Zona ? " • Zona " + cleanText(row.Zona, 30) : "";
+
+          const button = h("button", {
+            className: "sugerencia-item",
+            type: "button",
+            dataset: { id: row.__id }
+          }, [
+            h("span", { text: cleanText(row.Nombre, 120) }),
+            h("span", { className: "sugerencia-sub", text: type + zone })
+          ]);
+
+          dom.suggestions.appendChild(button);
+        }
+
+        dom.suggestions.style.display = "block";
+      }
+
+      function updateSuggestions() {
+        if (dom.searchInput.value.length > CONFIG.MAX_SEARCH_CHARS) {
+          dom.searchInput.value = dom.searchInput.value.slice(0, CONFIG.MAX_SEARCH_CHARS);
+        }
+
+        const term = normalizeText(dom.searchInput.value);
+        dom.clearButton.classList.toggle("visible", dom.searchInput.value.length > 0);
+
+        if (!term || !state.baseLoaded) {
+          dom.suggestions.replaceChildren();
+          dom.suggestions.style.display = "none";
+          return;
+        }
+
+        const suggestions = state.rows
+          .filter((row) => normalizeText(row.Nombre).includes(term))
+          .sort((a, b) => {
+            const nameA = normalizeText(a.Nombre);
+            const nameB = normalizeText(b.Nombre);
+            return (nameA.startsWith(term) ? 0 : 1) - (nameB.startsWith(term) ? 0 : 1) || nameA.localeCompare(nameB);
+          })
+          .slice(0, 12);
+
+        renderSuggestions(suggestions);
+      }
+
+      function selectSuggestion(rowId) {
+        const row = state.rowById.get(rowId);
+        if (!row) return;
+
+        dom.searchInput.value = row.Nombre;
+        dom.suggestions.replaceChildren();
+        dom.suggestions.style.display = "none";
+        dom.clearButton.classList.add("visible");
+        searchInstitute();
+      }
+
+      function renderDirector(row) {
+        const director = getDirector(row);
+        if (!director) return null;
+
+        return h("div", { className: "panel-gris" }, [
+          h("span", { className: "data-label" }, [
+            icon("fas fa-user-tie"),
+            " Director de Instituto"
+          ]),
+          h("div", { className: "data-val", text: director })
+        ]);
+      }
+
+      function renderFranchiseContact(row) {
+        if (!CONFIG.SHOW_SENSITIVE_FIELDS) {
+          return h("div", { className: "panel-gris panel-franchise" }, [
+            h("span", { className: "data-label price-heading" }, [
+              icon("fas fa-lock"),
+              " Contacto protegido"
+            ]),
+            h("p", { className: "private-note", text: "Contacto oculto en la versión pública. Usa el canal interno autorizado." })
+          ]);
+        }
+
+        const coord = firstValue(row, ["NOMBRE2"]) || "N/D";
+        const tel = firstValue(row, ["TELÉFONOS", "TELEFONOS"]) || "N/D";
+        const email = firstValue(row, ["EMAIL3", "EMAIL"]) || "N/D";
+
+        return h("div", { className: "panel-gris panel-franchise" }, [
+          h("span", { className: "data-label price-heading" }, [
+            icon("fas fa-headset"),
+            " Contacto Franquicia"
+          ]),
+          h("div", { className: "grid-2x2" }, [
+            metric("Coordinador", coord),
+            metric("Teléfono", tel),
+            metric("Email", email)
+          ])
+        ]);
+      }
+
+      function renderProgramSelect(row, priceBox) {
+        const select = h("select", { className: "btn-buscar", attrs: { "aria-label": "Selecciona programa" } });
+
+        for (const [key, program] of PROGRAMS.entries()) {
+          select.appendChild(h("option", { value: key, text: program.title.replace("PAGO UNICO ", "") }));
+        }
+
+        const updatePrice = () => {
+          const quote = buildQuote(row, select.value);
+          priceBox.replaceChildren(quote.element);
+        };
+
+        select.addEventListener("change", updatePrice);
+        updatePrice();
+
+        return select;
+      }
+
+      function copySummary(row, programKey) {
+        const type = getTypeInfo(row);
+        const quote = buildQuote(row, programKey);
+        const director = getDirector(row);
+
+        let summary;
+
+        if (type.label === "Franquicia") {
+          summary = [
+            "Instituto: " + clipboardSafe(row.Nombre || "N/D"),
+            "Categoría: Franquicia",
+            "Contacto: oculto en la versión pública. Usa el canal interno autorizado.",
+            "",
+            "Si te interesa estudiar inglés en modalidad 100% online, podemos apoyarte con información de costos, niveles, clases privadas y promociones vigentes."
+          ].join("\n");
+        } else {
+          summary = [
+            "Instituto: " + clipboardSafe(row.Nombre || "N/D"),
+            director ? "Director: " + clipboardSafe(director) : null,
+            "Tipo: " + clipboardSafe(row.Tipo || "Instituto"),
+            "Categoría: " + type.label,
+            quote.text
+          ].filter(Boolean).join("\n");
+        }
+
+        copyText(summary);
+      }
+
+      function renderResultCard(row) {
+        const type = getTypeInfo(row);
+        const priceBox = h("div");
+        const select = renderProgramSelect(row, priceBox);
+        const directorPanel = renderDirector(row);
+        const wikiUrl = type.label !== "Franquicia" ? safeWikiUrl(row.Wiki) : "";
+        const copyButton = h("button", { className: "btn-copiar", type: "button" }, [
+          icon("fas fa-copy"),
+          " Copiar Resumen"
+        ]);
+
+        copyButton.addEventListener("click", () => copySummary(row, select.value));
+
+        const buttons = h("div", { className: "buttons-wrapper" }, [copyButton]);
+
+        if (wikiUrl) {
+          buttons.appendChild(h("a", {
+            className: "btn-wiki",
+            href: wikiUrl,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            referrerPolicy: "no-referrer"
+          }, "Abrir Wiki"));
+        } else if (type.label !== "Franquicia") {
+          buttons.appendChild(h("div", { className: "no-wiki" }, [
+            icon("fas fa-info-circle"),
+            " Sin wiki disponible"
+          ]));
+        }
+
+        return h("article", { className: "result-card" }, [
+          h("div", { className: "instituto-header" }, [
+            h("div", {}, [
+              h("div", { className: "instituto-nombre", text: cleanText(row.Nombre || "Sin nombre", 120) }),
+              h("span", { className: "type-badge " + type.className, text: type.label })
+            ]),
+            icon("fas fa-school card-icon")
+          ]),
+          directorPanel,
+          type.label === "Franquicia" ? renderFranchiseContact(row) : null,
+          h("div", { className: "program-wrap" }, [
+            h("label", { text: "Selecciona Programa:" }),
+            select
+          ]),
+          priceBox,
+          buttons
+        ]);
+      }
+
+      function renderEmpty(message) {
+        dom.results.replaceChildren(h("p", { className: "empty-state", text: message }));
+      }
+
+      function searchInstitute() {
+        const visibleText = cleanText(dom.searchInput.value, CONFIG.MAX_SEARCH_CHARS);
+        const term = normalizeText(visibleText);
+        dom.suggestions.replaceChildren();
+        dom.suggestions.style.display = "none";
+
+        if (!state.baseLoaded) {
+          renderEmpty("Espera a que cargue la base de datos.");
+          return;
+        }
+
+        if (!term) {
+          renderEmpty("Escribe el nombre del instituto para buscar.");
+          return;
+        }
+
+        const matches = state.rows
+          .filter((row) => normalizeText(row.Nombre).includes(term))
+          .slice(0, CONFIG.MAX_RESULTS);
+
+        dom.results.replaceChildren();
+
+        if (!matches.length) {
+          renderEmpty('No se encontró nada para "' + visibleText + '".');
+          return;
+        }
+
+        for (const row of matches) dom.results.appendChild(renderResultCard(row));
+      }
+
+      function toggleDarkMode() {
+        const isLight = document.body.getAttribute("data-theme") === "light";
+        document.body.setAttribute("data-theme", isLight ? "dark" : "light");
+        dom.darkModeIcon.className = isLight ? "fas fa-sun" : "fas fa-moon";
+        dom.themeLabel.textContent = isLight ? "Día" : "Noche";
+      }
+
+      function toggleHelp(forceState) {
+        const shouldOpen = typeof forceState === "boolean" ? forceState : !dom.helpWidget.classList.contains("open");
+        dom.helpWidget.classList.toggle("open", shouldOpen);
+      }
+
+      function bindEasterEgg() {
+        let clickCount = 0;
+        let clickTimer = null;
+
+        dom.logo.style.cursor = "pointer";
+        dom.logo.addEventListener("click", () => {
+          clickCount += 1;
+          window.clearTimeout(clickTimer);
+
+          if (clickCount === 3) {
+            const darkMode = document.body.getAttribute("data-theme") === "dark";
+            const audioFile = darkMode ? "screamer.mp3" : "fnaf.mp3";
+            const durationSeconds = darkMode ? 2 : 2.5;
+            const audio = new Audio(audioFile);
+            audio.volume = 0.6;
+            audio.play().catch(() => {});
+
+            window.setTimeout(() => {
+              const fadeOut = window.setInterval(() => {
+                if (audio.volume > 0.1) {
+                  audio.volume = Math.max(0, audio.volume - 0.1);
                 } else {
-                    temporizadorClicks = setTimeout(() => { contadorClicks = 0; }, 800); 
+                  audio.pause();
+                  audio.currentTime = 0;
+                  window.clearInterval(fadeOut);
                 }
-            });
-        }
-    });
-</script>
+              }, 50);
+            }, durationSeconds * 1000);
+
+            if (window.confetti) {
+              window.confetti({
+                particleCount: 150,
+                spread: 90,
+                origin: { y: 0.5 },
+                zIndex: 10000,
+                colors: darkMode
+                  ? ["#cc1e3d", "#000000", "#ffffff"]
+                  : ["#ffea00", "#cc1e3d", "#198754", "#0d6efd", "#ffffff"]
+              });
+            }
+
+            clickCount = 0;
+          } else {
+            clickTimer = window.setTimeout(() => {
+              clickCount = 0;
+            }, 800);
+          }
+        });
+      }
+
+      function bindEvents() {
+        dom.themeToggle.addEventListener("click", toggleDarkMode);
+        dom.helpToggle.addEventListener("click", () => toggleHelp());
+        dom.helpClose.addEventListener("click", () => toggleHelp(false));
+        dom.clearButton.addEventListener("click", clearSearch);
+        dom.searchButton.addEventListener("click", searchInstitute);
+        dom.searchInput.addEventListener("focus", () => dom.searchInput.select());
+        dom.searchInput.addEventListener("input", updateSuggestions);
+        dom.searchInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") searchInstitute();
+          if (event.key === "Escape") dom.suggestions.style.display = "none";
+        });
+
+        dom.suggestions.addEventListener("click", (event) => {
+          const item = event.target.closest(".sugerencia-item");
+          if (item) selectSuggestion(item.dataset.id);
+        });
+
+        document.addEventListener("click", (event) => {
+          if (!event.target.closest(".busqueda-wrap")) dom.suggestions.style.display = "none";
+          if (!dom.helpWidget.contains(event.target)) dom.helpWidget.classList.remove("open");
+        });
+
+        document.addEventListener("securitypolicyviolation", () => {
+          setStatus("El navegador bloqueó un recurso no permitido por seguridad.", true);
+        }, { once: true });
+
+        bindEasterEgg();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        dom.logo = byId("logoHH");
+        dom.themeToggle = byId("themeToggle");
+        dom.darkModeIcon = byId("darkModeIcon");
+        dom.themeLabel = byId("themeLabel");
+        dom.spinner = byId("loadingSpinner");
+        dom.status = byId("statusCarga");
+        dom.searchInput = byId("textoBusqueda");
+        dom.clearButton = byId("btnLimpiar");
+        dom.searchButton = byId("searchButton");
+        dom.suggestions = byId("sugerencias");
+        dom.results = byId("resultado");
+        dom.helpWidget = byId("helpWidget");
+        dom.helpToggle = byId("helpToggle");
+        dom.helpClose = byId("helpClose");
+        dom.toastContainer = byId("toastContainer");
+
+        bindEvents();
+        loadData();
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -557,67 +557,211 @@
     function escaparHTML(texto) {
         return (texto ?? "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
     }
+    function normalizarNumero(valor) {
+        if (typeof valor === "number") return valor;
+        const limpio = (valor ?? "").toString().replace(/[$,\s]/g, "").trim();
+        const numero = parseFloat(limpio);
+        return Number.isFinite(numero) ? numero : 0;
+    }
     function formatearMoneda(valor) {
-        const numero = Number(valor) || 0;
+        const numero = normalizarNumero(valor) || 0;
         return "$" + numero.toLocaleString("es-MX", { maximumFractionDigits: 0 });
+    }
+    function esDatoVacio(valor) {
+        if (valor === null || valor === undefined) return true;
+        const texto = valor.toString().trim();
+        if (!texto) return true;
+        const normalizado = normalizarTexto(texto);
+        return ["n/a", "na", "n.d", "n/d", "s/d", "sin dato", "sin datos", "-", ".", "null", "undefined", "#n/a"].includes(normalizado);
+    }
+    function valorLimpio(valor) {
+        return esDatoVacio(valor) ? "" : valor.toString().trim();
+    }
+    function obtenerCampo(obj, nombres) {
+        if (!obj || typeof obj !== "object") return "";
+        const llaves = Object.keys(obj);
+        const objetivos = nombres.map(nombre => normalizarTexto(nombre));
+        for (const objetivo of objetivos) {
+            const llave = llaves.find(key => normalizarTexto(key) === objetivo);
+            if (llave) {
+                const valor = valorLimpio(obj[llave]);
+                if (valor) return valor;
+            }
+        }
+        return "";
+    }
+    function obtenerMonto(obj, nombres) {
+        const valor = obtenerCampo(obj, nombres);
+        return normalizarNumero(valor);
     }
 
     function obtenerDirector(obj) {
+        const directorDirecto = obtenerCampo(obj, ["Directores", "Director", "Directora"]);
+        if (directorDirecto) return directorDirecto;
         if (!obj || typeof obj !== "object") return "";
         for (let key in obj) {
-            if (typeof key === "string" && key.toLowerCase().includes("director")) {
-                const valor = obj[key];
-                if (valor && valor.toString().trim() !== "") {
-                    return valor.toString().trim();
-                }
+            if (typeof key === "string" && normalizarTexto(key).includes("director")) {
+                const valor = valorLimpio(obj[key]);
+                if (valor) return valor;
             }
         }
         return "";
     }
 
+    function obtenerContactoInstituto(datos) {
+        return {
+            asesor: obtenerCampo(datos, ["Asesor"]),
+            correoAsesor: obtenerCampo(datos, ["CorreoAsesor", "Correo Asesor", "Correo_Asesor"]),
+            asesor2: obtenerCampo(datos, ["Asesor_2", "Asesor 2", "Asesor2"]),
+            correoAsesor2: obtenerCampo(datos, ["CorreoAsesor_2", "Correo Asesor 2", "Correo_Asesor_2", "CorreoAsesor2"]),
+            telefonos: obtenerCampo(datos, ["Teléfonos", "Telefonos", "TELÉFONOS", "TELEFONOS"]),
+            wpp: obtenerCampo(datos, ["WPP", "WhatsApp", "Whatsapp", "Whats App"]),
+            direccion: obtenerCampo(datos, ["Dirección", "Direccion"])
+        };
+    }
+
+    function construirAsesoresHtml(datos) {
+        const contacto = obtenerContactoInstituto(datos);
+        const asesores = [
+            { label: "Asesor", nombre: contacto.asesor, correo: contacto.correoAsesor },
+            { label: "Asesor 2", nombre: contacto.asesor2, correo: contacto.correoAsesor2 }
+        ].filter(item => item.nombre || item.correo);
+
+        if (!asesores.length) return "";
+
+        const htmlAsesores = asesores.map(item => {
+            const contenidoNombre = item.nombre ? `<span class="data-val" style="font-size: 1.05em;">${escaparHTML(item.nombre)}</span>` : "";
+            const contenidoCorreo = item.correo ? `<span class="data-label" style="margin-top: 8px;"><i class="fas fa-envelope"></i> Correo</span><span class="data-val" style="font-size: 0.95em;">${escaparHTML(item.correo)}</span>` : "";
+            const span = asesores.length === 1 ? 'style="grid-column: span 2;"' : '';
+            return `<div class="data-stack" ${span}><span class="data-label"><i class="fas fa-user-check"></i> ${escaparHTML(item.label)}</span>${contenidoNombre}${contenidoCorreo}</div>`;
+        }).join("");
+
+        return `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-users"></i> Asesores</span><div class="grid-2x2">${htmlAsesores}</div></div>`;
+    }
+
+    function construirContactoHtml(datos) {
+        const contacto = obtenerContactoInstituto(datos);
+        const items = [
+            contacto.telefonos ? { label: "Teléfonos", icono: "fas fa-phone", valor: contacto.telefonos, span: false } : null,
+            contacto.wpp ? { label: "WPP", icono: "fab fa-whatsapp", valor: contacto.wpp, span: false } : null,
+            contacto.direccion ? { label: "Dirección", icono: "fas fa-location-dot", valor: contacto.direccion, span: true } : null
+        ].filter(Boolean);
+
+        if (!items.length) return "";
+
+        const htmlItems = items.map(item => {
+            const span = item.span ? 'style="grid-column: span 2;"' : '';
+            return `<div class="data-stack" ${span}><span class="data-label"><i class="${item.icono}"></i> ${escaparHTML(item.label)}</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(item.valor)}</span></div>`;
+        }).join("");
+
+        return `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-address-book"></i> Contacto del Instituto</span><div class="grid-2x2">${htmlItems}</div></div>`;
+    }
+
+    function obtenerLineasContacto(datos) {
+        const contacto = obtenerContactoInstituto(datos);
+        return [
+            contacto.asesor ? `Asesor: ${contacto.asesor}${contacto.correoAsesor ? " / " + contacto.correoAsesor : ""}` : (contacto.correoAsesor ? `Correo asesor: ${contacto.correoAsesor}` : null),
+            contacto.asesor2 ? `Asesor 2: ${contacto.asesor2}${contacto.correoAsesor2 ? " / " + contacto.correoAsesor2 : ""}` : (contacto.correoAsesor2 ? `Correo asesor 2: ${contacto.correoAsesor2}` : null),
+            contacto.telefonos ? `Teléfonos: ${contacto.telefonos}` : null,
+            contacto.wpp ? `WPP: ${contacto.wpp}` : null,
+            contacto.direccion ? `Dirección: ${contacto.direccion}` : null
+        ].filter(Boolean);
+    }
+
     function obtenerCotizacion(datos, programa) {
-        const ins = parseFloat(datos.Inscripcion) || 0;
+        const ins = obtenerMonto(datos, ["Inscripcion", "Inscripción"]);
+        const seg = obtenerMonto(datos, ["SEG"]);
+        const zona = obtenerCampo(datos, ["Zona"]) || "A";
         let html = "", texto = "", tienePrecio = false;
-        
+
         if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
-            
+
             switch (programa) {
-                case 'adults': mensu = parseFloat(datos.Adults_FF) || 0; sab = parseFloat(datos.Adults_SAB) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (1-20)"; break;
-                case 'pro': mensu = parseFloat(datos.Adults_PRO_FF) || 0; lib = parseFloat(datos.Libros_Adults) || 0; titulo = "Adultos (21-24)"; break;
-                case 'kids': mensu = parseFloat(datos.KPT_SEM) || 0; sab = parseFloat(datos.KPT_SAB) || 0; lib = parseFloat(datos.Libros_KIDS) || 0; titulo = "Kids"; break;
-                case 'pteen': mensu = parseFloat(datos.KPT_SEM) || 0; sab = parseFloat(datos.KPT_SAB) || 0; lib = parseFloat(datos.Libros_PTEEN) || 0; titulo = "Pre-Teens"; break;
+                case 'adults':
+                    mensu = obtenerMonto(datos, ["Adults_FF"]);
+                    sab = obtenerMonto(datos, ["Adults_SAB"]);
+                    lib = obtenerMonto(datos, ["Libros_Adults"]);
+                    titulo = "Adultos (1-20)";
+                    break;
+                case 'pro':
+                    mensu = obtenerMonto(datos, ["Adults_PRO_FF"]);
+                    lib = obtenerMonto(datos, ["Libros_Adults"]);
+                    titulo = "Adultos (21-24)";
+                    break;
+                case 'kids':
+                    mensu = obtenerMonto(datos, ["KPT_SEM"]);
+                    sab = obtenerMonto(datos, ["KPT_SAB"]);
+                    lib = obtenerMonto(datos, ["Libros_KIDS"]);
+                    titulo = "Kids";
+                    break;
+                case 'pteen':
+                    mensu = obtenerMonto(datos, ["KPT_SEM"]);
+                    sab = obtenerMonto(datos, ["KPT_SAB"]);
+                    lib = obtenerMonto(datos, ["Libros_PTEEN"]);
+                    titulo = "Pre-Teens";
+                    break;
             }
 
             if (mensu > 0 || sab > 0) tienePrecio = true;
-            
+
             if (tienePrecio) {
-                html = `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(datos.Zona || 'A')}</span><div class="grid-2x2">${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}</div></div>`;
+                html = `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(zona)}</span><div class="grid-2x2">${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}${seg > 0 ? `<div class="data-stack"><span class="data-label">SEG</span><span class="data-val">${formatearMoneda(seg)}</span></div>` : ''}${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}</div></div>`;
                 texto = [
                     `Programa: ${titulo}`,
-                    `Zona: ${datos.Zona || 'A'}`,
+                    `Zona: ${zona}`,
                     ins > 0 ? `Inscripción: ${formatearMoneda(ins)}` : null,
+                    seg > 0 ? `SEG: ${formatearMoneda(seg)}` : null,
                     lib > 0 ? `Libro: ${formatearMoneda(lib)}` : null,
-                    mensu > 0 ? `Mensualidad Free Friday: ${formatearMoneda(mensu)}` : null,
+                    mensu > 0 ? `Mensualidad Free Friday/Semanal: ${formatearMoneda(mensu)}` : null,
                     sab > 0 ? `Mensualidad Sabatina: ${formatearMoneda(sab)}` : null
                 ].filter(Boolean).join("\n");
             }
         } else {
-            let total = 0, titulo = "";
+            let titulo = "";
+            let precios = [];
+            const notaLibro = "Todo incluido (no incluye precio del libro; consultar en lo que se actualiza la información)";
+
             switch (programa) {
-                case 'toefl': total = parseFloat(datos.TOEFL_ITP_PRE) || 0; titulo = "PAGO ÚNICO TOEFL ITP"; break;
-                case 'tkt': total = parseFloat(datos.TKT) || 0; titulo = "PAGO ÚNICO TKT"; break;
-                case 'icc': total = parseFloat(datos.ICC_FF) || 0; titulo = "PAGO ÚNICO ICC"; break;
+                case 'toefl': {
+                    const ff = obtenerMonto(datos, ["TOEFL_ITP_PRE"]);
+                    const sab = obtenerMonto(datos, ["TOEFL_ITP_PRE_SAB"]);
+                    titulo = "PAGO ÚNICO TOEFL ITP";
+                    if (ff > 0) precios.push({ label: "FF/SEM", valor: ff });
+                    if (sab > 0) precios.push({ label: "Sabatino", valor: sab });
+                    break;
+                }
+                case 'tkt': {
+                    const total = obtenerMonto(datos, ["TKT"]);
+                    titulo = "PAGO ÚNICO TKT";
+                    if (total > 0) precios.push({ label: "Total", valor: total });
+                    break;
+                }
+                case 'icc': {
+                    const ff = obtenerMonto(datos, ["ICC_FF"]);
+                    const sab = obtenerMonto(datos, ["ICC_SAB"]);
+                    titulo = "PAGO ÚNICO ICC";
+                    if (ff > 0) precios.push({ label: "FF/SEM", valor: ff });
+                    if (sab > 0) precios.push({ label: "Sabatino", valor: sab });
+                    break;
+                }
             }
 
-            if (total > 0) tienePrecio = true;
+            if (precios.length > 0) tienePrecio = true;
 
             if (tienePrecio) {
-                html = `<div class="panel-gris" style="border-left:5px solid var(--hh-yellow); text-align:center;"><span class="data-label" style="display:block; margin-bottom:8px;">${escaparHTML(titulo)}</span><div style="font-size:2.2em; font-weight:900; margin:12px 0;">${formatearMoneda(total)}</div><span class="data-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> Todo incluido</span></div>`;
-                texto = [`Programa: ${titulo}`, `Total: ${formatearMoneda(total)}`, `Todo incluido`].join("\n");
+                const preciosHtml = precios.length === 1
+                    ? `<div style="font-size:2.2em; font-weight:900; margin:12px 0;">${formatearMoneda(precios[0].valor)}</div>`
+                    : `<div class="grid-2x2" style="margin: 16px 0; text-align:left;">${precios.map(item => `<div class="data-stack"><span class="data-label">${escaparHTML(item.label)}</span><span class="data-val">${formatearMoneda(item.valor)}</span></div>`).join("")}</div>`;
+                html = `<div class="panel-gris" style="border-left:5px solid var(--hh-yellow); text-align:center;"><span class="data-label" style="display:block; margin-bottom:8px;">${escaparHTML(titulo)}</span>${preciosHtml}<span class="data-label" style="font-size:0.75em;"><i class="fas fa-check-circle"></i> ${escaparHTML(notaLibro)}</span></div>`;
+                texto = [
+                    `Programa: ${titulo}`,
+                    ...precios.map(item => `${item.label}: ${formatearMoneda(item.valor)}`),
+                    notaLibro
+                ].join("\n");
             }
         }
-        
+
         if (!tienePrecio) {
             html = `<div class="caja-alerta"><i class="fas fa-exclamation-triangle"></i> Precios no definidos, valida la información.</div>`;
             texto = "Precios no definidos";
@@ -691,37 +835,49 @@
         if (!selector) return;
         const programa = selector.value;
         const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
-        const tipo = (datos.Tipo || "").toLowerCase();
-        
+        const tipo = normalizarTexto(obtenerCampo(datos, ["Tipo"]) || datos.Tipo || "");
+
         let labelTipo = "Propia";
         if (tipo.includes("franquicia")) labelTipo = "Franquicia";
         else if (tipo.includes("consolidado")) labelTipo = "Consolidado";
-        
+
         const cotizacion = obtenerCotizacion(datos, programa);
         const director = obtenerDirector(datos);
-        
+        const zona = obtenerCampo(datos, ["Zona"]);
+        const contacto = obtenerContactoInstituto(datos);
+        const lineasContacto = obtenerLineasContacto(datos);
+
         let textoFinal = "";
 
         if (labelTipo === "Franquicia") {
-            const tel = datos.TELÉFONOS || datos.TELEFONOS || "(Sin teléfono)";
-            const coord = datos.NOMBRE2 || "(Sin coordinador)";
-            const email = datos.EMAIL3 || datos.EMAIL || "";
-            
+            const tel = contacto.telefonos || obtenerCampo(datos, ["TELÉFONOS", "TELEFONOS"]);
+            const wpp = contacto.wpp;
+            const coord = contacto.asesor || obtenerCampo(datos, ["NOMBRE2", "Coordinador"]);
+            const email = contacto.correoAsesor || obtenerCampo(datos, ["EMAIL3", "EMAIL", "Correo"]);
+            const direccion = contacto.direccion;
+            const datosContactoFranquicia = [
+                tel ? `📞 Teléfono: ${tel}` : null,
+                wpp ? `💬 WPP: ${wpp}` : null,
+                coord ? `👤 Coordinador/Asesor: ${coord}${email ? ' / ' + email : ''}` : (email ? `✉️ Correo: ${email}` : null),
+                contacto.asesor2 ? `👤 Asesor 2: ${contacto.asesor2}${contacto.correoAsesor2 ? ' / ' + contacto.correoAsesor2 : ''}` : (contacto.correoAsesor2 ? `✉️ Correo asesor 2: ${contacto.correoAsesor2}` : null),
+                direccion ? `📍 Dirección: ${direccion}` : null
+            ].filter(Boolean).join("\n");
+
             textoFinal = `Muy bien, te comento que contamos con varios institutos que no han subido información actualizada en el sistema, así que de momento no tenemos datos sobre sus cursos, horarios, grupos ni costos presenciales. Sin embargo, con gusto te comparto los datos de contacto del instituto para que puedan brindarte atención directa:
- 
-📞 Teléfono: ${tel}
-👤 Coordinador: ${coord}${email ? ' / ' + email : ''}
-📍 Dirección: 
- 
+
+${datosContactoFranquicia || "Por el momento no hay datos de contacto visibles para este instituto."}
+
 ⏰ Horario de atención: de 9:00 am a 5:00 pm.
- 
+
 Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
         } else {
             textoFinal = [
-                `Instituto: ${datos.Nombre || 'N/D'}`,
-                director ? `Director: ${director}` : null,
-                `Tipo: ${datos.Tipo || 'Instituto'}`,
+                `Instituto: ${valorLimpio(datos.Nombre) || 'N/D'}`,
+                `Tipo: ${obtenerCampo(datos, ["Tipo"]) || 'Instituto'}`,
                 `Categoría: ${labelTipo}`,
+                zona ? `Zona: ${zona}` : null,
+                director ? `Director: ${director}` : null,
+                ...lineasContacto,
                 cotizacion.texto
             ].filter(Boolean).join("\n");
         }
@@ -745,7 +901,12 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             contenedor.style.display = "none"; 
             return; 
         }
-        contenedor.innerHTML = lista.map(item => `<div class="sugerencia-item" data-nombre="${escaparHTML(String(item.Nombre || ""))} ">${escaparHTML(item.Nombre || "Sin nombre")}<span class="sugerencia-sub">${escaparHTML(item.Tipo || "Instituto")}${item.Zona ? " • Zona " + escaparHTML(item.Zona) : ""}</span></div>`).join("");
+        contenedor.innerHTML = lista.map(item => {
+            const nombre = obtenerCampo(item, ["Nombre"]) || "Sin nombre";
+            const tipo = obtenerCampo(item, ["Tipo"]) || "Instituto";
+            const zona = obtenerCampo(item, ["Zona"]);
+            return `<div class="sugerencia-item" data-nombre="${escaparHTML(nombre)}">${escaparHTML(nombre)}<span class="sugerencia-sub">${escaparHTML(tipo)}${zona ? " • Zona " + escaparHTML(zona) : ""}</span></div>`;
+        }).join("");
         contenedor.style.display = "block";
     }
 
@@ -763,9 +924,9 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             return; 
         }
         const sugerencias = todosLosDatos
-            .filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda))
+            .filter(f => obtenerCampo(f, ["Nombre"]) && normalizarTexto(obtenerCampo(f, ["Nombre"])).includes(busqueda))
             .sort((a,b) => {
-                const na = normalizarTexto(a.Nombre), nb = normalizarTexto(b.Nombre);
+                const na = normalizarTexto(obtenerCampo(a, ["Nombre"])), nb = normalizarTexto(obtenerCampo(b, ["Nombre"]));
                 return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
             })
             .slice(0, 12);
@@ -783,22 +944,24 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         const texto = document.getElementById('textoBusqueda').value.trim();
         const busqueda = normalizarTexto(texto);
         document.getElementById("sugerencias").style.display = "none";
-        
+
         if (!busqueda) {
             document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
             return;
         }
-        
-        const resultados = todosLosDatos.filter(f => f.Nombre && normalizarTexto(f.Nombre).includes(busqueda));
+
+        const resultados = todosLosDatos.filter(f => obtenerCampo(f, ["Nombre"]) && normalizarTexto(obtenerCampo(f, ["Nombre"])).includes(busqueda));
         let htmlTotal = "";
-        
+
         resultados.forEach((encontrado, index) => {
             const infoJson = encodeURIComponent(JSON.stringify(encontrado));
-            const tipo = (encontrado.Tipo || "").toLowerCase();
-            
+            const tipo = normalizarTexto(obtenerCampo(encontrado, ["Tipo"]) || encontrado.Tipo || "");
+            const nombreInstituto = obtenerCampo(encontrado, ["Nombre"]) || "Sin nombre";
+            const zona = obtenerCampo(encontrado, ["Zona"]);
+
             let classType = "own";
             let labelTipo = "Propia";
-            
+
             if (tipo.includes("franquicia")) {
                 classType = "franchise";
                 labelTipo = "Franquicia";
@@ -806,29 +969,54 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 classType = "consolidado";
                 labelTipo = "Consolidado";
             }
-            
+
+            const zonaBadge = zona ? `<span class="type-badge" style="background:var(--hh-yellow); color:var(--hh-black); margin-left:8px;">ZONA ${escaparHTML(zona)}</span>` : "";
             const director = obtenerDirector(encontrado);
             let directorHtml = "";
             if (director) {
                 directorHtml = `<div class="panel-gris"><span class="data-label"><i class="fas fa-user-tie"></i> Director de Instituto</span><div class="data-val" style="margin-top: 6px; font-size: 1.1em; text-transform: uppercase;">${escaparHTML(director)}</div></div>`;
             }
-            
-            let franquiciaHtml = classType === "franchise" ? `<div class="panel-gris panel-franchise"><span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span><div class="grid-2x2"><div class="data-stack"><span class="data-label">Coordinador</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.NOMBRE2||"N/D")}</span></div><div class="data-stack"><span class="data-label">Teléfono</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(encontrado.TELÉFONOS||encontrado.TELEFONOS||"N/D")}</span></div><div class="data-stack" style="grid-column: span 2;"><span class="data-label">Email</span><span class="data-val" style="font-size: 0.95em;">${escaparHTML(encontrado.EMAIL3||encontrado.EMAIL||"N/D")}</span></div></div></div>` : "";
-                
+
+            let asesoresHtml = construirAsesoresHtml(encontrado);
+            let contactoHtml = construirContactoHtml(encontrado);
+            let franquiciaHtml = "";
+
+            if (classType === "franchise") {
+                const contacto = obtenerContactoInstituto(encontrado);
+                const coord = contacto.asesor || obtenerCampo(encontrado, ["NOMBRE2", "Coordinador"]);
+                const email = contacto.correoAsesor || obtenerCampo(encontrado, ["EMAIL3", "EMAIL", "Correo"]);
+                const tel = contacto.telefonos || obtenerCampo(encontrado, ["TELÉFONOS", "TELEFONOS"]);
+                const itemsFranquicia = [
+                    coord ? { label: "Coordinador/Asesor", icono: "fas fa-headset", valor: coord, span: false } : null,
+                    tel ? { label: "Teléfono", icono: "fas fa-phone", valor: tel, span: false } : null,
+                    email ? { label: "Email", icono: "fas fa-envelope", valor: email, span: false } : null,
+                    contacto.wpp ? { label: "WPP", icono: "fab fa-whatsapp", valor: contacto.wpp, span: false } : null,
+                    contacto.asesor2 ? { label: "Asesor 2", icono: "fas fa-user-check", valor: `${contacto.asesor2}${contacto.correoAsesor2 ? " / " + contacto.correoAsesor2 : ""}`, span: true } : (contacto.correoAsesor2 ? { label: "Correo Asesor 2", icono: "fas fa-envelope", valor: contacto.correoAsesor2, span: true } : null),
+                    contacto.direccion ? { label: "Dirección", icono: "fas fa-location-dot", valor: contacto.direccion, span: true } : null
+                ].filter(Boolean);
+
+                if (itemsFranquicia.length) {
+                    franquiciaHtml = `<div class="panel-gris panel-franchise"><span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span><div class="grid-2x2">${itemsFranquicia.map(item => `<div class="data-stack" ${item.span ? 'style="grid-column: span 2;"' : ''}><span class="data-label"><i class="${item.icono}"></i> ${escaparHTML(item.label)}</span><span class="data-val" style="font-size: ${item.span ? '0.95em' : '1.05em'};">${escaparHTML(item.valor)}</span></div>`).join("")}</div></div>`;
+                }
+
+                asesoresHtml = "";
+                contactoHtml = "";
+            }
+
             let enlaceHtml = "";
-            let linkUrl = (encontrado.Wiki||"").toString().trim();
+            let linkUrl = obtenerCampo(encontrado, ["Wiki"]).toString().trim();
             let tieneWiki = linkUrl && linkUrl !== "#" && linkUrl.toLowerCase() !== "n/a" && linkUrl.toLowerCase() !== "0";
-            
+
             if (classType !== "franchise" && tieneWiki) {
                 if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
                 enlaceHtml = `<a href="${escaparHTML(linkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-wiki">ABRIR WIKI</a>`;
             } else if (classType !== "franchise") {
                 enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--info-box); border-radius:18px; font-weight:800; color:var(--text); opacity:0.65;"><i class="fas fa-info-circle"></i> SIN WIKI DISPONIBLE</div>`;
             }
-            
-            htmlTotal += `<div class="result-card"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(encontrado.Nombre||"Sin nombre")}</div><span class="type-badge ${classType}">${labelTipo}</span></div><i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i></div>${directorHtml}${franquiciaHtml}<div style="margin-top: 24px; margin-bottom: 24px;"><label>Selecciona Programa:</label><select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div id="precios-${index}"></div><div class="buttons-wrapper"><button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>${enlaceHtml}</div></div>`;
+
+            htmlTotal += `<div class="result-card"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(nombreInstituto)}</div><span class="type-badge ${classType}">${labelTipo}</span>${zonaBadge}</div><i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i></div>${directorHtml}${asesoresHtml}${contactoHtml}${franquiciaHtml}<div style="margin-top: 24px; margin-bottom: 24px;"><label>Selecciona Programa:</label><select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div id="precios-${index}"></div><div class="buttons-wrapper"><button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>${enlaceHtml}</div></div>`;
         });
-        
+
         document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }

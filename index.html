@@ -35,7 +35,7 @@
             --radius-md: 20px;
             --radius-sm: 16px;
         }
-        
+
         [data-theme="dark"] {
             --bg: #0a0a0a;
             --card-bg: rgba(30,30,30,0.92);
@@ -53,14 +53,16 @@
             --shadow-soft: 0 12px 30px rgba(0,0,0,0.35);
             --shadow-lift: 0 30px 70px rgba(0,0,0,0.55);
         }
+
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 24px 16px;
+            padding: 24px 20px;
             min-height: 100vh;
             transition: background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
             overflow-x: hidden;
@@ -69,25 +71,25 @@
             flex-direction: column;
             align-items: center;
         }
+
+        /* ── Animated background ── */
         .wave-bg {
             position: fixed;
-            inset: -80px;                    
+            inset: -80px;
             z-index: -2;
             background: linear-gradient(135deg, rgba(255,234,0,0.75) 0%, rgba(255,244,170,0.45) 50%, rgba(255,234,0,0.75) 100%);
             animation: waveFloat 28s ease-in-out infinite;
         }
-
         [data-theme="dark"] .wave-bg {
             background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(35,35,35,0.75) 50%, rgba(20,20,20,0.95) 100%);
-            inset: -80px;                    
+            inset: -80px;
         }
-
         [data-theme="dark"] .wave-bg::before {
-            background: radial-gradient(circle at 30% 20%, rgba(255, 234, 0, 0.22) 0%, transparent 65%);
+            background: radial-gradient(circle at 30% 20%, rgba(255,234,0,0.22) 0%, transparent 65%);
         }
         @keyframes waveFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(30px, -30px) rotate(1deg); }
+            0%, 100% { transform: translate(0,0) rotate(0deg); }
+            50% { transform: translate(30px,-30px) rotate(1deg); }
         }
         .wave-bg::before {
             content: "";
@@ -100,20 +102,18 @@
             0%, 100% { opacity: 0.35; transform: scale(1); }
             50% { opacity: 0.55; transform: scale(1.08); }
         }
+
+        /* ── Header ── */
         .header {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1320px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 12px 8px 28px;
             margin-bottom: 12px;
         }
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
+        .logo-section { display: flex; align-items: center; gap: 14px; }
         .header-title h1 {
             margin: 0;
             font-size: clamp(2.1rem, 5vw, 2.8rem);
@@ -126,7 +126,7 @@
             user-select: none;
         }
         .header-title h1:hover { transform: scale(1.04); }
-        
+
         .dark-mode-toggle {
             display: inline-flex;
             align-items: center;
@@ -142,18 +142,65 @@
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             user-select: none;
         }
-        .dark-mode-toggle:hover {
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: var(--shadow-lift);
-        }
+        .dark-mode-toggle:hover { transform: scale(1.08) translateY(-2px); box-shadow: var(--shadow-lift); }
         .dark-mode-toggle:active { transform: scale(0.95); }
-        .contenedor {
+
+        /* ══════════════════════════════════════════
+           TWO-COLUMN LAYOUT
+           ══════════════════════════════════════════ */
+        .layout-wrapper {
             width: 100%;
-            max-width: 640px;
-            position: relative;
+            max-width: 1320px;
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
         }
+
+        /* LEFT: sticky search panel */
+        .left-panel {
+            width: 400px;
+            min-width: 320px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 24px;
+        }
+
+        /* RIGHT: scrollable results panel */
+        .right-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Label above results */
+        .results-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text);
+            opacity: 0.38;
+            padding: 0 4px;
+            margin-bottom: 18px;
+            user-select: none;
+        }
+
+        /* Initial placeholder when no search yet */
+        .right-empty-state {
+            text-align: center;
+            padding: 100px 24px;
+            opacity: 0.22;
+            color: var(--text);
+            user-select: none;
+        }
+        .right-empty-state i { font-size: 4em; display: block; margin-bottom: 20px; }
+        .right-empty-state p { margin: 0; font-weight: 800; font-size: 1.05em; line-height: 1.5; }
+
+        /* ── Section cards ── */
         .seccion {
-            margin-bottom: 28px;
+            margin-bottom: 20px;
             padding: 32px 28px;
             border-radius: var(--radius-lg);
             background: var(--card-bg);
@@ -162,10 +209,8 @@
             backdrop-filter: blur(28px);
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .seccion:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-lift);
-        }
+        .seccion:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); }
+
         label {
             display: block;
             margin-bottom: 12px;
@@ -176,10 +221,8 @@
             letter-spacing: 0.8px;
             opacity: 0.85;
         }
-        .busqueda-wrap {
-            position: relative;
-            z-index: 200;
-        }
+
+        .busqueda-wrap { position: relative; z-index: 200; }
         .busqueda-wrap::before {
             content: "\f002";
             font-family: "Font Awesome 6 Free";
@@ -194,9 +237,10 @@
             z-index: 2;
             transition: all 0.3s ease;
         }
+
         input[type="text"] {
             width: 100%;
-            padding: 18px 50px 18px 58px; 
+            padding: 18px 50px 18px 58px;
             border: 2px solid var(--input-border);
             border-radius: 28px;
             outline: none;
@@ -250,7 +294,7 @@
         }
         .btn-buscar:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 40px rgba(0,0,0,0.28); }
         .btn-buscar:active { transform: scale(0.96); }
-        
+
         select.btn-buscar {
             width: 100%;
             background: var(--input-bg);
@@ -258,7 +302,7 @@
             border-radius: 24px;
             padding: 16px 18px;
             font-weight: 700;
-            margin-bottom: 0px; 
+            margin-bottom: 0px;
             box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
             appearance: none;
             color: var(--text) !important;
@@ -270,13 +314,15 @@
         select.btn-buscar:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 5px rgba(255,234,0,0.22); transform: translateY(-2px); }
         select.btn-buscar option { color: var(--text) !important; background-color: var(--card-bg) !important; padding: 12px 18px; font-weight: 700; }
 
+        /* ── Results ── */
         #resultado {
-            margin-top: 16px;
+            margin-top: 0;
             display: flex;
             flex-direction: column;
             gap: 28px;
             padding-bottom: 120px;
         }
+
         .result-card {
             background: var(--card-bg);
             padding: 32px 28px;
@@ -292,30 +338,24 @@
         .result-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lift); }
         @keyframes cardPop {
             from { opacity: 0; transform: translateY(40px) scale(0.92); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
         .result-card::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            height: 6px;
-            width: 100%;
+            top: 0; left: 0;
+            height: 6px; width: 100%;
             background: linear-gradient(90deg, var(--hh-yellow), var(--hh-red));
         }
+
         .instituto-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 24px;
         }
-        .instituto-nombre {
-            font-size: 1.6em;
-            font-weight: 900;
-            letter-spacing: -0.6px;
-            line-height: 1.1;
-        }
-        
+        .instituto-nombre { font-size: 1.6em; font-weight: 900; letter-spacing: -0.6px; line-height: 1.1; }
+
         .type-badge {
             padding: 7px 16px;
             border-radius: 999px;
@@ -327,9 +367,9 @@
             display: inline-block;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .type-badge.own { background: var(--hh-green); }
+        .type-badge.own         { background: var(--hh-green); }
         .type-badge.consolidado { background: var(--hh-blue); }
-        .type-badge.franchise { background: var(--hh-red); }
+        .type-badge.franchise   { background: var(--hh-red); }
 
         .panel-gris {
             background: var(--info-box);
@@ -339,35 +379,14 @@
             margin-top: 20px;
             margin-bottom: 24px;
         }
-        .panel-franchise {
-            background: var(--franchise-bg);
-            border-left: 5px solid var(--hh-red);
-        }
-        
-        .grid-2x2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 24px;
-        }
-        .data-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .data-label {
-            font-size: 0.72em;
-            font-weight: 800;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .panel-franchise { background: var(--franchise-bg); border-left: 5px solid var(--hh-red); }
+
+        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+
+        .data-stack { display: flex; flex-direction: column; gap: 4px; }
+        .data-label { font-size: 0.72em; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
         .data-label i { margin-right: 6px; font-size: 1.1em; color: var(--text); opacity: 0.6; }
-        .data-val {
-            font-weight: 900;
-            color: var(--text);
-            font-size: 1.25em;
-            word-break: break-word;
-        }
+        .data-val { font-weight: 900; color: var(--text); font-size: 1.25em; word-break: break-word; }
 
         .caja-alerta {
             margin-top: 20px;
@@ -384,12 +403,8 @@
             border: 1px solid rgba(204,30,61,0.15);
         }
 
-        .buttons-wrapper {
-            margin-top: 32px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+        .buttons-wrapper { margin-top: 32px; display: flex; flex-direction: column; gap: 14px; }
+
         .btn-wiki, .btn-copiar {
             width: 100%;
             padding: 18px 22px;
@@ -413,8 +428,7 @@
         #loadingSpinner {
             display: none;
             position: absolute;
-            top: 28px;
-            right: 28px;
+            top: 28px; right: 28px;
             font-size: 1.4em;
             color: var(--text);
             animation: iosSpin 1.2s linear infinite;
@@ -425,8 +439,7 @@
             display: none;
             position: absolute;
             top: calc(100% + 12px);
-            left: 0;
-            right: 0;
+            left: 0; right: 0;
             z-index: 9999;
             background: var(--card-bg);
             border-radius: 28px;
@@ -437,15 +450,10 @@
             overflow-y: auto;
             border: 1px solid var(--border);
         }
-        .sugerencia-item {
-            padding: 16px 22px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: background 0.25s ease;
-        }
+        .sugerencia-item { padding: 16px 22px; cursor: pointer; font-weight: 700; transition: background 0.25s ease; }
         .sugerencia-item:hover { background: rgba(255,234,0,0.18); }
         .sugerencia-sub { display: block; margin-top: 4px; font-size: 0.82em; font-weight: 600; opacity: 0.7; }
-        
+
         .toast {
             background: rgba(0,0,0,0.88);
             color: var(--hh-yellow);
@@ -457,11 +465,12 @@
         }
         [data-theme="dark"] .toast { background: var(--hh-yellow); color: #000; }
         @keyframes iosToast {
-            0% { transform: translateY(80px) scale(0.7); opacity: 0; }
-            15% { transform: translateY(0) scale(1.05); opacity: 1; }
-            85% { transform: translateY(0) scale(1); }
+            0%   { transform: translateY(80px) scale(0.7); opacity: 0; }
+            15%  { transform: translateY(0) scale(1.05); opacity: 1; }
+            85%  { transform: translateY(0) scale(1); }
             100% { transform: translateY(40px) scale(0.9); opacity: 0; }
         }
+
         .empty-state {
             background: var(--card-bg);
             border-radius: 28px;
@@ -472,6 +481,7 @@
             color: var(--alert-text);
         }
 
+        /* ── Help widget ── */
         .help-widget { position: fixed; right: 18px; bottom: 18px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         .help-btn { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; font-size: 1.3rem; font-weight: 900; background: linear-gradient(180deg, var(--hh-yellow), #ffe600); color: #000; box-shadow: 0 14px 30px rgba(0,0,0,0.22); transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .help-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 20px 38px rgba(0,0,0,0.28); }
@@ -485,6 +495,12 @@
         .help-close:hover { opacity: 1; transform: scale(1.08); }
         .help-panel::before { content: ""; position: absolute; right: 18px; bottom: -8px; width: 16px; height: 16px; background: var(--card-bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
 
+        /* ── Responsive ── */
+        @media (max-width: 960px) {
+            .layout-wrapper { flex-direction: column; gap: 0; }
+            .left-panel { width: 100%; min-width: unset; position: relative; top: 0; }
+            #resultado { margin-top: 0; }
+        }
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
             .seccion { padding: 24px 20px; }
@@ -496,6 +512,8 @@
 </head>
 <body data-theme="light">
 <div class="wave-bg"></div>
+
+<!-- ══ HEADER ══ -->
 <div class="header">
     <div class="logo-section">
         <div class="header-title"><h1 id="logoHH">Harmon <span>Hall</span></h1></div>
@@ -505,26 +523,44 @@
         <span>Noche</span>
     </div>
 </div>
-<div class="contenedor">
-    <div class="seccion" style="text-align: center; padding: 18px 24px; position:relative;">
-        <i id="loadingSpinner" class="fas fa-spinner"></i>
-        <span id="statusCarga">Conectando base de datos… ⏳</span>
-    </div>
-    
-    <div class="seccion" style="position: relative; z-index: 100;">
-        <label>Buscador de Institutos</label>
-        <div class="busqueda-wrap">
-            <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
-            <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
-                <i class="fas fa-times"></i>
-            </button>
-            <div id="sugerencias" class="sugerencias"></div>
-        </div>
-        <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
-    </div>
-    <div id="resultado"></div>
-</div>
 
+<!-- ══ TWO-COLUMN LAYOUT ══ -->
+<div class="layout-wrapper">
+
+    <!-- ── LEFT: sticky search panel ── -->
+    <div class="left-panel">
+        <div class="seccion" style="text-align:center; padding:18px 24px; position:relative;">
+            <i id="loadingSpinner" class="fas fa-spinner"></i>
+            <span id="statusCarga">Conectando base de datos… ⏳</span>
+        </div>
+
+        <div class="seccion" style="position:relative; z-index:100;">
+            <label>Buscador de Institutos</label>
+            <div class="busqueda-wrap">
+                <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
+                <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div id="sugerencias" class="sugerencias"></div>
+            </div>
+            <button class="btn-buscar" onclick="buscarInstituto()">Buscar Ahora</button>
+        </div>
+    </div>
+
+    <!-- ── RIGHT: results panel ── -->
+    <div class="right-panel">
+        <p class="results-label"><i class="fas fa-list-ul"></i> Resultados de búsqueda</p>
+        <div id="resultado">
+            <div class="right-empty-state">
+                <i class="fas fa-magnifying-glass"></i>
+                <p>Busca un instituto para ver<br>los resultados aquí</p>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /layout-wrapper -->
+
+<!-- ══ HELP WIDGET ══ -->
 <div class="help-widget" id="helpWidget" aria-live="polite">
     <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
         <button class="help-close" type="button" onclick="toggleHelp(false)" aria-label="Cerrar ayuda">
@@ -538,12 +574,10 @@
             Si detectas algo que se pueda mejorar o tienes alguna duda, contáctame por Teams.
         </p>
         <div class="help-email">
-            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx 
+            <i class="fab fa-microsoft"></i> abraham.quintero@unid.mx
         </div>
     </div>
-    <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">
-        ?
-    </button>
+    <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">?</button>
 </div>
 
 <script>
@@ -789,19 +823,19 @@
     }
 
     async function copiarAlPortapapeles(texto) {
-        try { 
-            await navigator.clipboard.writeText(texto); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
-        } catch { 
-            const area = document.createElement("textarea"); 
-            area.value = texto; 
-            area.style.position = "fixed"; 
-            area.style.opacity = "0"; 
-            document.body.appendChild(area); 
-            area.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(area); 
-            mostrarNotificacion("Resumen copiado con éxito"); 
+        try {
+            await navigator.clipboard.writeText(texto);
+            mostrarNotificacion("Resumen copiado con éxito");
+        } catch {
+            const area = document.createElement("textarea");
+            area.value = texto;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            document.body.removeChild(area);
+            mostrarNotificacion("Resumen copiado con éxito");
         }
     }
 
@@ -896,10 +930,10 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
 
     function renderSugerencias(lista) {
         const contenedor = document.getElementById("sugerencias");
-        if (!lista.length) { 
-            contenedor.innerHTML = ""; 
-            contenedor.style.display = "none"; 
-            return; 
+        if (!lista.length) {
+            contenedor.innerHTML = "";
+            contenedor.style.display = "none";
+            return;
         }
         contenedor.innerHTML = lista.map(item => {
             const nombre = obtenerCampo(item, ["Nombre"]) || "Sin nombre";
@@ -919,13 +953,13 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         } else {
             btnLimpiar.classList.remove('visible');
         }
-        if (!busqueda) { 
-            document.getElementById("sugerencias").style.display = "none"; 
-            return; 
+        if (!busqueda) {
+            document.getElementById("sugerencias").style.display = "none";
+            return;
         }
         const sugerencias = todosLosDatos
             .filter(f => obtenerCampo(f, ["Nombre"]) && normalizarTexto(obtenerCampo(f, ["Nombre"])).includes(busqueda))
-            .sort((a,b) => {
+            .sort((a, b) => {
                 const na = normalizarTexto(obtenerCampo(a, ["Nombre"])), nb = normalizarTexto(obtenerCampo(b, ["Nombre"]));
                 return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
             })
@@ -936,7 +970,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     function seleccionarSugerencia(nombre) {
         document.getElementById('textoBusqueda').value = nombre;
         document.getElementById("sugerencias").style.display = "none";
-        document.getElementById('btnLimpiar').classList.add('visible'); 
+        document.getElementById('btnLimpiar').classList.add('visible');
         buscarInstituto();
     }
 
@@ -1021,11 +1055,11 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
 
-    window.onload = async function() {
+    window.onload = async function () {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
         spinner.style.display = 'block';
-        
+
         try {
             const promesas = archivosA_Cargar.map(async (archivo) => {
                 const response = await fetch(archivo);
@@ -1050,7 +1084,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     document.addEventListener('DOMContentLoaded', () => {
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');
-        
+
         textoBusqueda.addEventListener('input', actualizarSugerencias);
         textoBusqueda.addEventListener('keydown', e => {
             if (e.key === 'Enter') buscarInstituto();
@@ -1072,16 +1106,16 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         let temporizadorClicks = null;
 
         if (logoHH) {
-            logoHH.style.cursor = 'pointer'; 
+            logoHH.style.cursor = 'pointer';
             logoHH.addEventListener('click', () => {
                 contadorClicks++;
                 clearTimeout(temporizadorClicks);
                 if (contadorClicks === 3) {
                     const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
                     let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-                    let duracionSegundos = modoNocheActivo ? 2.0 : 2.5; 
+                    let duracionSegundos = modoNocheActivo ? 2.0 : 2.5;
                     const sonidoEasterEgg = new Audio(archivoAudio);
-                    sonidoEasterEgg.volume = 0.6; 
+                    sonidoEasterEgg.volume = 0.6;
                     sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
                     setTimeout(() => {
                         const fadeOut = setInterval(() => {
@@ -1089,7 +1123,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                                 sonidoEasterEgg.volume -= 0.1;
                             } else {
                                 sonidoEasterEgg.pause();
-                                sonidoEasterEgg.currentTime = 0; 
+                                sonidoEasterEgg.currentTime = 0;
                                 clearInterval(fadeOut);
                             }
                         }, 50);
@@ -1097,9 +1131,9 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     if (window.confetti) {
                         confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, zIndex: 10000, colors: modoNocheActivo ? ['#cc1e3d', '#000000', '#ffffff'] : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] });
                     }
-                    contadorClicks = 0; 
+                    contadorClicks = 0;
                 } else {
-                    temporizadorClicks = setTimeout(() => { contadorClicks = 0; }, 800); 
+                    temporizadorClicks = setTimeout(() => { contadorClicks = 0; }, 800);
                 }
             });
         }

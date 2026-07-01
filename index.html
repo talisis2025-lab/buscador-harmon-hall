@@ -508,6 +508,63 @@
             .help-widget { right: 12px; bottom: 12px; }
             .help-panel { width: min(300px, calc(100vw - 24px)); }
         }
+
+
+        /* ── Admin oculto: no modifica la vista pública porque permanece invisible ── */
+        .admin-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20000;
+            background: rgba(0,0,0,0.62);
+            backdrop-filter: blur(18px);
+            display: none;
+            padding: 18px;
+        }
+        .admin-overlay.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .admin-shell {
+            width: min(1280px, 100%);
+            height: min(880px, 96vh);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lift);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-shell-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+        .admin-close-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 900;
+            background: var(--hh-red);
+            color: white;
+            box-shadow: 0 10px 24px rgba(204,30,61,0.28);
+        }
+        .admin-frame {
+            width: 100%;
+            flex: 1;
+            border: 0;
+            background: var(--hh-yellow);
+        }
+        body.admin-open { overflow: hidden; }
     </style>
 </head>
 <body data-theme="light">
@@ -560,6 +617,21 @@
 
 </div><!-- /layout-wrapper -->
 
+
+
+<!-- ══ ADMIN OCULTO: se abre con 5 clics rápidos en el logo ══ -->
+<div class="admin-overlay" id="adminOverlay" aria-hidden="true">
+    <div class="admin-shell" role="dialog" aria-label="Panel administrador Harmon Hall">
+        <div class="admin-shell-header">
+            <span><i class="fas fa-user-shield"></i> Modo administrador</span>
+            <button class="admin-close-btn" type="button" onclick="cerrarAdministrador()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
+        <iframe id="adminFrame" class="admin-frame" title="Administrador Harmon Hall" src="about:blank"></iframe>
+    </div>
+</div>
+
 <!-- ══ HELP WIDGET ══ -->
 <div class="help-widget" id="helpWidget" aria-live="polite">
     <div class="help-panel" id="helpPanel" role="dialog" aria-label="Ayuda y contacto">
@@ -583,7 +655,15 @@
 <script>
     let todosLosDatos = [];
     let baseCargada = false;
-    const archivosA_Cargar = ['database.xlsx', 'database2.xlsx'];
+    /*
+     * Google Sheets reemplaza a database.xlsx.
+     * database2.xlsx se queda en GitHub y se sigue cargando igual.
+     * Pega aquí la URL /exec de tu Apps Script cuando lo publiques.
+     */
+    const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyt8Ih68SxEBbKXmL1QTv8wp6pB4gg4fFMUMO5ug2FjlRg10xW91nXXgbUO8SyyyHRM/exec";
+    const archivosA_Cargar = ['database2.xlsx'];
+    const EASTER_EGG_CLICKS = 3;
+    const ADMIN_TRIGGER_CLICKS = 5;
 
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -1055,25 +1135,189 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
     }
 
+
+
+    function apiGoogleSheetsConfigurada() {
+        return SHEETS_API_URL && !SHEETS_API_URL.includes("PEGA_AQUI") && /^https?:\/\//i.test(SHEETS_API_URL);
+    }
+
+    function construirUrlAppsScript(params = {}) {
+        const sep = SHEETS_API_URL.includes("?") ? "&" : "?";
+        const query = Object.entries(params)
+            .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+            .join("&");
+        return SHEETS_API_URL + sep + query;
+    }
+
+    function cargarGoogleSheetsJsonp() {
+        return new Promise((resolve, reject) => {
+            if (!apiGoogleSheetsConfigurada()) {
+                resolve([]);
+                return;
+            }
+
+            const callbackName = "hhSheetsCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+            const script = document.createElement("script");
+            let terminado = false;
+
+            const limpiar = () => {
+                try { delete window[callbackName]; } catch { window[callbackName] = undefined; }
+                if (script.parentNode) script.parentNode.removeChild(script);
+            };
+
+            const timeout = setTimeout(() => {
+                if (terminado) return;
+                terminado = true;
+                limpiar();
+                reject(new Error("Tiempo de espera agotado al cargar Google Sheets."));
+            }, 18000);
+
+            window[callbackName] = (respuesta) => {
+                if (terminado) return;
+                terminado = true;
+                clearTimeout(timeout);
+                limpiar();
+
+                if (!respuesta || !respuesta.ok) {
+                    reject(new Error((respuesta && respuesta.error) || "Google Sheets no respondió correctamente."));
+                    return;
+                }
+
+                const datos = Array.isArray(respuesta.data) ? respuesta.data : [];
+                resolve(datos.map(item => ({ ...item, _source: item._source || "sheets" })));
+            };
+
+            script.onerror = () => {
+                if (terminado) return;
+                terminado = true;
+                clearTimeout(timeout);
+                limpiar();
+                reject(new Error("No se pudo conectar con Apps Script."));
+            };
+
+            script.src = construirUrlAppsScript({ action: "list", callback: callbackName, _: Date.now() });
+            document.body.appendChild(script);
+        });
+    }
+
+    async function cargarExcelGitHub(archivo) {
+        const response = await fetch(archivo + "?v=" + Date.now());
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+        return XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]).map(item => ({ ...item, _source: archivo }));
+    }
+
+    async function cargarBasesDeDatos(mostrarEstado = true) {
+        const errores = [];
+        const datosFinales = [];
+
+        if (apiGoogleSheetsConfigurada()) {
+            try {
+                const datosSheets = await cargarGoogleSheetsJsonp();
+                datosFinales.push(...datosSheets);
+            } catch (error) {
+                console.error("Error cargando Google Sheets:", error);
+                errores.push(error.message);
+            }
+        } else {
+            errores.push("Falta configurar SHEETS_API_URL en index.html.");
+        }
+
+        for (const archivo of archivosA_Cargar) {
+            try {
+                const datosExcel = await cargarExcelGitHub(archivo);
+                datosFinales.push(...datosExcel);
+            } catch (error) {
+                console.error("Error cargando " + archivo + ":", error);
+                errores.push(error.message);
+            }
+        }
+
+        todosLosDatos = datosFinales;
+        baseCargada = true;
+
+        if (!datosFinales.length && errores.length) {
+            throw new Error(errores.join(" | "));
+        }
+
+        return { datos: datosFinales, errores };
+    }
+
+    async function recargarDatosDesdeAdmin() {
+        try {
+            const busquedaActual = document.getElementById('textoBusqueda').value.trim();
+            await cargarBasesDeDatos(false);
+            if (busquedaActual) buscarInstituto();
+            mostrarNotificacion("Datos actualizados desde Google Sheets");
+        } catch (error) {
+            console.error("No se pudo refrescar después del cambio admin:", error);
+            mostrarNotificacion("Guarda realizado; recarga la página para ver cambios");
+        }
+    }
+
+    function abrirAdministrador() {
+        if (!apiGoogleSheetsConfigurada()) {
+            mostrarNotificacion("Primero configura la URL de Apps Script en index.html");
+            return;
+        }
+        const overlay = document.getElementById("adminOverlay");
+        const frame = document.getElementById("adminFrame");
+        if (!overlay || !frame) return;
+
+        frame.src = construirUrlAppsScript({ view: "admin", embedded: "1", _: Date.now() });
+        overlay.classList.add("visible");
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.classList.add("admin-open");
+    }
+
+    function cerrarAdministrador() {
+        const overlay = document.getElementById("adminOverlay");
+        const frame = document.getElementById("adminFrame");
+        if (!overlay || !frame) return;
+
+        overlay.classList.remove("visible");
+        overlay.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("admin-open");
+        frame.src = "about:blank";
+    }
+
+    function activarEasterEgg() {
+        const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
+        let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
+        let duracionSegundos = modoNocheActivo ? 2.0 : 2.5;
+        const sonidoEasterEgg = new Audio(archivoAudio);
+        sonidoEasterEgg.volume = 0.6;
+        sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
+        setTimeout(() => {
+            const fadeOut = setInterval(() => {
+                if (sonidoEasterEgg.volume > 0.1) {
+                    sonidoEasterEgg.volume -= 0.1;
+                } else {
+                    sonidoEasterEgg.pause();
+                    sonidoEasterEgg.currentTime = 0;
+                    clearInterval(fadeOut);
+                }
+            }, 50);
+        }, duracionSegundos * 1000);
+        if (window.confetti) {
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, zIndex: 10000, colors: modoNocheActivo ? ['#cc1e3d', '#000000', '#ffffff'] : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] });
+        }
+    }
+
     window.onload = async function () {
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
         spinner.style.display = 'block';
 
         try {
-            const promesas = archivosA_Cargar.map(async (archivo) => {
-                const response = await fetch(archivo);
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
-                const arrayBuffer = await response.arrayBuffer();
-                const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                return XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
-            });
-
-            const resultados = await Promise.all(promesas);
-            resultados.forEach(json => { todosLosDatos = todosLosDatos.concat(json); });
+            const resultadoCarga = await cargarBasesDeDatos(true);
+            if (resultadoCarga.errores.length) {
+                console.warn("Base cargada con avisos:", resultadoCarga.errores);
+            }
             status.innerHTML = "✅ Base de datos lista.";
         } catch (e) {
-            console.error("Error cargando archivos Excel: ", e);
+            console.error("Error cargando bases de datos: ", e);
             status.innerHTML = "❌ Error al cargar algunos datos.";
         } finally {
             spinner.style.display = 'none';
@@ -1107,36 +1351,27 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
 
         if (logoHH) {
             logoHH.style.cursor = 'pointer';
+            logoHH.title = 'Harmon Hall';
             logoHH.addEventListener('click', () => {
                 contadorClicks++;
                 clearTimeout(temporizadorClicks);
-                if (contadorClicks === 3) {
-                    const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
-                    let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-                    let duracionSegundos = modoNocheActivo ? 2.0 : 2.5;
-                    const sonidoEasterEgg = new Audio(archivoAudio);
-                    sonidoEasterEgg.volume = 0.6;
-                    sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
-                    setTimeout(() => {
-                        const fadeOut = setInterval(() => {
-                            if (sonidoEasterEgg.volume > 0.1) {
-                                sonidoEasterEgg.volume -= 0.1;
-                            } else {
-                                sonidoEasterEgg.pause();
-                                sonidoEasterEgg.currentTime = 0;
-                                clearInterval(fadeOut);
-                            }
-                        }, 50);
-                    }, duracionSegundos * 1000);
-                    if (window.confetti) {
-                        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, zIndex: 10000, colors: modoNocheActivo ? ['#cc1e3d', '#000000', '#ffffff'] : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] });
+
+                temporizadorClicks = setTimeout(() => {
+                    if (contadorClicks >= ADMIN_TRIGGER_CLICKS) {
+                        abrirAdministrador();
+                    } else if (contadorClicks === EASTER_EGG_CLICKS) {
+                        activarEasterEgg();
                     }
                     contadorClicks = 0;
-                } else {
-                    temporizadorClicks = setTimeout(() => { contadorClicks = 0; }, 800);
-                }
+                }, 760);
             });
         }
+
+        window.addEventListener("message", event => {
+            const data = event.data || {};
+            if (data.type === "HH_ADMIN_DATA_CHANGED") recargarDatosDesdeAdmin();
+            if (data.type === "HH_ADMIN_CLOSE") cerrarAdministrador();
+        });
     });
 </script>
 </body>

@@ -1380,19 +1380,13 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
   if (gate) gate.classList.add("admin-hidden");
   frame.classList.remove("admin-hidden");
 
-  // Sin hash. Mandamos la credencial por postMessage cuando el iframe termine de cargar.
-  frame.src = construirUrlAppsScript({ view: "admin", embedded: "1", _: Date.now() });
-
-  frame.onload = () => {
-    try {
-      frame.contentWindow.postMessage(
-        { type: "HH_ADMIN_CREDENTIAL", credential: adminCredential },
-        "*"
-      );
-    } catch (e) {
-      console.error("No se pudo enviar la credencial al iframe admin:", e);
-    }
-  };
+  // Pasamos la credencial como query string para que no se pierda en el redirect
+  frame.src = construirUrlAppsScript({
+    view: "admin",
+    embedded: "1",
+    credential: adminCredential,
+    _: Date.now()
+  });
 }
 
     window.onAdminGoogleCredential = onAdminGoogleCredential;

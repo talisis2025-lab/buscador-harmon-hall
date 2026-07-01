@@ -7,6 +7,7 @@
     <link rel="icon" type="image/jpeg" href="https://strat-branding.com/wp-content/uploads/2022/04/sb-harmon-hall.jpg">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -564,6 +565,40 @@
             border: 0;
             background: var(--hh-yellow);
         }
+        .admin-hidden { display: none !important; }
+        .admin-login-gate {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--hh-yellow);
+            padding: 28px;
+        }
+        .admin-login-card {
+            width: min(520px, 100%);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            text-align: center;
+        }
+        .admin-login-card h2 {
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .admin-login-card p {
+            margin: 0 0 18px;
+            font-weight: 800;
+            opacity: .72;
+            line-height: 1.45;
+        }
+        .admin-login-msg {
+            margin-top: 16px;
+            font-weight: 900;
+        }
         body.admin-open { overflow: hidden; }
     </style>
 </head>
@@ -628,7 +663,15 @@
                 <i class="fas fa-times"></i> Cerrar
             </button>
         </div>
-        <iframe id="adminFrame" class="admin-frame" title="Administrador Harmon Hall" src="about:blank"></iframe>
+        <div id="adminLoginGate" class="admin-login-gate">
+            <div class="admin-login-card">
+                <h2><i class="fas fa-user-shield"></i> Acceso administrador</h2>
+                <p>Inicia sesión con el correo autorizado en la pestaña <b>UsuariosAdmin</b>.</p>
+                <div id="adminGoogleBtn"></div>
+                <div id="adminLoginMsg" class="admin-login-msg"></div>
+            </div>
+        </div>
+        <iframe id="adminFrame" class="admin-frame admin-hidden" title="Administrador Harmon Hall" src="about:blank"></iframe>
     </div>
 </div>
 
@@ -661,9 +704,12 @@
      * Pega aquí la URL /exec de tu Apps Script cuando lo publiques.
      */
     const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyt8Ih68SxEBbKXmL1QTv8wp6pB4gg4fFMUMO5ug2FjlRg10xW91nXXgbUO8SyyyHRM/exec";
+    const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.googleusercontent.com";
     const archivosA_Cargar = ['database2.xlsx'];
     const EASTER_EGG_CLICKS = 3;
     const ADMIN_TRIGGER_CLICKS = 5;
+    let adminCredential = "";
+    let adminGoogleButtonRendered = false;
 
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -1262,14 +1308,80 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             return;
         }
         const overlay = document.getElementById("adminOverlay");
-        const frame = document.getElementById("adminFrame");
-        if (!overlay || !frame) return;
+        if (!overlay) return;
 
-        frame.src = construirUrlAppsScript({ view: "admin", embedded: "1", _: Date.now() });
         overlay.classList.add("visible");
         overlay.setAttribute("aria-hidden", "false");
         document.body.classList.add("admin-open");
+
+        if (adminCredential) {
+            cargarPanelAdminConSesion();
+        } else {
+            mostrarLoginAdmin();
+        }
     }
+
+    function mostrarLoginAdmin() {
+        const gate = document.getElementById("adminLoginGate");
+        const frame = document.getElementById("adminFrame");
+        if (gate) gate.classList.remove("admin-hidden");
+        if (frame) {
+            frame.classList.add("admin-hidden");
+            frame.src = "about:blank";
+        }
+        renderizarBotonGoogleAdmin();
+    }
+
+    function renderizarBotonGoogleAdmin() {
+        const btn = document.getElementById("adminGoogleBtn");
+        const msg = document.getElementById("adminLoginMsg");
+        if (!btn) return;
+
+        if (!window.google || !google.accounts || !google.accounts.id) {
+            if (msg) msg.textContent = "Cargando inicio de sesión de Google…";
+            setTimeout(renderizarBotonGoogleAdmin, 350);
+            return;
+        }
+
+        if (adminGoogleButtonRendered) return;
+        adminGoogleButtonRendered = true;
+        if (msg) msg.textContent = "";
+
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: onAdminGoogleCredential,
+            ux_mode: "popup"
+        });
+        google.accounts.id.renderButton(btn, {
+            type: "standard",
+            size: "large",
+            theme: "filled_black",
+            text: "signin_with",
+            shape: "pill",
+            logo_alignment: "left"
+        });
+    }
+
+    function onAdminGoogleCredential(response) {
+        if (!response || !response.credential) {
+            const msg = document.getElementById("adminLoginMsg");
+            if (msg) msg.textContent = "No se recibió sesión de Google.";
+            return;
+        }
+        adminCredential = response.credential;
+        cargarPanelAdminConSesion();
+    }
+
+    function cargarPanelAdminConSesion() {
+        const gate = document.getElementById("adminLoginGate");
+        const frame = document.getElementById("adminFrame");
+        if (!frame) return;
+        if (gate) gate.classList.add("admin-hidden");
+        frame.classList.remove("admin-hidden");
+        frame.src = construirUrlAppsScript({ view: "admin", embedded: "1", _: Date.now() }) + "#credential=" + encodeURIComponent(adminCredential);
+    }
+
+    window.onAdminGoogleCredential = onAdminGoogleCredential;
 
     function cerrarAdministrador() {
         const overlay = document.getElementById("adminOverlay");
@@ -1280,6 +1392,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         overlay.setAttribute("aria-hidden", "true");
         document.body.classList.remove("admin-open");
         frame.src = "about:blank";
+        frame.classList.add("admin-hidden");
     }
 
     function activarEasterEgg() {

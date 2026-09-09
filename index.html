@@ -496,18 +496,224 @@
         .help-close:hover { opacity: 1; transform: scale(1.08); }
         .help-panel::before { content: ""; position: absolute; right: 18px; bottom: -8px; width: 16px; height: 16px; background: var(--card-bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
 
+        /* ── Modalidad Presencial / Online ── */
+        .mode-switcher-wrap {
+            width: 100%;
+            max-width: 1320px;
+            display: flex;
+            justify-content: center;
+            margin: -8px 0 28px;
+        }
+        .mode-switcher {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: min(430px, 100%);
+            padding: 5px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+        .mode-tab {
+            min-height: 48px;
+            border: 0;
+            border-radius: 7px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .mode-tab i { margin-right: 8px; }
+        .mode-tab.active { background: #000; color: var(--hh-yellow); }
+        [data-theme="dark"] .mode-tab.active { background: var(--hh-yellow); color: #000; }
+        .mode-tab:active { transform: scale(0.98); }
+        .view-section { width: 100%; max-width: 1320px; }
+        .view-section[hidden] { display: none; }
+
+        .online-layout {
+            width: 100%;
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+        }
+        .online-controls {
+            width: 400px;
+            min-width: 320px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 24px;
+        }
+        .online-results { flex: 1; min-width: 0; }
+        .online-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 24px;
+            font-size: 1.18rem;
+            font-weight: 900;
+        }
+        .online-title i { color: var(--hh-red); }
+        .online-license-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+        .online-license-btn {
+            min-width: 0;
+            min-height: 44px;
+            padding: 8px 5px;
+            border: 2px solid var(--input-border);
+            border-radius: 7px;
+            background: var(--input-bg);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .online-license-btn.active {
+            border-color: #000;
+            background: #000;
+            color: #fff;
+        }
+        [data-theme="dark"] .online-license-btn.active {
+            border-color: var(--hh-yellow);
+            color: var(--hh-yellow);
+        }
+        .online-select {
+            width: 100%;
+            min-height: 52px;
+            padding: 12px 42px 12px 14px;
+            margin: 0 0 22px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 800;
+        }
+        .online-limit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: -4px;
+            padding: 12px 0 0;
+            border-top: 1px solid var(--border);
+        }
+        .online-limit-row span { font-size: 0.84rem; font-weight: 800; opacity: 0.68; }
+        .online-limit-row strong { color: var(--hh-red); opacity: 1; }
+        .online-manage-btn {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: var(--input-bg);
+            color: var(--text);
+            cursor: pointer;
+        }
+        .online-quote {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .online-quote::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 6px;
+            background: var(--hh-green);
+        }
+        .online-quote.plus::before { background: var(--hh-blue); }
+        .online-quote.elite::before { background: var(--hh-red); }
+        .online-quote-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .online-quote-name { margin: 0; font-size: 1.45rem; font-weight: 900; }
+        .online-quote-term { margin-top: 5px; font-weight: 800; opacity: 0.58; }
+        .online-discount-badge {
+            flex: 0 0 auto;
+            padding: 8px 12px;
+            border-radius: 7px;
+            background: #000;
+            color: var(--hh-yellow);
+            font-size: 0.85rem;
+            font-weight: 900;
+        }
+        [data-theme="dark"] .online-discount-badge { background: var(--hh-yellow); color: #000; }
+        .online-price-label {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            opacity: 0.55;
+        }
+        .online-price-main {
+            margin: 6px 0 28px;
+            font-size: 3.2rem;
+            line-height: 1.05;
+            font-weight: 900;
+            word-break: break-word;
+        }
+        .online-price-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            border-top: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            margin-bottom: 26px;
+        }
+        .online-price-item {
+            min-width: 0;
+            padding: 18px;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .online-price-item span { display: block; font-size: 0.75rem; font-weight: 800; opacity: 0.55; }
+        .online-price-item strong { display: block; margin-top: 6px; font-size: 1.05rem; word-break: break-word; }
+        .online-copy-btn {
+            width: 100%;
+            min-height: 54px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--hh-red);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.96rem;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .online-copy-btn:hover { filter: brightness(1.06); }
+
         /* ── Responsive ── */
         @media (max-width: 960px) {
             .layout-wrapper { flex-direction: column; gap: 0; }
             .left-panel { width: 100%; min-width: unset; position: relative; top: 0; }
             #resultado { margin-top: 0; }
+            .online-layout { flex-direction: column; gap: 0; }
+            .online-controls { width: 100%; min-width: unset; position: relative; top: 0; }
+            .online-results { width: 100%; }
         }
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
             .seccion { padding: 24px 20px; }
             .result-card { padding: 24px 20px; }
-            .help-widget { right: 12px; bottom: 12px; }
-            .help-panel { width: min(300px, calc(100vw - 24px)); }
+            .help-widget { position: relative; right: auto; bottom: auto; align-self: flex-end; margin-top: 18px; }
+            .help-panel { position: absolute; right: 0; bottom: 66px; width: min(300px, calc(100vw - 24px)); }
+            .mode-switcher-wrap { margin-bottom: 20px; }
+            .online-quote { padding: 24px 20px 20px 24px; }
+            .online-price-grid { grid-template-columns: 1fr; }
+            .online-price-main { font-size: 2rem; }
         }
 
 
@@ -616,6 +822,18 @@
     </div>
 </div>
 
+<div class="mode-switcher-wrap">
+    <div class="mode-switcher" role="tablist" aria-label="Modalidad">
+        <button id="tabPresencial" class="mode-tab active" type="button" role="tab" aria-selected="true" aria-controls="presencialView" onclick="cambiarModalidad('presencial')">
+            <i class="fas fa-school"></i> Presencial
+        </button>
+        <button id="tabOnline" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="onlineView" onclick="cambiarModalidad('online')">
+            <i class="fas fa-laptop"></i> 100% Online
+        </button>
+    </div>
+</div>
+
+<section id="presencialView" class="view-section" role="tabpanel" aria-labelledby="tabPresencial">
 <!-- ══ TWO-COLUMN LAYOUT ══ -->
 <div class="layout-wrapper">
 
@@ -651,6 +869,42 @@
     </div>
 
 </div><!-- /layout-wrapper -->
+</section>
+
+<section id="onlineView" class="view-section" role="tabpanel" aria-labelledby="tabOnline" hidden>
+    <div class="online-layout">
+        <div class="online-controls">
+            <div class="seccion">
+                <h2 class="online-title"><i class="fas fa-wifi"></i> Cotizador 100% Online</h2>
+
+                <label>Licencia</label>
+                <div class="online-license-tabs" role="group" aria-label="Licencia Online">
+                    <button class="online-license-btn active" type="button" data-license="Standard" onclick="seleccionarLicenciaOnline('Standard')">Standard</button>
+                    <button class="online-license-btn" type="button" data-license="Plus" onclick="seleccionarLicenciaOnline('Plus')">Plus</button>
+                    <button class="online-license-btn" type="button" data-license="Elite" onclick="seleccionarLicenciaOnline('Elite')">Elite</button>
+                </div>
+
+                <label for="onlineTermSelect">Plazo</label>
+                <select id="onlineTermSelect" class="online-select" onchange="renderizarCotizadorOnline()"></select>
+
+                <label for="onlineDiscountSelect">Descuento</label>
+                <select id="onlineDiscountSelect" class="online-select" onchange="renderizarCotizadorOnline()"></select>
+
+                <div class="online-limit-row">
+                    <span>Tope autorizado: <strong id="onlineMaxDiscountLabel">0%</strong></span>
+                    <button class="online-manage-btn" type="button" onclick="abrirAdministrador()" title="Administrar tope de descuento" aria-label="Administrar tope de descuento">
+                        <i class="fas fa-gear"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="online-results">
+            <p class="results-label"><i class="fas fa-receipt"></i> Cotización Online</p>
+            <div id="onlineQuote"></div>
+        </div>
+    </div>
+</section>
 
 
 
@@ -708,8 +962,25 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     const archivosA_Cargar = ['database2.xlsx'];
     const EASTER_EGG_CLICKS = 3;
     const ADMIN_TRIGGER_CLICKS = 5;
+    const ONLINE_PLANS = [
+        { id: "standard-mensual", licencia: "Standard", plazo: "Mensual", precioLista: 1700, diferido: false },
+        { id: "standard-trimestral", licencia: "Standard", plazo: "Trimestral", precioLista: 4999, diferido: false },
+        { id: "standard-semestral", licencia: "Standard", plazo: "Semestral", precioLista: 8499, diferido: true },
+        { id: "standard-anual", licencia: "Standard", plazo: "Anual", precioLista: 14899, diferido: true },
+        { id: "standard-18", licencia: "Standard", plazo: "18 Meses", precioLista: 19200, diferido: true },
+        { id: "plus-trimestral", licencia: "Plus", plazo: "Trimestral", precioLista: 9729, diferido: true },
+        { id: "plus-semestral", licencia: "Plus", plazo: "Semestral", precioLista: 16538, diferido: true },
+        { id: "plus-anual", licencia: "Plus", plazo: "Anual", precioLista: 24944, diferido: true },
+        { id: "plus-18", licencia: "Plus", plazo: "18 Meses", precioLista: 33738, diferido: true },
+        { id: "elite-trimestral", licencia: "Elite", plazo: "Trimestral", precioLista: 14593, diferido: true },
+        { id: "elite-semestral", licencia: "Elite", plazo: "Semestral", precioLista: 24807, diferido: true },
+        { id: "elite-anual", licencia: "Elite", plazo: "Anual", precioLista: 39692, diferido: true },
+        { id: "elite-18", licencia: "Elite", plazo: "18 Meses", precioLista: 50607, diferido: true }
+    ];
     let adminCredential = "";
     let adminGoogleButtonRendered = false;
+    let onlineLicense = "Standard";
+    let onlineMaxDiscount = 0;
 
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -733,6 +1004,152 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }) + " MXN";
+    }
+
+    function cambiarModalidad(modalidad) {
+        const esOnline = modalidad === "online";
+        document.getElementById("presencialView").hidden = esOnline;
+        document.getElementById("onlineView").hidden = !esOnline;
+
+        const tabPresencial = document.getElementById("tabPresencial");
+        const tabOnline = document.getElementById("tabOnline");
+        tabPresencial.classList.toggle("active", !esOnline);
+        tabOnline.classList.toggle("active", esOnline);
+        tabPresencial.setAttribute("aria-selected", String(!esOnline));
+        tabOnline.setAttribute("aria-selected", String(esOnline));
+
+        if (esOnline) renderizarCotizadorOnline();
+    }
+
+    function seleccionarLicenciaOnline(licencia) {
+        if (!ONLINE_PLANS.some(plan => plan.licencia === licencia)) return;
+        onlineLicense = licencia;
+
+        document.querySelectorAll(".online-license-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.getAttribute("data-license") === licencia);
+        });
+
+        actualizarPlazosOnline();
+    }
+
+    function actualizarPlazosOnline() {
+        const select = document.getElementById("onlineTermSelect");
+        if (!select) return;
+
+        const planes = ONLINE_PLANS.filter(plan => plan.licencia === onlineLicense);
+        select.innerHTML = planes
+            .map(plan => `<option value="${escaparHTML(plan.id)}">${escaparHTML(plan.plazo)}</option>`)
+            .join("");
+        renderizarCotizadorOnline();
+    }
+
+    function actualizarOpcionesDescuentoOnline(valorPreferido) {
+        const select = document.getElementById("onlineDiscountSelect");
+        if (!select) return;
+
+        const preferido = Number.isInteger(Number(valorPreferido))
+            ? Math.max(0, Math.min(onlineMaxDiscount, Number(valorPreferido)))
+            : onlineMaxDiscount;
+        const opciones = [];
+
+        for (let descuento = onlineMaxDiscount; descuento >= 0; descuento--) {
+            opciones.push(`<option value="${descuento}"${descuento === preferido ? " selected" : ""}>${descuento}%</option>`);
+        }
+
+        select.innerHTML = opciones.join("");
+    }
+
+    function obtenerPlanOnlineSeleccionado() {
+        const select = document.getElementById("onlineTermSelect");
+        const planId = select && select.value;
+        return ONLINE_PLANS.find(plan => plan.id === planId)
+            || ONLINE_PLANS.find(plan => plan.licencia === onlineLicense)
+            || ONLINE_PLANS[0];
+    }
+
+    function obtenerCotizacionOnlineActual() {
+        const plan = obtenerPlanOnlineSeleccionado();
+        const selectDescuento = document.getElementById("onlineDiscountSelect");
+        const descuentoSolicitado = Number(selectDescuento && selectDescuento.value);
+        const descuento = Number.isFinite(descuentoSolicitado)
+            ? Math.max(0, Math.min(onlineMaxDiscount, Math.floor(descuentoSolicitado)))
+            : 0;
+        const ahorro = plan.precioLista * descuento / 100;
+        const precioFinal = plan.precioLista - ahorro;
+
+        return {
+            plan,
+            descuento,
+            ahorro,
+            precioFinal,
+            diferido3: plan.diferido ? precioFinal / 3 : null,
+            diferido6: plan.diferido ? precioFinal / 6 : null
+        };
+    }
+
+    function renderizarCotizadorOnline() {
+        const contenedor = document.getElementById("onlineQuote");
+        if (!contenedor) return;
+
+        const cotizacion = obtenerCotizacionOnlineActual();
+        const { plan, descuento, ahorro, precioFinal, diferido3, diferido6 } = cotizacion;
+        const claseLicencia = normalizarTexto(plan.licencia);
+        const valorDiferido3 = diferido3 === null ? "No aplica" : formatearMonedaResumen(diferido3);
+        const valorDiferido6 = diferido6 === null ? "No aplica" : formatearMonedaResumen(diferido6);
+
+        contenedor.innerHTML = `<div class="online-quote ${escaparHTML(claseLicencia)}">
+            <div class="online-quote-header">
+                <div>
+                    <h2 class="online-quote-name">Licencia ${escaparHTML(plan.licencia)}</h2>
+                    <div class="online-quote-term">${escaparHTML(plan.plazo)}</div>
+                </div>
+                <div class="online-discount-badge">${descuento}% descuento</div>
+            </div>
+            <div class="online-price-label">Precio con descuento</div>
+            <div class="online-price-main">${formatearMonedaResumen(precioFinal)}</div>
+            <div class="online-price-grid">
+                <div class="online-price-item"><span>Precio de lista</span><strong>${formatearMonedaResumen(plan.precioLista)}</strong></div>
+                <div class="online-price-item"><span>Ahorro</span><strong>${formatearMonedaResumen(ahorro)}</strong></div>
+                <div class="online-price-item"><span>Diferido 3 meses</span><strong>${valorDiferido3}</strong></div>
+                <div class="online-price-item"><span>Diferido 6 meses</span><strong>${valorDiferido6}</strong></div>
+            </div>
+            <button class="online-copy-btn" type="button" onclick="copiarCotizacionOnline()"><i class="fas fa-copy"></i> Copiar cotización</button>
+        </div>`;
+    }
+
+    function copiarCotizacionOnline() {
+        const { plan, descuento, ahorro, precioFinal, diferido3, diferido6 } = obtenerCotizacionOnlineActual();
+        const lineas = [
+            "💻 ¡Harmon Hall 100% Online!",
+            "",
+            `Licencia: ${plan.licencia}`,
+            `Plazo: ${plan.plazo}`,
+            `Precio de lista: ${formatearMonedaResumen(plan.precioLista)}`,
+            `Descuento aplicado: ${descuento}%`,
+            `Ahorro: ${formatearMonedaResumen(ahorro)}`,
+            `Precio con descuento: ${formatearMonedaResumen(precioFinal)}`,
+            diferido3 === null ? "Diferido a 3 meses: No aplica" : `Diferido a 3 meses: ${formatearMonedaResumen(diferido3)}`,
+            diferido6 === null ? "Diferido a 6 meses: No aplica" : `Diferido a 6 meses: ${formatearMonedaResumen(diferido6)}`
+        ];
+
+        copiarAlPortapapeles(lineas.join("\n"));
+    }
+
+    function aplicarConfiguracionOnline(config) {
+        const valor = Number(config && config.maxDiscount);
+        onlineMaxDiscount = Number.isFinite(valor)
+            ? Math.max(0, Math.min(100, Math.floor(valor)))
+            : 0;
+
+        const label = document.getElementById("onlineMaxDiscountLabel");
+        if (label) label.textContent = onlineMaxDiscount + "%";
+        actualizarOpcionesDescuentoOnline(onlineMaxDiscount);
+        renderizarCotizadorOnline();
+    }
+
+    function inicializarCotizadorOnline() {
+        seleccionarLicenciaOnline("Standard");
+        aplicarConfiguracionOnline({ maxDiscount: onlineMaxDiscount });
     }
     function esDatoVacio(valor) {
         if (valor === null || valor === undefined) return true;
@@ -1318,6 +1735,66 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         });
     }
 
+    function cargarConfiguracionOnlineJsonp() {
+        return new Promise((resolve, reject) => {
+            if (!apiGoogleSheetsConfigurada()) {
+                resolve({ maxDiscount: 0 });
+                return;
+            }
+
+            const callbackName = "hhOnlineConfigCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+            const script = document.createElement("script");
+            let terminado = false;
+
+            const limpiar = () => {
+                try { delete window[callbackName]; } catch { window[callbackName] = undefined; }
+                if (script.parentNode) script.parentNode.removeChild(script);
+            };
+
+            const timeout = setTimeout(() => {
+                if (terminado) return;
+                terminado = true;
+                limpiar();
+                reject(new Error("Tiempo de espera agotado al cargar el tope Online."));
+            }, 10000);
+
+            window[callbackName] = (respuesta) => {
+                if (terminado) return;
+                terminado = true;
+                clearTimeout(timeout);
+                limpiar();
+
+                if (!respuesta || !respuesta.ok) {
+                    reject(new Error((respuesta && respuesta.error) || "No se pudo cargar el tope Online."));
+                    return;
+                }
+
+                resolve(respuesta.data || { maxDiscount: 0 });
+            };
+
+            script.onerror = () => {
+                if (terminado) return;
+                terminado = true;
+                clearTimeout(timeout);
+                limpiar();
+                reject(new Error("No se pudo conectar con la configuración Online."));
+            };
+
+            script.src = construirUrlAppsScript({ action: "onlineConfig", callback: callbackName, _: Date.now() });
+            document.body.appendChild(script);
+        });
+    }
+
+    async function actualizarConfiguracionOnlineDesdeServidor() {
+        try {
+            const config = await cargarConfiguracionOnlineJsonp();
+            aplicarConfiguracionOnline(config);
+        } catch (error) {
+            console.warn("No se pudo cargar el tope Online; se usará 0%:", error);
+            aplicarConfiguracionOnline({ maxDiscount: 0 });
+        }
+    }
+
     async function cargarExcelGitHub(archivo) {
         const response = await fetch(archivo + "?v=" + Date.now());
         if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
@@ -1366,6 +1843,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         try {
             const busquedaActual = document.getElementById('textoBusqueda').value.trim();
             await cargarBasesDeDatos(false);
+            await actualizarConfiguracionOnlineDesdeServidor();
             if (busquedaActual) buscarInstituto();
             mostrarNotificacion("Datos actualizados desde Google Sheets");
         } catch (error) {
@@ -1502,6 +1980,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         const spinner = document.getElementById('loadingSpinner');
         const status = document.getElementById('statusCarga');
         spinner.style.display = 'block';
+        actualizarConfiguracionOnlineDesdeServidor();
 
         try {
             const resultadoCarga = await cargarBasesDeDatos(true);
@@ -1519,6 +1998,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+        inicializarCotizadorOnline();
         const textoBusqueda = document.getElementById('textoBusqueda');
         const sugerencias = document.getElementById('sugerencias');
 

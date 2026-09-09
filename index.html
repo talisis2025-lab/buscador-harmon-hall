@@ -547,6 +547,7 @@
             top: 24px;
         }
         .online-results { flex: 1; min-width: 0; }
+        #onlineQuote { display: flex; flex-direction: column; gap: 20px; }
         .online-title {
             display: flex;
             align-items: center;
@@ -633,7 +634,7 @@
             background: var(--hh-green);
         }
         .online-quote.plus::before { background: var(--hh-blue); }
-        .online-quote.elite::before { background: var(--hh-red); }
+        .online-quote.elite::before { background: #7650c8; }
         .online-quote-header {
             display: flex;
             align-items: flex-start;
@@ -653,6 +654,37 @@
             font-weight: 900;
         }
         [data-theme="dark"] .online-discount-badge { background: var(--hh-yellow); color: #000; }
+        .online-discount-editor { width: 142px; flex: 0 0 142px; }
+        .online-discount-editor label {
+            margin: 0 0 5px;
+            font-size: 0.68rem;
+            letter-spacing: 0;
+        }
+        .online-percent-input { position: relative; }
+        .online-percent-input input {
+            width: 100%;
+            height: 48px;
+            margin: 0;
+            padding: 8px 38px 8px 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 1.15rem;
+            font-weight: 900;
+        }
+        .online-percent-input input:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 4px rgba(255,234,0,0.2); }
+        .online-percent-input span {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 900;
+            opacity: 0.55;
+            pointer-events: none;
+        }
+        .online-discount-editor small { display: block; margin-top: 5px; font-weight: 800; opacity: 0.55; }
         .online-price-label {
             font-size: 0.75rem;
             font-weight: 900;
@@ -660,12 +692,13 @@
             opacity: 0.55;
         }
         .online-price-main {
-            margin: 6px 0 28px;
+            margin: 6px 0 5px;
             font-size: 3.2rem;
             line-height: 1.05;
             font-weight: 900;
             word-break: break-word;
         }
+        .online-applied-discount { margin-bottom: 24px; color: var(--hh-red); font-weight: 900; }
         .online-price-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -694,6 +727,14 @@
             letter-spacing: 0;
         }
         .online-copy-btn:hover { filter: brightness(1.06); }
+        body.online-active .help-widget {
+            position: relative;
+            right: auto;
+            bottom: auto;
+            align-self: flex-end;
+            margin-top: 18px;
+        }
+        body.online-active .help-panel { position: absolute; right: 0; bottom: 66px; }
 
         /* ── Responsive ── */
         @media (max-width: 960px) {
@@ -877,18 +918,8 @@
             <div class="seccion">
                 <h2 class="online-title"><i class="fas fa-wifi"></i> Cotizador 100% Online</h2>
 
-                <label>Licencia</label>
-                <div class="online-license-tabs" role="group" aria-label="Licencia Online">
-                    <button class="online-license-btn active" type="button" data-license="Standard" onclick="seleccionarLicenciaOnline('Standard')">Standard</button>
-                    <button class="online-license-btn" type="button" data-license="Plus" onclick="seleccionarLicenciaOnline('Plus')">Plus</button>
-                    <button class="online-license-btn" type="button" data-license="Elite" onclick="seleccionarLicenciaOnline('Elite')">Elite</button>
-                </div>
-
                 <label for="onlineTermSelect">Plazo</label>
                 <select id="onlineTermSelect" class="online-select" onchange="renderizarCotizadorOnline()"></select>
-
-                <label for="onlineDiscountSelect">Descuento</label>
-                <select id="onlineDiscountSelect" class="online-select" onchange="renderizarCotizadorOnline()"></select>
 
                 <div class="online-limit-row">
                     <span>Tope autorizado: <strong id="onlineMaxDiscountLabel">0%</strong></span>
@@ -977,10 +1008,35 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         { id: "elite-anual", licencia: "Elite", plazo: "Anual", precioLista: 39692, diferido: true },
         { id: "elite-18", licencia: "Elite", plazo: "18 Meses", precioLista: 50607, diferido: true }
     ];
+    const ONLINE_TERMS = ["Mensual", "Trimestral", "Semestral", "Anual", "18 Meses"];
+    const ONLINE_LICENSE_META = {
+        Standard: { icono: "🟢", clase: "standard" },
+        Plus: { icono: "🔵", clase: "plus" },
+        Elite: { icono: "🟣", clase: "elite" }
+    };
+    const ONLINE_FEATURES = {
+        Standard: [
+            "✅ Clases grupales en vivo con teacher",
+            "✅ Plataforma disponible 24/7",
+            "✅ Clubes de conversación",
+            "✅ Metodología Cambridge",
+            "✅ Ruta completa desde nivel básico hasta C2"
+        ],
+        Plus: [
+            "✅ Todo lo de Standard",
+            "✅ 3 clases privadas al mes con teacher.",
+            "✅ Mayor seguimiento y práctica de conversación"
+        ],
+        Elite: [
+            "✅ Todo lo de Plus",
+            "✅ 6 clases privadas al mes con teacher",
+            "✅ Acompañamiento más personalizado"
+        ]
+    };
     let adminCredential = "";
     let adminGoogleButtonRendered = false;
-    let onlineLicense = "Standard";
     let onlineMaxDiscount = 0;
+    let onlineDiscounts = {};
 
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -1008,6 +1064,7 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
 
     function cambiarModalidad(modalidad) {
         const esOnline = modalidad === "online";
+        document.body.classList.toggle("online-active", esOnline);
         document.getElementById("presencialView").hidden = esOnline;
         document.getElementById("onlineView").hidden = !esOnline;
 
@@ -1021,59 +1078,22 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         if (esOnline) renderizarCotizadorOnline();
     }
 
-    function seleccionarLicenciaOnline(licencia) {
-        if (!ONLINE_PLANS.some(plan => plan.licencia === licencia)) return;
-        onlineLicense = licencia;
-
-        document.querySelectorAll(".online-license-btn").forEach(btn => {
-            btn.classList.toggle("active", btn.getAttribute("data-license") === licencia);
-        });
-
-        actualizarPlazosOnline();
-    }
-
-    function actualizarPlazosOnline() {
+    function obtenerPlanesOnlinePorPlazo() {
         const select = document.getElementById("onlineTermSelect");
-        if (!select) return;
-
-        const planes = ONLINE_PLANS.filter(plan => plan.licencia === onlineLicense);
-        select.innerHTML = planes
-            .map(plan => `<option value="${escaparHTML(plan.id)}">${escaparHTML(plan.plazo)}</option>`)
-            .join("");
-        renderizarCotizadorOnline();
+        const plazo = (select && select.value) || "Semestral";
+        return ONLINE_PLANS.filter(plan => plan.plazo === plazo);
     }
 
-    function actualizarOpcionesDescuentoOnline(valorPreferido) {
-        const select = document.getElementById("onlineDiscountSelect");
-        if (!select) return;
-
-        const preferido = Number.isInteger(Number(valorPreferido))
-            ? Math.max(0, Math.min(onlineMaxDiscount, Number(valorPreferido)))
-            : onlineMaxDiscount;
-        const opciones = [];
-
-        for (let descuento = onlineMaxDiscount; descuento >= 0; descuento--) {
-            opciones.push(`<option value="${descuento}"${descuento === preferido ? " selected" : ""}>${descuento}%</option>`);
-        }
-
-        select.innerHTML = opciones.join("");
-    }
-
-    function obtenerPlanOnlineSeleccionado() {
-        const select = document.getElementById("onlineTermSelect");
-        const planId = select && select.value;
-        return ONLINE_PLANS.find(plan => plan.id === planId)
-            || ONLINE_PLANS.find(plan => plan.licencia === onlineLicense)
-            || ONLINE_PLANS[0];
-    }
-
-    function obtenerCotizacionOnlineActual() {
-        const plan = obtenerPlanOnlineSeleccionado();
-        const selectDescuento = document.getElementById("onlineDiscountSelect");
-        const descuentoSolicitado = Number(selectDescuento && selectDescuento.value);
-        const descuento = Number.isFinite(descuentoSolicitado)
-            ? Math.max(0, Math.min(onlineMaxDiscount, Math.floor(descuentoSolicitado)))
+    function obtenerDescuentoOnline(plan) {
+        if (plan.id === "standard-mensual") return 0;
+        const valor = Number(onlineDiscounts[plan.id]);
+        return Number.isFinite(valor)
+            ? Math.max(0, Math.min(onlineMaxDiscount, Math.floor(valor)))
             : 0;
+    }
+
+    function calcularPlanOnline(plan) {
+        const descuento = obtenerDescuentoOnline(plan);
         const ahorro = plan.precioLista * descuento / 100;
         const precioFinal = plan.precioLista - ahorro;
 
@@ -1087,52 +1107,118 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         };
     }
 
+    function actualizarDescuentoOnline(planId, input) {
+        const plan = ONLINE_PLANS.find(item => item.id === planId);
+        if (!plan || plan.id === "standard-mensual") return;
+
+        const solicitado = Number(input.value);
+        const descuento = Number.isFinite(solicitado)
+            ? Math.max(0, Math.min(onlineMaxDiscount, Math.floor(solicitado)))
+            : 0;
+
+        onlineDiscounts[planId] = descuento;
+        if (input.value !== "" && Number(input.value) !== descuento) input.value = descuento;
+        actualizarValoresPlanOnline(plan);
+    }
+
+    function normalizarInputDescuentoOnline(planId, input) {
+        const plan = ONLINE_PLANS.find(item => item.id === planId);
+        if (!plan) return;
+        input.value = obtenerDescuentoOnline(plan);
+        actualizarValoresPlanOnline(plan);
+    }
+
+    function actualizarValoresPlanOnline(plan) {
+        const cotizacion = calcularPlanOnline(plan);
+        const valores = {
+            [`online-discount-${plan.id}`]: cotizacion.descuento + "% descuento",
+            [`online-final-${plan.id}`]: formatearMonedaResumen(cotizacion.precioFinal),
+            [`online-list-${plan.id}`]: formatearMonedaResumen(plan.precioLista),
+            [`online-saving-${plan.id}`]: formatearMonedaResumen(cotizacion.ahorro),
+            [`online-3-${plan.id}`]: cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3),
+            [`online-6-${plan.id}`]: cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)
+        };
+
+        Object.entries(valores).forEach(([id, texto]) => {
+            const elemento = document.getElementById(id);
+            if (elemento) elemento.textContent = texto;
+        });
+    }
+
+    function crearTarjetaOnline(plan) {
+        const cotizacion = calcularPlanOnline(plan);
+        const meta = ONLINE_LICENSE_META[plan.licencia];
+        const sinDescuento = plan.id === "standard-mensual";
+        const editorDescuento = sinDescuento
+            ? `<div class="online-discount-badge">Sin descuento</div>`
+            : `<div class="online-discount-editor">
+                <label for="online-input-${escaparHTML(plan.id)}">Descuento</label>
+                <div class="online-percent-input">
+                    <input id="online-input-${escaparHTML(plan.id)}" type="number" min="0" max="${onlineMaxDiscount}" step="1" inputmode="numeric" value="${cotizacion.descuento}" oninput="actualizarDescuentoOnline('${escaparHTML(plan.id)}', this)" onblur="normalizarInputDescuentoOnline('${escaparHTML(plan.id)}', this)">
+                    <span>%</span>
+                </div>
+                <small>Máximo ${onlineMaxDiscount}%</small>
+            </div>`;
+
+        return `<div class="online-quote ${escaparHTML(meta.clase)}">
+            <div class="online-quote-header">
+                <div>
+                    <h2 class="online-quote-name">${meta.icono} ${escaparHTML(plan.licencia)}</h2>
+                    <div class="online-quote-term">${escaparHTML(plan.plazo)}</div>
+                </div>
+                ${editorDescuento}
+            </div>
+            <div class="online-price-label">Precio con descuento</div>
+            <div id="online-final-${escaparHTML(plan.id)}" class="online-price-main">${formatearMonedaResumen(cotizacion.precioFinal)}</div>
+            <div id="online-discount-${escaparHTML(plan.id)}" class="online-applied-discount">${cotizacion.descuento}% descuento</div>
+            <div class="online-price-grid">
+                <div class="online-price-item"><span>Precio de lista</span><strong id="online-list-${escaparHTML(plan.id)}">${formatearMonedaResumen(plan.precioLista)}</strong></div>
+                <div class="online-price-item"><span>Ahorro</span><strong id="online-saving-${escaparHTML(plan.id)}">${formatearMonedaResumen(cotizacion.ahorro)}</strong></div>
+                <div class="online-price-item"><span>Diferido 3 meses</span><strong id="online-3-${escaparHTML(plan.id)}">${cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3)}</strong></div>
+                <div class="online-price-item"><span>Diferido 6 meses</span><strong id="online-6-${escaparHTML(plan.id)}">${cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)}</strong></div>
+            </div>
+        </div>`;
+    }
+
     function renderizarCotizadorOnline() {
         const contenedor = document.getElementById("onlineQuote");
         if (!contenedor) return;
 
-        const cotizacion = obtenerCotizacionOnlineActual();
-        const { plan, descuento, ahorro, precioFinal, diferido3, diferido6 } = cotizacion;
-        const claseLicencia = normalizarTexto(plan.licencia);
-        const valorDiferido3 = diferido3 === null ? "No aplica" : formatearMonedaResumen(diferido3);
-        const valorDiferido6 = diferido6 === null ? "No aplica" : formatearMonedaResumen(diferido6);
+        const planes = obtenerPlanesOnlinePorPlazo();
+        contenedor.innerHTML = planes.map(crearTarjetaOnline).join("")
+            + `<button class="online-copy-btn" type="button" onclick="copiarCotizacionOnline()"><i class="fas fa-copy"></i> Copiar resumen Online</button>`;
+    }
 
-        contenedor.innerHTML = `<div class="online-quote ${escaparHTML(claseLicencia)}">
-            <div class="online-quote-header">
-                <div>
-                    <h2 class="online-quote-name">Licencia ${escaparHTML(plan.licencia)}</h2>
-                    <div class="online-quote-term">${escaparHTML(plan.plazo)}</div>
-                </div>
-                <div class="online-discount-badge">${descuento}% descuento</div>
-            </div>
-            <div class="online-price-label">Precio con descuento</div>
-            <div class="online-price-main">${formatearMonedaResumen(precioFinal)}</div>
-            <div class="online-price-grid">
-                <div class="online-price-item"><span>Precio de lista</span><strong>${formatearMonedaResumen(plan.precioLista)}</strong></div>
-                <div class="online-price-item"><span>Ahorro</span><strong>${formatearMonedaResumen(ahorro)}</strong></div>
-                <div class="online-price-item"><span>Diferido 3 meses</span><strong>${valorDiferido3}</strong></div>
-                <div class="online-price-item"><span>Diferido 6 meses</span><strong>${valorDiferido6}</strong></div>
-            </div>
-            <button class="online-copy-btn" type="button" onclick="copiarCotizacionOnline()"><i class="fas fa-copy"></i> Copiar cotización</button>
-        </div>`;
+    function formatearPrecioOnline(valor, decimales) {
+        const numero = normalizarNumero(valor) || 0;
+        return "$" + numero.toLocaleString("es-MX", {
+            minimumFractionDigits: decimales,
+            maximumFractionDigits: decimales
+        });
+    }
+
+    function crearResumenPlanOnline(plan) {
+        const { descuento, precioFinal } = calcularPlanOnline(plan);
+        const meta = ONLINE_LICENSE_META[plan.licencia];
+        const lineas = [
+            `**${meta.icono} ${plan.licencia} ${plan.plazo}**`,
+            "",
+            `💰 Precio regular: ${formatearPrecioOnline(plan.precioLista, 0)}`
+        ];
+
+        if (plan.id !== "standard-mensual") {
+            lineas.push(`🎁 Con ${descuento}% de descuento: ${formatearPrecioOnline(precioFinal, 2)}`);
+        }
+
+        lineas.push("", ...ONLINE_FEATURES[plan.licencia]);
+        return lineas.join("\n");
     }
 
     function copiarCotizacionOnline() {
-        const { plan, descuento, ahorro, precioFinal, diferido3, diferido6 } = obtenerCotizacionOnlineActual();
-        const lineas = [
-            "💻 ¡Harmon Hall 100% Online!",
-            "",
-            `Licencia: ${plan.licencia}`,
-            `Plazo: ${plan.plazo}`,
-            `Precio de lista: ${formatearMonedaResumen(plan.precioLista)}`,
-            `Descuento aplicado: ${descuento}%`,
-            `Ahorro: ${formatearMonedaResumen(ahorro)}`,
-            `Precio con descuento: ${formatearMonedaResumen(precioFinal)}`,
-            diferido3 === null ? "Diferido a 3 meses: No aplica" : `Diferido a 3 meses: ${formatearMonedaResumen(diferido3)}`,
-            diferido6 === null ? "Diferido a 6 meses: No aplica" : `Diferido a 6 meses: ${formatearMonedaResumen(diferido6)}`
-        ];
-
-        copiarAlPortapapeles(lineas.join("\n"));
+        const resumen = obtenerPlanesOnlinePorPlazo()
+            .map(crearResumenPlanOnline)
+            .join("\n\n\n");
+        copiarAlPortapapeles(resumen);
     }
 
     function aplicarConfiguracionOnline(config) {
@@ -1141,14 +1227,23 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
             ? Math.max(0, Math.min(100, Math.floor(valor)))
             : 0;
 
+        Object.keys(onlineDiscounts).forEach(planId => {
+            onlineDiscounts[planId] = Math.min(onlineDiscounts[planId], onlineMaxDiscount);
+        });
+
         const label = document.getElementById("onlineMaxDiscountLabel");
         if (label) label.textContent = onlineMaxDiscount + "%";
-        actualizarOpcionesDescuentoOnline(onlineMaxDiscount);
         renderizarCotizadorOnline();
     }
 
     function inicializarCotizadorOnline() {
-        seleccionarLicenciaOnline("Standard");
+        const select = document.getElementById("onlineTermSelect");
+        if (!select) return;
+
+        select.innerHTML = ONLINE_TERMS
+            .map(plazo => `<option value="${escaparHTML(plazo)}">${escaparHTML(plazo)}</option>`)
+            .join("");
+        select.value = "Semestral";
         aplicarConfiguracionOnline({ maxDiscount: onlineMaxDiscount });
     }
     function esDatoVacio(valor) {

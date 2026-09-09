@@ -563,7 +563,13 @@
             gap: 6px;
             margin-bottom: 22px;
         }
-        .online-license-btn {
+        .online-promotion-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+        .online-license-btn, .online-promotion-btn {
             min-width: 0;
             min-height: 44px;
             padding: 8px 5px;
@@ -575,12 +581,13 @@
             font-weight: 900;
             letter-spacing: 0;
         }
-        .online-license-btn.active {
+        .online-license-btn.active, .online-promotion-btn.active {
             border-color: #000;
             background: #000;
             color: #fff;
         }
-        [data-theme="dark"] .online-license-btn.active {
+        [data-theme="dark"] .online-license-btn.active,
+        [data-theme="dark"] .online-promotion-btn.active {
             border-color: var(--hh-yellow);
             color: var(--hh-yellow);
         }
@@ -654,14 +661,8 @@
             font-weight: 900;
         }
         [data-theme="dark"] .online-discount-badge { background: var(--hh-yellow); color: #000; }
-        .online-discount-editor { width: 142px; flex: 0 0 142px; }
-        .online-discount-editor label {
-            margin: 0 0 5px;
-            font-size: 0.68rem;
-            letter-spacing: 0;
-        }
-        .online-percent-input { position: relative; }
-        .online-percent-input input {
+        .online-main-percent { position: relative; margin-bottom: 22px; }
+        .online-main-percent input {
             width: 100%;
             height: 48px;
             margin: 0;
@@ -674,8 +675,9 @@
             font-size: 1.15rem;
             font-weight: 900;
         }
-        .online-percent-input input:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 4px rgba(255,234,0,0.2); }
-        .online-percent-input span {
+        .online-main-percent input:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 4px rgba(255,234,0,0.2); }
+        .online-main-percent input:disabled { opacity: 0.55; cursor: not-allowed; }
+        .online-main-percent span {
             position: absolute;
             right: 13px;
             top: 50%;
@@ -684,7 +686,6 @@
             opacity: 0.55;
             pointer-events: none;
         }
-        .online-discount-editor small { display: block; margin-top: 5px; font-weight: 800; opacity: 0.55; }
         .online-price-label {
             font-size: 0.75rem;
             font-weight: 900;
@@ -918,8 +919,27 @@
             <div class="seccion">
                 <h2 class="online-title"><i class="fas fa-wifi"></i> Cotizador 100% Online</h2>
 
+                <label>Licencia</label>
+                <div class="online-license-tabs" role="group" aria-label="Licencia Online">
+                    <button class="online-license-btn active" type="button" data-license="Standard" onclick="seleccionarLicenciaOnline('Standard')">Standard</button>
+                    <button class="online-license-btn" type="button" data-license="Plus" onclick="seleccionarLicenciaOnline('Plus')">Plus</button>
+                    <button class="online-license-btn" type="button" data-license="Elite" onclick="seleccionarLicenciaOnline('Elite')">Elite</button>
+                </div>
+
                 <label for="onlineTermSelect">Plazo</label>
                 <select id="onlineTermSelect" class="online-select" onchange="renderizarCotizadorOnline()"></select>
+
+                <label>Promoción</label>
+                <div class="online-promotion-tabs" role="group" aria-label="Tipo de promoción">
+                    <button class="online-promotion-btn active" type="button" data-promotion="descuento" onclick="seleccionarPromocionOnline('descuento')">Descuento</button>
+                    <button class="online-promotion-btn" type="button" data-promotion="pagoHoy" onclick="seleccionarPromocionOnline('pagoHoy')">Pago hoy</button>
+                </div>
+
+                <label for="onlineDiscountInput">Porcentaje</label>
+                <div class="online-main-percent">
+                    <input id="onlineDiscountInput" type="number" min="0" max="0" step="1" inputmode="numeric" value="0" oninput="actualizarDescuentoOnline(this)" onblur="normalizarInputDescuentoOnline(this)">
+                    <span>%</span>
+                </div>
 
                 <div class="online-limit-row">
                     <span>Tope autorizado: <strong id="onlineMaxDiscountLabel">0%</strong></span>
@@ -994,21 +1014,20 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     const EASTER_EGG_CLICKS = 3;
     const ADMIN_TRIGGER_CLICKS = 5;
     const ONLINE_PLANS = [
-        { id: "standard-mensual", licencia: "Standard", plazo: "Mensual", precioLista: 1700, diferido: false },
-        { id: "standard-trimestral", licencia: "Standard", plazo: "Trimestral", precioLista: 4999, diferido: false },
-        { id: "standard-semestral", licencia: "Standard", plazo: "Semestral", precioLista: 8499, diferido: true },
-        { id: "standard-anual", licencia: "Standard", plazo: "Anual", precioLista: 14899, diferido: true },
-        { id: "standard-18", licencia: "Standard", plazo: "18 Meses", precioLista: 19200, diferido: true },
-        { id: "plus-trimestral", licencia: "Plus", plazo: "Trimestral", precioLista: 9729, diferido: true },
-        { id: "plus-semestral", licencia: "Plus", plazo: "Semestral", precioLista: 16538, diferido: true },
-        { id: "plus-anual", licencia: "Plus", plazo: "Anual", precioLista: 24944, diferido: true },
-        { id: "plus-18", licencia: "Plus", plazo: "18 Meses", precioLista: 33738, diferido: true },
-        { id: "elite-trimestral", licencia: "Elite", plazo: "Trimestral", precioLista: 14593, diferido: true },
-        { id: "elite-semestral", licencia: "Elite", plazo: "Semestral", precioLista: 24807, diferido: true },
-        { id: "elite-anual", licencia: "Elite", plazo: "Anual", precioLista: 39692, diferido: true },
-        { id: "elite-18", licencia: "Elite", plazo: "18 Meses", precioLista: 50607, diferido: true }
+        { id: "standard-mensual", licencia: "Standard", plazo: "Mensual", precioLista: 1700, diferido: false, topeDescuento: 0, topePagoHoy: 0 },
+        { id: "standard-trimestral", licencia: "Standard", plazo: "Trimestral", precioLista: 4999, diferido: false, topeDescuento: 0, topePagoHoy: 10 },
+        { id: "standard-semestral", licencia: "Standard", plazo: "Semestral", precioLista: 8499, diferido: true, topeDescuento: 0, topePagoHoy: 10 },
+        { id: "standard-anual", licencia: "Standard", plazo: "Anual", precioLista: 14899, diferido: true, topeDescuento: 10, topePagoHoy: 20 },
+        { id: "standard-18", licencia: "Standard", plazo: "18 Meses", precioLista: 19200, diferido: true, topeDescuento: 10, topePagoHoy: 20 },
+        { id: "plus-trimestral", licencia: "Plus", plazo: "Trimestral", precioLista: 9729, diferido: true, topeDescuento: 10, topePagoHoy: 20 },
+        { id: "plus-semestral", licencia: "Plus", plazo: "Semestral", precioLista: 16538, diferido: true, topeDescuento: 10, topePagoHoy: 20 },
+        { id: "plus-anual", licencia: "Plus", plazo: "Anual", precioLista: 24944, diferido: true, topeDescuento: 20, topePagoHoy: 30 },
+        { id: "plus-18", licencia: "Plus", plazo: "18 Meses", precioLista: 33738, diferido: true, topeDescuento: 20, topePagoHoy: 30 },
+        { id: "elite-trimestral", licencia: "Elite", plazo: "Trimestral", precioLista: 14593, diferido: true, topeDescuento: 20, topePagoHoy: 30 },
+        { id: "elite-semestral", licencia: "Elite", plazo: "Semestral", precioLista: 24807, diferido: true, topeDescuento: 20, topePagoHoy: 30 },
+        { id: "elite-anual", licencia: "Elite", plazo: "Anual", precioLista: 39692, diferido: true, topeDescuento: 30, topePagoHoy: 40 },
+        { id: "elite-18", licencia: "Elite", plazo: "18 Meses", precioLista: 50607, diferido: true, topeDescuento: 30, topePagoHoy: 40 }
     ];
-    const ONLINE_TERMS = ["Mensual", "Trimestral", "Semestral", "Anual", "18 Meses"];
     const ONLINE_LICENSE_META = {
         Standard: { icono: "🟢", clase: "standard" },
         Plus: { icono: "🔵", clase: "plus" },
@@ -1035,7 +1054,12 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     };
     let adminCredential = "";
     let adminGoogleButtonRendered = false;
-    let onlineMaxDiscount = 0;
+    let onlineLicense = "Standard";
+    let onlinePromotion = "descuento";
+    let onlineLimits = ONLINE_PLANS.reduce((limits, plan) => {
+        limits[plan.id] = { descuento: plan.topeDescuento, pagoHoy: plan.topePagoHoy };
+        return limits;
+    }, {});
     let onlineDiscounts = {};
 
     function normalizarTexto(texto) {
@@ -1078,17 +1102,64 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         if (esOnline) renderizarCotizadorOnline();
     }
 
-    function obtenerPlanesOnlinePorPlazo() {
+    function seleccionarLicenciaOnline(licencia) {
+        if (!ONLINE_PLANS.some(plan => plan.licencia === licencia)) return;
+
         const select = document.getElementById("onlineTermSelect");
-        const plazo = (select && select.value) || "Semestral";
-        return ONLINE_PLANS.filter(plan => plan.plazo === plazo);
+        const planAnterior = ONLINE_PLANS.find(plan => plan.id === (select && select.value));
+        const plazoPreferido = planAnterior && planAnterior.plazo;
+        onlineLicense = licencia;
+
+        document.querySelectorAll(".online-license-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.getAttribute("data-license") === licencia);
+        });
+
+        actualizarPlazosOnline(plazoPreferido);
+    }
+
+    function actualizarPlazosOnline(plazoPreferido) {
+        const select = document.getElementById("onlineTermSelect");
+        if (!select) return;
+
+        const planes = ONLINE_PLANS.filter(plan => plan.licencia === onlineLicense);
+        select.innerHTML = planes
+            .map(plan => `<option value="${escaparHTML(plan.id)}">${escaparHTML(plan.plazo)}</option>`)
+            .join("");
+
+        const planPreferido = planes.find(plan => plan.plazo === plazoPreferido);
+        if (planPreferido) select.value = planPreferido.id;
+        renderizarCotizadorOnline();
+    }
+
+    function seleccionarPromocionOnline(promocion) {
+        if (!["descuento", "pagoHoy"].includes(promocion)) return;
+        onlinePromotion = promocion;
+        document.querySelectorAll(".online-promotion-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.getAttribute("data-promotion") === promocion);
+        });
+        renderizarCotizadorOnline();
+    }
+
+    function obtenerPlanOnlineSeleccionado() {
+        const select = document.getElementById("onlineTermSelect");
+        const planId = select && select.value;
+        return ONLINE_PLANS.find(plan => plan.id === planId)
+            || ONLINE_PLANS.find(plan => plan.licencia === onlineLicense)
+            || ONLINE_PLANS[0];
+    }
+
+    function obtenerTopeOnline(plan) {
+        const limits = onlineLimits[plan.id] || { descuento: plan.topeDescuento, pagoHoy: plan.topePagoHoy };
+        const valor = Number(limits[onlinePromotion]);
+        return Number.isFinite(valor) ? Math.max(0, Math.min(100, Math.floor(valor))) : 0;
     }
 
     function obtenerDescuentoOnline(plan) {
-        if (plan.id === "standard-mensual") return 0;
-        const valor = Number(onlineDiscounts[plan.id]);
+        const tope = obtenerTopeOnline(plan);
+        const clave = plan.id + "::" + onlinePromotion;
+        const valor = Number(onlineDiscounts[clave]);
         return Number.isFinite(valor)
-            ? Math.max(0, Math.min(onlineMaxDiscount, Math.floor(valor)))
+            ? Math.max(0, Math.min(tope, Math.floor(valor)))
             : 0;
     }
 
@@ -1107,36 +1178,37 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         };
     }
 
-    function actualizarDescuentoOnline(planId, input) {
-        const plan = ONLINE_PLANS.find(item => item.id === planId);
-        if (!plan || plan.id === "standard-mensual") return;
+    function actualizarDescuentoOnline(input) {
+        const plan = obtenerPlanOnlineSeleccionado();
+        const tope = obtenerTopeOnline(plan);
+        const clave = plan.id + "::" + onlinePromotion;
 
         const solicitado = Number(input.value);
         const descuento = Number.isFinite(solicitado)
-            ? Math.max(0, Math.min(onlineMaxDiscount, Math.floor(solicitado)))
+            ? Math.max(0, Math.min(tope, Math.floor(solicitado)))
             : 0;
 
-        onlineDiscounts[planId] = descuento;
+        onlineDiscounts[clave] = descuento;
         if (input.value !== "" && Number(input.value) !== descuento) input.value = descuento;
-        actualizarValoresPlanOnline(plan);
+        actualizarTarjetaOnline();
     }
 
-    function normalizarInputDescuentoOnline(planId, input) {
-        const plan = ONLINE_PLANS.find(item => item.id === planId);
-        if (!plan) return;
+    function normalizarInputDescuentoOnline(input) {
+        const plan = obtenerPlanOnlineSeleccionado();
         input.value = obtenerDescuentoOnline(plan);
-        actualizarValoresPlanOnline(plan);
+        actualizarTarjetaOnline();
     }
 
-    function actualizarValoresPlanOnline(plan) {
+    function actualizarTarjetaOnline() {
+        const plan = obtenerPlanOnlineSeleccionado();
         const cotizacion = calcularPlanOnline(plan);
         const valores = {
-            [`online-discount-${plan.id}`]: cotizacion.descuento + "% descuento",
-            [`online-final-${plan.id}`]: formatearMonedaResumen(cotizacion.precioFinal),
-            [`online-list-${plan.id}`]: formatearMonedaResumen(plan.precioLista),
-            [`online-saving-${plan.id}`]: formatearMonedaResumen(cotizacion.ahorro),
-            [`online-3-${plan.id}`]: cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3),
-            [`online-6-${plan.id}`]: cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)
+            "online-discount-current": cotizacion.descuento + "% descuento",
+            "online-final-current": formatearMonedaResumen(cotizacion.precioFinal),
+            "online-list-current": formatearMonedaResumen(plan.precioLista),
+            "online-saving-current": formatearMonedaResumen(cotizacion.ahorro),
+            "online-3-current": cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3),
+            "online-6-current": cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)
         };
 
         Object.entries(valores).forEach(([id, texto]) => {
@@ -1148,35 +1220,26 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     function crearTarjetaOnline(plan) {
         const cotizacion = calcularPlanOnline(plan);
         const meta = ONLINE_LICENSE_META[plan.licencia];
-        const sinDescuento = plan.id === "standard-mensual";
-        const editorDescuento = sinDescuento
-            ? `<div class="online-discount-badge">Sin descuento</div>`
-            : `<div class="online-discount-editor">
-                <label for="online-input-${escaparHTML(plan.id)}">Descuento</label>
-                <div class="online-percent-input">
-                    <input id="online-input-${escaparHTML(plan.id)}" type="number" min="0" max="${onlineMaxDiscount}" step="1" inputmode="numeric" value="${cotizacion.descuento}" oninput="actualizarDescuentoOnline('${escaparHTML(plan.id)}', this)" onblur="normalizarInputDescuentoOnline('${escaparHTML(plan.id)}', this)">
-                    <span>%</span>
-                </div>
-                <small>Máximo ${onlineMaxDiscount}%</small>
-            </div>`;
+        const etiquetaPromocion = onlinePromotion === "pagoHoy" ? "Pago hoy" : "Descuento";
 
         return `<div class="online-quote ${escaparHTML(meta.clase)}">
             <div class="online-quote-header">
                 <div>
-                    <h2 class="online-quote-name">${meta.icono} ${escaparHTML(plan.licencia)}</h2>
-                    <div class="online-quote-term">${escaparHTML(plan.plazo)}</div>
+                    <h2 class="online-quote-name">${meta.icono} ${escaparHTML(plan.licencia)} ${escaparHTML(plan.plazo)}</h2>
+                    <div class="online-quote-term">Precio de lista</div>
                 </div>
-                ${editorDescuento}
+                <div class="online-discount-badge">${escaparHTML(etiquetaPromocion)}</div>
             </div>
             <div class="online-price-label">Precio con descuento</div>
-            <div id="online-final-${escaparHTML(plan.id)}" class="online-price-main">${formatearMonedaResumen(cotizacion.precioFinal)}</div>
-            <div id="online-discount-${escaparHTML(plan.id)}" class="online-applied-discount">${cotizacion.descuento}% descuento</div>
+            <div id="online-final-current" class="online-price-main">${formatearMonedaResumen(cotizacion.precioFinal)}</div>
+            <div id="online-discount-current" class="online-applied-discount">${cotizacion.descuento}% descuento</div>
             <div class="online-price-grid">
-                <div class="online-price-item"><span>Precio de lista</span><strong id="online-list-${escaparHTML(plan.id)}">${formatearMonedaResumen(plan.precioLista)}</strong></div>
-                <div class="online-price-item"><span>Ahorro</span><strong id="online-saving-${escaparHTML(plan.id)}">${formatearMonedaResumen(cotizacion.ahorro)}</strong></div>
-                <div class="online-price-item"><span>Diferido 3 meses</span><strong id="online-3-${escaparHTML(plan.id)}">${cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3)}</strong></div>
-                <div class="online-price-item"><span>Diferido 6 meses</span><strong id="online-6-${escaparHTML(plan.id)}">${cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)}</strong></div>
+                <div class="online-price-item"><span>Precio de lista</span><strong id="online-list-current">${formatearMonedaResumen(plan.precioLista)}</strong></div>
+                <div class="online-price-item"><span>Ahorro</span><strong id="online-saving-current">${formatearMonedaResumen(cotizacion.ahorro)}</strong></div>
+                <div class="online-price-item"><span>Diferido 3 meses</span><strong id="online-3-current">${cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3)}</strong></div>
+                <div class="online-price-item"><span>Diferido 6 meses</span><strong id="online-6-current">${cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)}</strong></div>
             </div>
+            <button class="online-copy-btn" type="button" onclick="copiarCotizacionOnline()"><i class="fas fa-copy"></i> Copiar resumen Online</button>
         </div>`;
     }
 
@@ -1184,9 +1247,20 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         const contenedor = document.getElementById("onlineQuote");
         if (!contenedor) return;
 
-        const planes = obtenerPlanesOnlinePorPlazo();
-        contenedor.innerHTML = planes.map(crearTarjetaOnline).join("")
-            + `<button class="online-copy-btn" type="button" onclick="copiarCotizacionOnline()"><i class="fas fa-copy"></i> Copiar resumen Online</button>`;
+        const plan = obtenerPlanOnlineSeleccionado();
+        const tope = obtenerTopeOnline(plan);
+        const descuento = obtenerDescuentoOnline(plan);
+        const input = document.getElementById("onlineDiscountInput");
+        const label = document.getElementById("onlineMaxDiscountLabel");
+
+        if (input) {
+            input.max = String(tope);
+            input.value = String(descuento);
+            input.disabled = tope === 0;
+        }
+        if (label) label.textContent = tope + "%";
+
+        contenedor.innerHTML = crearTarjetaOnline(plan);
     }
 
     function formatearPrecioOnline(valor, decimales) {
@@ -1206,8 +1280,11 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
             `💰 Precio regular: ${formatearPrecioOnline(plan.precioLista, 0)}`
         ];
 
-        if (plan.id !== "standard-mensual") {
-            lineas.push(`🎁 Con ${descuento}% de descuento: ${formatearPrecioOnline(precioFinal, 2)}`);
+        if (obtenerTopeOnline(plan) > 0) {
+            const textoPromocion = onlinePromotion === "pagoHoy"
+                ? `🎁 Pago hoy con ${descuento}% de descuento: ${formatearPrecioOnline(precioFinal, 2)}`
+                : `🎁 Con ${descuento}% de descuento: ${formatearPrecioOnline(precioFinal, 2)}`;
+            lineas.push(textoPromocion);
         }
 
         lineas.push("", ...ONLINE_FEATURES[plan.licencia]);
@@ -1215,36 +1292,36 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     }
 
     function copiarCotizacionOnline() {
-        const resumen = obtenerPlanesOnlinePorPlazo()
-            .map(crearResumenPlanOnline)
-            .join("\n\n\n");
-        copiarAlPortapapeles(resumen);
+        copiarAlPortapapeles(crearResumenPlanOnline(obtenerPlanOnlineSeleccionado()));
     }
 
     function aplicarConfiguracionOnline(config) {
-        const valor = Number(config && config.maxDiscount);
-        onlineMaxDiscount = Number.isFinite(valor)
-            ? Math.max(0, Math.min(100, Math.floor(valor)))
-            : 0;
-
-        Object.keys(onlineDiscounts).forEach(planId => {
-            onlineDiscounts[planId] = Math.min(onlineDiscounts[planId], onlineMaxDiscount);
+        const plans = config && Array.isArray(config.plans) ? config.plans : [];
+        plans.forEach(item => {
+            if (!onlineLimits[item.id]) return;
+            const descuento = Number(item.descuento);
+            const pagoHoy = Number(item.pagoHoy);
+            onlineLimits[item.id] = {
+                descuento: Number.isFinite(descuento) ? Math.max(0, Math.min(100, Math.floor(descuento))) : onlineLimits[item.id].descuento,
+                pagoHoy: Number.isFinite(pagoHoy) ? Math.max(0, Math.min(100, Math.floor(pagoHoy))) : onlineLimits[item.id].pagoHoy
+            };
         });
 
-        const label = document.getElementById("onlineMaxDiscountLabel");
-        if (label) label.textContent = onlineMaxDiscount + "%";
+        Object.keys(onlineDiscounts).forEach(clave => {
+            const [planId, promocion] = clave.split("::");
+            const limits = onlineLimits[planId];
+            if (limits && Object.prototype.hasOwnProperty.call(limits, promocion)) {
+                onlineDiscounts[clave] = Math.min(onlineDiscounts[clave], limits[promocion]);
+            }
+        });
+
         renderizarCotizadorOnline();
     }
 
     function inicializarCotizadorOnline() {
-        const select = document.getElementById("onlineTermSelect");
-        if (!select) return;
-
-        select.innerHTML = ONLINE_TERMS
-            .map(plazo => `<option value="${escaparHTML(plazo)}">${escaparHTML(plazo)}</option>`)
-            .join("");
-        select.value = "Semestral";
-        aplicarConfiguracionOnline({ maxDiscount: onlineMaxDiscount });
+        seleccionarLicenciaOnline("Standard");
+        seleccionarPromocionOnline("descuento");
+        aplicarConfiguracionOnline({ plans: [] });
     }
     function esDatoVacio(valor) {
         if (valor === null || valor === undefined) return true;
@@ -1833,7 +1910,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     function cargarConfiguracionOnlineJsonp() {
         return new Promise((resolve, reject) => {
             if (!apiGoogleSheetsConfigurada()) {
-                resolve({ maxDiscount: 0 });
+                resolve({ plans: [] });
                 return;
             }
 
@@ -1864,7 +1941,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                     return;
                 }
 
-                resolve(respuesta.data || { maxDiscount: 0 });
+                resolve(respuesta.data || { plans: [] });
             };
 
             script.onerror = () => {
@@ -1886,7 +1963,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             aplicarConfiguracionOnline(config);
         } catch (error) {
             console.warn("No se pudo cargar el tope Online; se usará 0%:", error);
-            aplicarConfiguracionOnline({ maxDiscount: 0 });
+            aplicarConfiguracionOnline({ plans: [] });
         }
     }
 

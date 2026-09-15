@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harmon Hall - Buscador</title>
     <link rel="icon" type="image/jpeg" href="https://strat-branding.com/wp-content/uploads/2022/04/sb-harmon-hall.jpg">
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://accounts.google.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -335,6 +339,8 @@
             backdrop-filter: blur(24px);
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            content-visibility: auto;
+            contain-intrinsic-size: auto 640px;
         }
         .result-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lift); }
         @keyframes cardPop {
@@ -920,24 +926,24 @@
                 <h2 class="online-title"><i class="fas fa-wifi"></i> Cotizador 100% Online</h2>
 
                 <label>Licencia</label>
-                <div class="online-license-tabs" role="group" aria-label="Licencia Online">
-                    <button class="online-license-btn active" type="button" data-license="Standard" onclick="seleccionarLicenciaOnline('Standard')">Standard</button>
-                    <button class="online-license-btn" type="button" data-license="Plus" onclick="seleccionarLicenciaOnline('Plus')">Plus</button>
-                    <button class="online-license-btn" type="button" data-license="Elite" onclick="seleccionarLicenciaOnline('Elite')">Elite</button>
+                <div id="onlineLicenseTabs" class="online-license-tabs" role="group" aria-label="Licencia Online">
+                    <button class="online-license-btn active" type="button" data-license="Standard">Standard</button>
+                    <button class="online-license-btn" type="button" data-license="Plus">Plus</button>
+                    <button class="online-license-btn" type="button" data-license="Elite">Elite</button>
                 </div>
 
                 <label for="onlineTermSelect">Plazo</label>
-                <select id="onlineTermSelect" class="online-select" onchange="renderizarCotizadorOnline()"></select>
+                <select id="onlineTermSelect" class="online-select"></select>
 
                 <label>Promoción</label>
-                <div class="online-promotion-tabs" role="group" aria-label="Tipo de promoción">
-                    <button class="online-promotion-btn active" type="button" data-promotion="descuento" onclick="seleccionarPromocionOnline('descuento')">Descuento</button>
-                    <button class="online-promotion-btn" type="button" data-promotion="pagoHoy" onclick="seleccionarPromocionOnline('pagoHoy')">Pago hoy</button>
+                <div id="onlinePromotionTabs" class="online-promotion-tabs" role="group" aria-label="Tipo de promoción">
+                    <button class="online-promotion-btn active" type="button" data-promotion="descuento">Descuento</button>
+                    <button class="online-promotion-btn" type="button" data-promotion="pagoHoy">Pago hoy</button>
                 </div>
 
                 <label for="onlineDiscountInput">Porcentaje</label>
                 <div class="online-main-percent">
-                    <input id="onlineDiscountInput" type="number" min="0" max="0" step="1" inputmode="numeric" value="0" oninput="actualizarDescuentoOnline(this)" onblur="normalizarInputDescuentoOnline(this)">
+                    <input id="onlineDiscountInput" type="number" min="0" max="0" step="1" inputmode="numeric" value="0">
                     <span>%</span>
                 </div>
 
@@ -976,7 +982,7 @@
                 <div id="adminLoginMsg" class="admin-login-msg"></div>
             </div>
         </div>
-        <iframe id="adminFrame" class="admin-frame admin-hidden" title="Administrador Harmon Hall" src="about:blank"></iframe>
+        <iframe id="adminFrame" class="admin-frame admin-hidden" title="Administrador Harmon Hall" src="about:blank" loading="lazy"></iframe>
     </div>
 </div>
 
@@ -1061,9 +1067,70 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         return limits;
     }, {});
     let onlineDiscounts = {};
+    let indiceInstitutos = [];
+    let indiceInstitutosOrdenados = [];
+    let resultadosActuales = [];
+    let onlineQuoteDom = null;
+    let toastContainer = null;
+
+    const camposNormalizados = new WeakMap();
+    const ONLINE_PLAN_BY_ID = new Map(ONLINE_PLANS.map(plan => [plan.id, plan]));
+    const ONLINE_PLANS_BY_LICENSE = ONLINE_PLANS.reduce((map, plan) => {
+        if (!map.has(plan.licencia)) map.set(plan.licencia, []);
+        map.get(plan.licencia).push(plan);
+        return map;
+    }, new Map());
+    const dom = {
+        body: document.body,
+        presencialView: document.getElementById("presencialView"),
+        onlineView: document.getElementById("onlineView"),
+        tabPresencial: document.getElementById("tabPresencial"),
+        tabOnline: document.getElementById("tabOnline"),
+        onlineLicenseTabs: document.getElementById("onlineLicenseTabs"),
+        onlineLicenseButtons: Array.from(document.querySelectorAll(".online-license-btn")),
+        onlineTermSelect: document.getElementById("onlineTermSelect"),
+        onlinePromotionTabs: document.getElementById("onlinePromotionTabs"),
+        onlinePromotionButtons: Array.from(document.querySelectorAll(".online-promotion-btn")),
+        onlineDiscountInput: document.getElementById("onlineDiscountInput"),
+        onlineMaxDiscountLabel: document.getElementById("onlineMaxDiscountLabel"),
+        onlineQuote: document.getElementById("onlineQuote"),
+        textoBusqueda: document.getElementById("textoBusqueda"),
+        sugerencias: document.getElementById("sugerencias"),
+        btnLimpiar: document.getElementById("btnLimpiar"),
+        resultado: document.getElementById("resultado"),
+        busquedaWrap: document.querySelector(".busqueda-wrap"),
+        darkModeIcon: document.getElementById("darkModeIcon"),
+        darkModeLabel: document.querySelector(".dark-mode-toggle span"),
+        helpWidget: document.getElementById("helpWidget"),
+        logoHH: document.getElementById("logoHH"),
+        loadingSpinner: document.getElementById("loadingSpinner"),
+        statusCarga: document.getElementById("statusCarga"),
+        adminOverlay: document.getElementById("adminOverlay"),
+        adminLoginGate: document.getElementById("adminLoginGate"),
+        adminFrame: document.getElementById("adminFrame"),
+        adminGoogleBtn: document.getElementById("adminGoogleBtn"),
+        adminLoginMsg: document.getElementById("adminLoginMsg")
+    };
 
     function normalizarTexto(texto) {
         return (texto ?? "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    }
+    function crearDebounce(fn, espera) {
+        let temporizador = null;
+        const debounced = (...args) => {
+            clearTimeout(temporizador);
+            temporizador = setTimeout(() => fn(...args), espera);
+        };
+        debounced.cancelar = () => {
+            clearTimeout(temporizador);
+            temporizador = null;
+        };
+        return debounced;
+    }
+    function reemplazarContenido(contenedor, html) {
+        const plantilla = document.createElement("template");
+        plantilla.innerHTML = html;
+        contenedor.replaceChildren(plantilla.content);
     }
     function escaparHTML(texto) {
         return (texto ?? "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -1088,29 +1155,25 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
 
     function cambiarModalidad(modalidad) {
         const esOnline = modalidad === "online";
-        document.body.classList.toggle("online-active", esOnline);
-        document.getElementById("presencialView").hidden = esOnline;
-        document.getElementById("onlineView").hidden = !esOnline;
-
-        const tabPresencial = document.getElementById("tabPresencial");
-        const tabOnline = document.getElementById("tabOnline");
-        tabPresencial.classList.toggle("active", !esOnline);
-        tabOnline.classList.toggle("active", esOnline);
-        tabPresencial.setAttribute("aria-selected", String(!esOnline));
-        tabOnline.setAttribute("aria-selected", String(esOnline));
+        dom.body.classList.toggle("online-active", esOnline);
+        dom.presencialView.hidden = esOnline;
+        dom.onlineView.hidden = !esOnline;
+        dom.tabPresencial.classList.toggle("active", !esOnline);
+        dom.tabOnline.classList.toggle("active", esOnline);
+        dom.tabPresencial.setAttribute("aria-selected", String(!esOnline));
+        dom.tabOnline.setAttribute("aria-selected", String(esOnline));
 
         if (esOnline) renderizarCotizadorOnline();
     }
 
     function seleccionarLicenciaOnline(licencia) {
-        if (!ONLINE_PLANS.some(plan => plan.licencia === licencia)) return;
+        if (!ONLINE_PLANS_BY_LICENSE.has(licencia)) return;
 
-        const select = document.getElementById("onlineTermSelect");
-        const planAnterior = ONLINE_PLANS.find(plan => plan.id === (select && select.value));
+        const planAnterior = ONLINE_PLAN_BY_ID.get(dom.onlineTermSelect.value);
         const plazoPreferido = planAnterior && planAnterior.plazo;
         onlineLicense = licencia;
 
-        document.querySelectorAll(".online-license-btn").forEach(btn => {
+        dom.onlineLicenseButtons.forEach(btn => {
             btn.classList.toggle("active", btn.getAttribute("data-license") === licencia);
         });
 
@@ -1118,33 +1181,28 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     }
 
     function actualizarPlazosOnline(plazoPreferido) {
-        const select = document.getElementById("onlineTermSelect");
-        if (!select) return;
-
-        const planes = ONLINE_PLANS.filter(plan => plan.licencia === onlineLicense);
-        select.innerHTML = planes
+        const planes = ONLINE_PLANS_BY_LICENSE.get(onlineLicense) || [];
+        reemplazarContenido(dom.onlineTermSelect, planes
             .map(plan => `<option value="${escaparHTML(plan.id)}">${escaparHTML(plan.plazo)}</option>`)
-            .join("");
+            .join(""));
 
         const planPreferido = planes.find(plan => plan.plazo === plazoPreferido);
-        if (planPreferido) select.value = planPreferido.id;
+        if (planPreferido) dom.onlineTermSelect.value = planPreferido.id;
         renderizarCotizadorOnline();
     }
 
     function seleccionarPromocionOnline(promocion) {
         if (!["descuento", "pagoHoy"].includes(promocion)) return;
         onlinePromotion = promocion;
-        document.querySelectorAll(".online-promotion-btn").forEach(btn => {
+        dom.onlinePromotionButtons.forEach(btn => {
             btn.classList.toggle("active", btn.getAttribute("data-promotion") === promocion);
         });
         renderizarCotizadorOnline();
     }
 
     function obtenerPlanOnlineSeleccionado() {
-        const select = document.getElementById("onlineTermSelect");
-        const planId = select && select.value;
-        return ONLINE_PLANS.find(plan => plan.id === planId)
-            || ONLINE_PLANS.find(plan => plan.licencia === onlineLicense)
+        return ONLINE_PLAN_BY_ID.get(dom.onlineTermSelect.value)
+            || (ONLINE_PLANS_BY_LICENSE.get(onlineLicense) || [])[0]
             || ONLINE_PLANS[0];
     }
 
@@ -1200,21 +1258,15 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     }
 
     function actualizarTarjetaOnline() {
+        if (!onlineQuoteDom) return;
         const plan = obtenerPlanOnlineSeleccionado();
         const cotizacion = calcularPlanOnline(plan);
-        const valores = {
-            "online-discount-current": cotizacion.descuento + "% descuento",
-            "online-final-current": formatearMonedaResumen(cotizacion.precioFinal),
-            "online-list-current": formatearMonedaResumen(plan.precioLista),
-            "online-saving-current": formatearMonedaResumen(cotizacion.ahorro),
-            "online-3-current": cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3),
-            "online-6-current": cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)
-        };
-
-        Object.entries(valores).forEach(([id, texto]) => {
-            const elemento = document.getElementById(id);
-            if (elemento) elemento.textContent = texto;
-        });
+        onlineQuoteDom.discount.textContent = cotizacion.descuento + "% descuento";
+        onlineQuoteDom.final.textContent = formatearMonedaResumen(cotizacion.precioFinal);
+        onlineQuoteDom.list.textContent = formatearMonedaResumen(plan.precioLista);
+        onlineQuoteDom.saving.textContent = formatearMonedaResumen(cotizacion.ahorro);
+        onlineQuoteDom.deferred3.textContent = cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3);
+        onlineQuoteDom.deferred6.textContent = cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6);
     }
 
     function crearTarjetaOnline(plan) {
@@ -1239,28 +1291,28 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
                 <div class="online-price-item"><span>Diferido 3 meses</span><strong id="online-3-current">${cotizacion.diferido3 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido3)}</strong></div>
                 <div class="online-price-item"><span>Diferido 6 meses</span><strong id="online-6-current">${cotizacion.diferido6 === null ? "No aplica" : formatearMonedaResumen(cotizacion.diferido6)}</strong></div>
             </div>
-            <button class="online-copy-btn" type="button" onclick="copiarCotizacionOnline()"><i class="fas fa-copy"></i> Copiar resumen Online</button>
+            <button class="online-copy-btn" type="button" data-action="copy-online"><i class="fas fa-copy"></i> Copiar resumen Online</button>
         </div>`;
     }
 
     function renderizarCotizadorOnline() {
-        const contenedor = document.getElementById("onlineQuote");
-        if (!contenedor) return;
-
         const plan = obtenerPlanOnlineSeleccionado();
         const tope = obtenerTopeOnline(plan);
         const descuento = obtenerDescuentoOnline(plan);
-        const input = document.getElementById("onlineDiscountInput");
-        const label = document.getElementById("onlineMaxDiscountLabel");
+        dom.onlineDiscountInput.max = String(tope);
+        dom.onlineDiscountInput.value = String(descuento);
+        dom.onlineDiscountInput.disabled = tope === 0;
+        dom.onlineMaxDiscountLabel.textContent = tope + "%";
 
-        if (input) {
-            input.max = String(tope);
-            input.value = String(descuento);
-            input.disabled = tope === 0;
-        }
-        if (label) label.textContent = tope + "%";
-
-        contenedor.innerHTML = crearTarjetaOnline(plan);
+        reemplazarContenido(dom.onlineQuote, crearTarjetaOnline(plan));
+        onlineQuoteDom = {
+            discount: dom.onlineQuote.querySelector("#online-discount-current"),
+            final: dom.onlineQuote.querySelector("#online-final-current"),
+            list: dom.onlineQuote.querySelector("#online-list-current"),
+            saving: dom.onlineQuote.querySelector("#online-saving-current"),
+            deferred3: dom.onlineQuote.querySelector("#online-3-current"),
+            deferred6: dom.onlineQuote.querySelector("#online-6-current")
+        };
     }
 
     function formatearPrecioOnline(valor, decimales) {
@@ -1335,10 +1387,18 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     }
     function obtenerCampo(obj, nombres) {
         if (!obj || typeof obj !== "object") return "";
-        const llaves = Object.keys(obj);
-        const objetivos = nombres.map(nombre => normalizarTexto(nombre));
-        for (const objetivo of objetivos) {
-            const llave = llaves.find(key => normalizarTexto(key) === objetivo);
+        let indice = camposNormalizados.get(obj);
+        if (!indice) {
+            indice = new Map();
+            Object.keys(obj).forEach(llave => {
+                const llaveNormalizada = normalizarTexto(llave);
+                if (!indice.has(llaveNormalizada)) indice.set(llaveNormalizada, llave);
+            });
+            camposNormalizados.set(obj, indice);
+        }
+
+        for (const nombre of nombres) {
+            const llave = indice.get(normalizarTexto(nombre));
             if (llave) {
                 const valor = valorLimpio(obj[llave]);
                 if (valor) return valor;
@@ -1355,13 +1415,20 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         const directorDirecto = obtenerCampo(obj, ["Directores", "Director", "Directora"]);
         if (directorDirecto) return directorDirecto;
         if (!obj || typeof obj !== "object") return "";
-        for (let key in obj) {
-            if (typeof key === "string" && normalizarTexto(key).includes("director")) {
-                const valor = valorLimpio(obj[key]);
-                if (valor) return valor;
-            }
-        }
-        return "";
+        const llave = Object.keys(obj).find(key => normalizarTexto(key).includes("director") && valorLimpio(obj[key]));
+        return llave ? valorLimpio(obj[llave]) : "";
+    }
+
+    function reconstruirIndiceInstitutos() {
+        indiceInstitutos = todosLosDatos
+            .map((datos, posicion) => {
+                const nombre = obtenerCampo(datos, ["Nombre"]);
+                return { datos, posicion, nombre, nombreNormalizado: normalizarTexto(nombre) };
+            })
+            .filter(item => item.nombreNormalizado);
+        indiceInstitutosOrdenados = indiceInstitutos
+            .slice()
+            .sort((a, b) => a.nombreNormalizado.localeCompare(b.nombreNormalizado));
     }
 
     function obtenerContactoInstituto(datos) {
@@ -1526,21 +1593,20 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     }
 
     function mostrarNotificacion(mensaje) {
-        let container = document.querySelector('.toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.className = 'toast-container';
-            container.style.position = 'fixed';
-            container.style.bottom = '30px';
-            container.style.left = '50%';
-            container.style.transform = 'translateX(-50%)';
-            container.style.zIndex = '9999';
-            document.body.appendChild(container);
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container';
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.bottom = '30px';
+            toastContainer.style.left = '50%';
+            toastContainer.style.transform = 'translateX(-50%)';
+            toastContainer.style.zIndex = '9999';
+            dom.body.appendChild(toastContainer);
         }
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${escaparHTML(mensaje)}`;
-        container.appendChild(toast);
+        toastContainer.appendChild(toast);
         setTimeout(() => toast.remove(), 2800);
     }
 
@@ -1562,28 +1628,26 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     }
 
     function toggleDarkMode() {
-        const body = document.body;
-        const isLight = body.getAttribute('data-theme') === 'light';
-        body.setAttribute('data-theme', isLight ? 'dark' : 'light');
-        document.getElementById('darkModeIcon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        document.querySelector('.dark-mode-toggle span').innerText = isLight ? 'Día' : 'Noche';
+        const isLight = dom.body.getAttribute('data-theme') === 'light';
+        dom.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
+        dom.darkModeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+        dom.darkModeLabel.innerText = isLight ? 'Día' : 'Noche';
     }
 
     function toggleHelp(forceState) {
-        const widget = document.getElementById('helpWidget');
-        const shouldOpen = typeof forceState === 'boolean' ? forceState : !widget.classList.contains('open');
-        widget.classList.toggle('open', shouldOpen);
+        const shouldOpen = typeof forceState === 'boolean' ? forceState : !dom.helpWidget.classList.contains('open');
+        dom.helpWidget.classList.toggle('open', shouldOpen);
     }
 
-    function actualizarCotizacion(index) {
-        const selector = document.getElementById(`select-${index}`);
-        if (!selector) return;
+    function actualizarCotizacion(index, selector) {
+        const datos = resultadosActuales[index];
+        if (!datos || !selector) return;
         const programa = selector.value;
-        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
-        const contenedor = document.getElementById(`precios-${index}`);
+        const tarjeta = selector.closest(".result-card");
+        const contenedor = tarjeta && tarjeta.querySelector("[data-role='prices']");
         if (!contenedor) return;
         const cotizacion = obtenerCotizacion(datos, programa);
-        contenedor.innerHTML = cotizacion.html;
+        reemplazarContenido(contenedor, cotizacion.html);
     }
 
     function crearResumenAdultos(datos, programa) {
@@ -1648,10 +1712,11 @@ Sábados | ⏳6 horas
     }
 
     function copiarResumen(index) {
-        const selector = document.getElementById(`select-${index}`);
-        if (!selector) return;
+        const datos = resultadosActuales[index];
+        const tarjeta = dom.resultado.querySelector(`[data-result-index="${index}"]`);
+        const selector = tarjeta && tarjeta.querySelector(".result-program-select");
+        if (!datos || !selector) return;
         const programa = selector.value;
-        const datos = JSON.parse(decodeURIComponent(selector.getAttribute('data-info')));
         const tipo = normalizarTexto(obtenerCampo(datos, ["Tipo"]) || datos.Tipo || "");
 
         let labelTipo = "Propia";
@@ -1707,75 +1772,75 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     }
 
     function limpiarBusqueda() {
-        const input = document.getElementById('textoBusqueda');
-        input.value = '';
-        document.getElementById('sugerencias').style.display = 'none';
-        document.getElementById('btnLimpiar').classList.remove('visible');
-        document.getElementById('resultado').innerHTML = '';
-        input.focus();
+        actualizarSugerenciasDebounced.cancelar();
+        resultadosActuales = [];
+        dom.textoBusqueda.value = '';
+        dom.sugerencias.style.display = 'none';
+        dom.btnLimpiar.classList.remove('visible');
+        dom.resultado.replaceChildren();
+        dom.textoBusqueda.focus();
     }
 
     function renderSugerencias(lista) {
-        const contenedor = document.getElementById("sugerencias");
         if (!lista.length) {
-            contenedor.innerHTML = "";
-            contenedor.style.display = "none";
+            dom.sugerencias.replaceChildren();
+            dom.sugerencias.style.display = "none";
             return;
         }
-        contenedor.innerHTML = lista.map(item => {
-            const nombre = obtenerCampo(item, ["Nombre"]) || "Sin nombre";
-            const tipo = obtenerCampo(item, ["Tipo"]) || "Instituto";
-            const zona = obtenerCampo(item, ["Zona"]);
+        reemplazarContenido(dom.sugerencias, lista.map(item => {
+            const nombre = item.nombre || "Sin nombre";
+            const tipo = obtenerCampo(item.datos, ["Tipo"]) || "Instituto";
+            const zona = obtenerCampo(item.datos, ["Zona"]);
             return `<div class="sugerencia-item" data-nombre="${escaparHTML(nombre)}">${escaparHTML(nombre)}<span class="sugerencia-sub">${escaparHTML(tipo)}${zona ? " • Zona " + escaparHTML(zona) : ""}</span></div>`;
-        }).join("");
-        contenedor.style.display = "block";
+        }).join(""));
+        dom.sugerencias.style.display = "block";
     }
 
     function actualizarSugerencias() {
-        const inputVal = document.getElementById('textoBusqueda').value;
+        const inputVal = dom.textoBusqueda.value;
         const busqueda = normalizarTexto(inputVal);
-        const btnLimpiar = document.getElementById('btnLimpiar');
-        if (inputVal.length > 0) {
-            btnLimpiar.classList.add('visible');
-        } else {
-            btnLimpiar.classList.remove('visible');
-        }
         if (!busqueda) {
-            document.getElementById("sugerencias").style.display = "none";
+            dom.sugerencias.style.display = "none";
             return;
         }
-        const sugerencias = todosLosDatos
-            .filter(f => obtenerCampo(f, ["Nombre"]) && normalizarTexto(obtenerCampo(f, ["Nombre"])).includes(busqueda))
-            .sort((a, b) => {
-                const na = normalizarTexto(obtenerCampo(a, ["Nombre"])), nb = normalizarTexto(obtenerCampo(b, ["Nombre"]));
-                return (na.startsWith(busqueda) ? 0 : 1) - (nb.startsWith(busqueda) ? 0 : 1) || na.localeCompare(nb);
-            })
-            .slice(0, 12);
-        renderSugerencias(sugerencias);
+
+        const prefijos = [];
+        const parciales = [];
+        for (const item of indiceInstitutosOrdenados) {
+            if (!item.nombreNormalizado.includes(busqueda)) continue;
+            if (item.nombreNormalizado.startsWith(busqueda)) prefijos.push(item);
+            else if (parciales.length < 12) parciales.push(item);
+        }
+        renderSugerencias(prefijos.slice(0, 12).concat(parciales).slice(0, 12));
     }
 
+    const actualizarSugerenciasDebounced = crearDebounce(actualizarSugerencias, 120);
+
     function seleccionarSugerencia(nombre) {
-        document.getElementById('textoBusqueda').value = nombre;
-        document.getElementById("sugerencias").style.display = "none";
-        document.getElementById('btnLimpiar').classList.add('visible');
+        actualizarSugerenciasDebounced.cancelar();
+        dom.textoBusqueda.value = nombre;
+        dom.sugerencias.style.display = "none";
+        dom.btnLimpiar.classList.add('visible');
         buscarInstituto();
     }
 
     function buscarInstituto() {
-        const texto = document.getElementById('textoBusqueda').value.trim();
+        const texto = dom.textoBusqueda.value.trim();
         const busqueda = normalizarTexto(texto);
-        document.getElementById("sugerencias").style.display = "none";
+        dom.sugerencias.style.display = "none";
 
         if (!busqueda) {
-            document.getElementById('resultado').innerHTML = `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`;
+            resultadosActuales = [];
+            reemplazarContenido(dom.resultado, `<p class="empty-state">Escribe el nombre del instituto para buscar.</p>`);
             return;
         }
 
-        const resultados = todosLosDatos.filter(f => obtenerCampo(f, ["Nombre"]) && normalizarTexto(obtenerCampo(f, ["Nombre"])).includes(busqueda));
-        let htmlTotal = "";
+        const resultados = indiceInstitutos
+            .filter(item => item.nombreNormalizado.includes(busqueda))
+            .map(item => item.datos);
+        resultadosActuales = resultados;
+        const htmlTotal = resultados.map((encontrado, index) => {
 
-        resultados.forEach((encontrado, index) => {
-            const infoJson = encodeURIComponent(JSON.stringify(encontrado));
             const tipo = normalizarTexto(obtenerCampo(encontrado, ["Tipo"]) || encontrado.Tipo || "");
             const nombreInstituto = obtenerCampo(encontrado, ["Nombre"]) || "Sin nombre";
             const zona = obtenerCampo(encontrado, ["Zona"]);
@@ -1835,11 +1900,13 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 enlaceHtml = `<div style="text-align:center; padding:16px; background:var(--info-box); border-radius:18px; font-weight:800; color:var(--text); opacity:0.65;"><i class="fas fa-info-circle"></i> SIN WIKI DISPONIBLE</div>`;
             }
 
-            htmlTotal += `<div class="result-card"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(nombreInstituto)}</div><span class="type-badge ${classType}">${labelTipo}</span>${zonaBadge}</div><i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i></div>${directorHtml}${asesoresHtml}${contactoHtml}${franquiciaHtml}<div style="margin-top: 24px; margin-bottom: 24px;"><label>Selecciona Programa:</label><select id="select-${index}" class="btn-buscar" data-info="${infoJson}" onchange="actualizarCotizacion(${index})"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div id="precios-${index}"></div><div class="buttons-wrapper"><button class="btn-copiar" onclick="copiarResumen(${index})"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>${enlaceHtml}</div></div>`;
-        });
+            const cotizacionInicial = obtenerCotizacion(encontrado, "adults");
+            return `<div class="result-card" data-result-index="${index}"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(nombreInstituto)}</div><span class="type-badge ${classType}">${labelTipo}</span>${zonaBadge}</div><i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i></div>${directorHtml}${asesoresHtml}${contactoHtml}${franquiciaHtml}<div style="margin-top: 24px; margin-bottom: 24px;"><label>Selecciona Programa:</label><select class="btn-buscar result-program-select"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div data-role="prices">${cotizacionInicial.html}</div><div class="buttons-wrapper"><button class="btn-copiar" type="button" data-action="copy-summary"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>${enlaceHtml}</div></div>`;
+        }).join("");
 
-        document.getElementById('resultado').innerHTML = resultados.length ? htmlTotal : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`;
-        if (resultados.length) resultados.forEach((_, i) => actualizarCotizacion(i));
+        reemplazarContenido(dom.resultado, resultados.length
+            ? htmlTotal
+            : `<p class="empty-state">No se encontró nada para "${escaparHTML(texto)}".</p>`);
     }
 
 
@@ -1968,7 +2035,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     }
 
     async function cargarExcelGitHub(archivo) {
-        const response = await fetch(archivo + "?v=" + Date.now());
+        const response = await fetch(archivo, { cache: "default" });
         if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
         const arrayBuffer = await response.arrayBuffer();
         const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
@@ -1978,30 +2045,31 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     async function cargarBasesDeDatos(mostrarEstado = true) {
         const errores = [];
         const datosFinales = [];
+        const cargas = [];
 
         if (apiGoogleSheetsConfigurada()) {
-            try {
-                const datosSheets = await cargarGoogleSheetsJsonp();
-                datosFinales.push(...datosSheets);
-            } catch (error) {
-                console.error("Error cargando Google Sheets:", error);
-                errores.push(error.message);
-            }
+            cargas.push({ nombre: "Google Sheets", promesa: cargarGoogleSheetsJsonp() });
         } else {
             errores.push("Falta configurar SHEETS_API_URL en index.html.");
         }
 
-        for (const archivo of archivosA_Cargar) {
-            try {
-                const datosExcel = await cargarExcelGitHub(archivo);
-                datosFinales.push(...datosExcel);
-            } catch (error) {
-                console.error("Error cargando " + archivo + ":", error);
-                errores.push(error.message);
+        archivosA_Cargar.forEach(archivo => {
+            cargas.push({ nombre: archivo, promesa: cargarExcelGitHub(archivo) });
+        });
+
+        const resultados = await Promise.allSettled(cargas.map(carga => carga.promesa));
+        resultados.forEach((resultado, index) => {
+            if (resultado.status === "fulfilled") {
+                datosFinales.push(...resultado.value);
+            } else {
+                const nombre = cargas[index].nombre;
+                console.error("Error cargando " + nombre + ":", resultado.reason);
+                errores.push((resultado.reason && resultado.reason.message) || String(resultado.reason));
             }
-        }
+        });
 
         todosLosDatos = datosFinales;
+        reconstruirIndiceInstitutos();
         baseCargada = true;
 
         if (!datosFinales.length && errores.length) {
@@ -2013,7 +2081,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
 
     async function recargarDatosDesdeAdmin() {
         try {
-            const busquedaActual = document.getElementById('textoBusqueda').value.trim();
+            const busquedaActual = dom.textoBusqueda.value.trim();
             await cargarBasesDeDatos(false);
             await actualizarConfiguracionOnlineDesdeServidor();
             if (busquedaActual) buscarInstituto();
@@ -2029,12 +2097,9 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             mostrarNotificacion("Primero configura la URL de Apps Script en index.html");
             return;
         }
-        const overlay = document.getElementById("adminOverlay");
-        if (!overlay) return;
-
-        overlay.classList.add("visible");
-        overlay.setAttribute("aria-hidden", "false");
-        document.body.classList.add("admin-open");
+        dom.adminOverlay.classList.add("visible");
+        dom.adminOverlay.setAttribute("aria-hidden", "false");
+        dom.body.classList.add("admin-open");
 
         if (adminCredential) {
             cargarPanelAdminConSesion();
@@ -2044,37 +2109,29 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     }
 
     function mostrarLoginAdmin() {
-        const gate = document.getElementById("adminLoginGate");
-        const frame = document.getElementById("adminFrame");
-        if (gate) gate.classList.remove("admin-hidden");
-        if (frame) {
-            frame.classList.add("admin-hidden");
-            frame.src = "about:blank";
-        }
+        dom.adminLoginGate.classList.remove("admin-hidden");
+        dom.adminFrame.classList.add("admin-hidden");
+        dom.adminFrame.src = "about:blank";
         renderizarBotonGoogleAdmin();
     }
 
     function renderizarBotonGoogleAdmin() {
-        const btn = document.getElementById("adminGoogleBtn");
-        const msg = document.getElementById("adminLoginMsg");
-        if (!btn) return;
-
         if (!window.google || !google.accounts || !google.accounts.id) {
-            if (msg) msg.textContent = "Cargando inicio de sesión de Google…";
+            dom.adminLoginMsg.textContent = "Cargando inicio de sesión de Google…";
             setTimeout(renderizarBotonGoogleAdmin, 350);
             return;
         }
 
         if (adminGoogleButtonRendered) return;
         adminGoogleButtonRendered = true;
-        if (msg) msg.textContent = "";
+        dom.adminLoginMsg.textContent = "";
 
         google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
             callback: onAdminGoogleCredential,
             ux_mode: "popup"
         });
-        google.accounts.id.renderButton(btn, {
+        google.accounts.id.renderButton(dom.adminGoogleBtn, {
             type: "standard",
             size: "large",
             theme: "filled_black",
@@ -2086,8 +2143,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
 
     function onAdminGoogleCredential(response) {
         if (!response || !response.credential) {
-            const msg = document.getElementById("adminLoginMsg");
-            if (msg) msg.textContent = "No se recibió sesión de Google.";
+            dom.adminLoginMsg.textContent = "No se recibió sesión de Google.";
             return;
         }
         adminCredential = response.credential;
@@ -2095,15 +2151,11 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     }
 
    function cargarPanelAdminConSesion() {
-  const gate = document.getElementById("adminLoginGate");
-  const frame = document.getElementById("adminFrame");
-  if (!frame) return;
-
-  if (gate) gate.classList.add("admin-hidden");
-  frame.classList.remove("admin-hidden");
+  dom.adminLoginGate.classList.add("admin-hidden");
+  dom.adminFrame.classList.remove("admin-hidden");
 
   // Pasamos la credencial como query string para que no se pierda en el redirect
-  frame.src = construirUrlAppsScript({
+  dom.adminFrame.src = construirUrlAppsScript({
     view: "admin",
     embedded: "1",
     credential: adminCredential,
@@ -2114,19 +2166,15 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     window.onAdminGoogleCredential = onAdminGoogleCredential;
 
     function cerrarAdministrador() {
-        const overlay = document.getElementById("adminOverlay");
-        const frame = document.getElementById("adminFrame");
-        if (!overlay || !frame) return;
-
-        overlay.classList.remove("visible");
-        overlay.setAttribute("aria-hidden", "true");
-        document.body.classList.remove("admin-open");
-        frame.src = "about:blank";
-        frame.classList.add("admin-hidden");
+        dom.adminOverlay.classList.remove("visible");
+        dom.adminOverlay.setAttribute("aria-hidden", "true");
+        dom.body.classList.remove("admin-open");
+        dom.adminFrame.src = "about:blank";
+        dom.adminFrame.classList.add("admin-hidden");
     }
 
     function activarEasterEgg() {
-        const modoNocheActivo = document.body.getAttribute('data-theme') === 'dark';
+        const modoNocheActivo = dom.body.getAttribute('data-theme') === 'dark';
         let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
         let duracionSegundos = modoNocheActivo ? 2.0 : 2.5;
         const sonidoEasterEgg = new Audio(archivoAudio);
@@ -2149,9 +2197,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     }
 
     window.onload = async function () {
-        const spinner = document.getElementById('loadingSpinner');
-        const status = document.getElementById('statusCarga');
-        spinner.style.display = 'block';
+        dom.loadingSpinner.style.display = 'block';
         actualizarConfiguracionOnlineDesdeServidor();
 
         try {
@@ -2159,45 +2205,71 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             if (resultadoCarga.errores.length) {
                 console.warn("Base cargada con avisos:", resultadoCarga.errores);
             }
-            status.innerHTML = "✅ Base de datos lista.";
+            dom.statusCarga.innerHTML = "✅ Base de datos lista.";
         } catch (e) {
             console.error("Error cargando bases de datos: ", e);
-            status.innerHTML = "❌ Error al cargar algunos datos.";
+            dom.statusCarga.innerHTML = "❌ Error al cargar algunos datos.";
         } finally {
-            spinner.style.display = 'none';
+            dom.loadingSpinner.style.display = 'none';
             baseCargada = true;
         }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
         inicializarCotizadorOnline();
-        const textoBusqueda = document.getElementById('textoBusqueda');
-        const sugerencias = document.getElementById('sugerencias');
-
-        textoBusqueda.addEventListener('input', actualizarSugerencias);
-        textoBusqueda.addEventListener('keydown', e => {
-            if (e.key === 'Enter') buscarInstituto();
-            if (e.key === 'Escape') sugerencias.style.display = 'none';
+        dom.textoBusqueda.addEventListener('input', () => {
+            dom.btnLimpiar.classList.toggle('visible', dom.textoBusqueda.value.length > 0);
+            actualizarSugerenciasDebounced();
         });
-        sugerencias.addEventListener("click", e => {
+        dom.textoBusqueda.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                actualizarSugerenciasDebounced.cancelar();
+                buscarInstituto();
+            }
+            if (e.key === 'Escape') dom.sugerencias.style.display = 'none';
+        });
+        dom.sugerencias.addEventListener("click", e => {
             const item = e.target.closest(".sugerencia-item");
             if (item) seleccionarSugerencia(item.getAttribute("data-nombre"));
         });
+        dom.resultado.addEventListener("change", e => {
+            const selector = e.target.closest(".result-program-select");
+            if (!selector) return;
+            const tarjeta = selector.closest("[data-result-index]");
+            actualizarCotizacion(Number(tarjeta.dataset.resultIndex), selector);
+        });
+        dom.resultado.addEventListener("click", e => {
+            const boton = e.target.closest("[data-action='copy-summary']");
+            if (!boton) return;
+            const tarjeta = boton.closest("[data-result-index]");
+            copiarResumen(Number(tarjeta.dataset.resultIndex));
+        });
+        dom.onlineLicenseTabs.addEventListener("click", e => {
+            const boton = e.target.closest("[data-license]");
+            if (boton) seleccionarLicenciaOnline(boton.dataset.license);
+        });
+        dom.onlinePromotionTabs.addEventListener("click", e => {
+            const boton = e.target.closest("[data-promotion]");
+            if (boton) seleccionarPromocionOnline(boton.dataset.promotion);
+        });
+        dom.onlineTermSelect.addEventListener("change", renderizarCotizadorOnline);
+        dom.onlineDiscountInput.addEventListener("input", () => actualizarDescuentoOnline(dom.onlineDiscountInput));
+        dom.onlineDiscountInput.addEventListener("blur", () => normalizarInputDescuentoOnline(dom.onlineDiscountInput));
+        dom.onlineQuote.addEventListener("click", e => {
+            if (e.target.closest("[data-action='copy-online']")) copiarCotizacionOnline();
+        });
         document.addEventListener("click", e => {
-            const busquedaWrap = document.querySelector(".busqueda-wrap");
-            if (busquedaWrap && !busquedaWrap.contains(e.target)) sugerencias.style.display = "none";
-            const helpWidget = document.getElementById('helpWidget');
-            if (helpWidget && !helpWidget.contains(e.target)) helpWidget.classList.remove('open');
+            if (!dom.busquedaWrap.contains(e.target)) dom.sugerencias.style.display = "none";
+            if (!dom.helpWidget.contains(e.target)) dom.helpWidget.classList.remove('open');
         });
 
-        const logoHH = document.getElementById('logoHH');
         let contadorClicks = 0;
         let temporizadorClicks = null;
 
-        if (logoHH) {
-            logoHH.style.cursor = 'pointer';
-            logoHH.title = 'Harmon Hall';
-            logoHH.addEventListener('click', () => {
+        if (dom.logoHH) {
+            dom.logoHH.style.cursor = 'pointer';
+            dom.logoHH.title = 'Harmon Hall';
+            dom.logoHH.addEventListener('click', () => {
                 contadorClicks++;
                 clearTimeout(temporizadorClicks);
 

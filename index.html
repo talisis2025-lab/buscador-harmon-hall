@@ -157,14 +157,15 @@
             width: 100%;
             max-width: 1320px;
             display: flex;
-            gap: 32px;
+            gap: 24px;
             align-items: flex-start;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         /* LEFT: sticky search panel */
         .left-panel {
-            width: 400px;
-            min-width: 320px;
+            width: 360px;
+            min-width: 300px;
             flex-shrink: 0;
             position: sticky;
             top: 24px;
@@ -205,8 +206,8 @@
 
         /* ── Section cards ── */
         .seccion {
-            margin-bottom: 20px;
-            padding: 32px 28px;
+            margin-bottom: 16px;
+            padding: 24px 22px;
             border-radius: var(--radius-lg);
             background: var(--card-bg);
             box-shadow: var(--shadow);
@@ -245,7 +246,7 @@
 
         input[type="text"] {
             width: 100%;
-            padding: 18px 50px 18px 58px;
+            padding: 15px 48px 15px 54px;
             border: 2px solid var(--input-border);
             border-radius: 28px;
             outline: none;
@@ -283,7 +284,7 @@
 
         .btn-buscar {
             width: 100%;
-            padding: 18px 24px;
+            padding: 15px 20px;
             background: linear-gradient(180deg, #111111 0%, #000000 100%);
             color: var(--hh-white);
             border: none;
@@ -293,7 +294,7 @@
             font-size: 1.05em;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            margin-top: 16px;
+            margin-top: 12px;
             box-shadow: 0 14px 28px rgba(0,0,0,0.22);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -319,18 +320,59 @@
         select.btn-buscar:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 5px rgba(255,234,0,0.22); transform: translateY(-2px); }
         select.btn-buscar option { color: var(--text) !important; background-color: var(--card-bg) !important; padding: 12px 18px; font-weight: 700; }
 
+        .program-picker {
+            display: grid;
+            grid-template-columns: minmax(120px, 0.45fr) minmax(0, 1fr);
+            align-items: center;
+            gap: 14px;
+            margin: 16px 0 14px;
+            padding: 12px 14px;
+            background: var(--info-box);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        .program-picker-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: none;
+            opacity: 0.72;
+        }
+        .program-select {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 38px 9px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text);
+            font: inherit;
+            font-weight: 700;
+            outline: none;
+            appearance: none;
+            background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position: calc(100% - 17px) 18px, calc(100% - 11px) 18px;
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+        }
+        .program-select:focus { border-color: var(--hh-yellow); box-shadow: 0 0 0 3px rgba(255,234,0,0.22); }
+
         /* ── Results ── */
         #resultado {
             margin-top: 0;
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 18px;
             padding-bottom: 120px;
         }
 
         .result-card {
             background: var(--card-bg);
-            padding: 32px 28px;
+            padding: 24px 22px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
             position: relative;
@@ -359,12 +401,12 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
-        .instituto-nombre { font-size: 1.6em; font-weight: 900; letter-spacing: -0.6px; line-height: 1.1; }
+        .instituto-nombre { font-size: 1.45em; font-weight: 800; letter-spacing: 0; line-height: 1.15; }
 
         .type-badge {
-            padding: 7px 16px;
+            padding: 6px 12px;
             border-radius: 999px;
             font-size: 0.73em;
             font-weight: 900;
@@ -382,23 +424,23 @@
             background: var(--info-box);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 22px;
-            margin-top: 20px;
-            margin-bottom: 24px;
+            padding: 16px;
+            margin-top: 12px;
+            margin-bottom: 14px;
         }
         .panel-franchise { background: var(--franchise-bg); border-left: 5px solid var(--hh-red); }
 
-        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 13px 18px; }
 
         .data-stack { display: flex; flex-direction: column; gap: 4px; }
-        .data-label { font-size: 0.72em; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-label { font-size: 0.72em; font-weight: 700; color: #777; text-transform: uppercase; letter-spacing: 0; }
         .data-label i { margin-right: 6px; font-size: 1.1em; color: var(--text); opacity: 0.6; }
-        .data-val { font-weight: 900; color: var(--text); font-size: 1.25em; word-break: break-word; }
+        .data-val { font-weight: 700; color: var(--text); font-size: 1.08em; word-break: break-word; }
 
         .caja-alerta {
-            margin-top: 20px;
-            margin-bottom: 24px;
-            padding: 18px 20px;
+            margin-top: 12px;
+            margin-bottom: 14px;
+            padding: 14px 16px;
             background: var(--alert-bg);
             color: var(--alert-text);
             border-radius: var(--radius-md);
@@ -410,11 +452,11 @@
             border: 1px solid rgba(204,30,61,0.15);
         }
 
-        .buttons-wrapper { margin-top: 32px; display: flex; flex-direction: column; gap: 14px; }
+        .buttons-wrapper { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; overflow: visible; }
 
         .btn-wiki, .btn-copiar {
             width: 100%;
-            padding: 18px 22px;
+            padding: 14px 18px;
             border-radius: 28px;
             font-weight: 900;
             text-align: center;
@@ -431,6 +473,57 @@
         .btn-wiki { background: var(--hh-yellow); color: var(--hh-black); border: 2px solid var(--hh-black); }
         .btn-wiki:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 38px rgba(255,234,0,0.35); }
         .btn-wiki:active, .btn-copiar:active { transform: scale(0.96); }
+
+        .copy-menu-wrap { position: relative; width: 100%; }
+        .copy-choice-popover {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 12px);
+            z-index: 40;
+            width: min(330px, calc(100vw - 64px));
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text);
+            box-shadow: var(--shadow-lift);
+            transform: translateX(-50%);
+            animation: copyBubbleIn 0.18s ease-out;
+        }
+        .copy-choice-popover[hidden] { display: none; }
+        .copy-choice-popover::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -7px;
+            width: 12px;
+            height: 12px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .copy-choice-title { margin: 0 0 10px; font-size: 0.84rem; font-weight: 700; text-align: center; }
+        .copy-choice-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .copy-choice-options.single { grid-template-columns: 1fr; }
+        .copy-choice-option {
+            min-height: 42px;
+            padding: 9px 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text);
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .copy-choice-option:hover:not(:disabled) { border-color: var(--hh-red); color: var(--hh-red); }
+        .copy-choice-option:disabled { cursor: not-allowed; opacity: 0.42; }
+        @keyframes copyBubbleIn {
+            from { opacity: 0; transform: translate(-50%, 6px) scale(0.98); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
 
         #loadingSpinner {
             display: none;
@@ -542,12 +635,13 @@
         .online-layout {
             width: 100%;
             display: flex;
-            gap: 32px;
+            gap: 24px;
             align-items: flex-start;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .online-controls {
-            width: 400px;
-            min-width: 320px;
+            width: 360px;
+            min-width: 300px;
             flex-shrink: 0;
             position: sticky;
             top: 24px;
@@ -754,8 +848,10 @@
         }
         @media (max-width: 768px) {
             body { padding: 16px 12px; }
-            .seccion { padding: 24px 20px; }
-            .result-card { padding: 24px 20px; }
+            .seccion { padding: 20px 16px; }
+            .result-card { padding: 20px 16px; }
+            .program-picker { grid-template-columns: 1fr; gap: 8px; }
+            .copy-choice-popover { width: min(300px, calc(100vw - 48px)); }
             .help-widget { position: relative; right: auto; bottom: auto; align-self: flex-end; margin-top: 18px; }
             .help-panel { position: absolute; right: 0; bottom: 66px; width: min(300px, calc(100vw - 24px)); }
             .mode-switcher-wrap { margin-bottom: 20px; }
@@ -1152,6 +1248,14 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
             maximumFractionDigits: 2
         }) + " MXN";
     }
+    function formatearMonedaPlantilla(valor) {
+        const numero = normalizarNumero(valor) || 0;
+        const tieneDecimales = !Number.isInteger(numero);
+        return "$" + numero.toLocaleString("es-MX", {
+            minimumFractionDigits: tieneDecimales ? 2 : 0,
+            maximumFractionDigits: 2
+        }) + " MXN";
+    }
 
     function cambiarModalidad(modalidad) {
         const esOnline = modalidad === "online";
@@ -1459,7 +1563,7 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
             return `<div class="data-stack" ${span}><span class="data-label"><i class="fas fa-user-check"></i> ${escaparHTML(item.label)}</span>${contenidoNombre}${contenidoCorreo}</div>`;
         }).join("");
 
-        return `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-users"></i> Asesores</span><div class="grid-2x2">${htmlAsesores}</div></div>`;
+        return `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:10px;"><i class="fas fa-users"></i> Asesores</span><div class="grid-2x2">${htmlAsesores}</div></div>`;
     }
 
     function construirContactoHtml(datos) {
@@ -1477,7 +1581,7 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
             return `<div class="data-stack" ${span}><span class="data-label"><i class="${item.icono}"></i> ${escaparHTML(item.label)}</span><span class="data-val" style="font-size: 1.05em;">${escaparHTML(item.valor)}</span></div>`;
         }).join("");
 
-        return `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-address-book"></i> Contacto del Instituto</span><div class="grid-2x2">${htmlItems}</div></div>`;
+        return `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:10px;"><i class="fas fa-address-book"></i> Contacto del Instituto</span><div class="grid-2x2">${htmlItems}</div></div>`;
     }
 
     function obtenerLineasContacto(datos) {
@@ -1491,13 +1595,20 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         ].filter(Boolean);
     }
 
+    function obtenerMaterialInfantil(datos, programa) {
+        if (programa === "teens") {
+            return obtenerMonto(datos, ["Libros_TEENS", "Libros_Teens"]) || 777;
+        }
+        return obtenerMonto(datos, [programa === "kids" ? "Libros_KIDS" : "Libros_PTEEN"]);
+    }
+
     function obtenerCotizacion(datos, programa) {
         const ins = obtenerMonto(datos, ["Inscripcion", "Inscripción"]);
         const seg = obtenerMonto(datos, ["SEG"]);
         const zona = obtenerCampo(datos, ["Zona"]) || "A";
         let html = "", texto = "", tienePrecio = false;
 
-        if (['adults', 'pro', 'kids', 'pteen'].includes(programa)) {
+        if (['adults', 'pro', 'kids', 'pteen', 'teens'].includes(programa)) {
             let mensu = 0, sab = 0, lib = 0, titulo = "";
 
             switch (programa) {
@@ -1521,15 +1632,24 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
                 case 'pteen':
                     mensu = obtenerMonto(datos, ["KPT_SEM"]);
                     sab = obtenerMonto(datos, ["KPT_SAB"]);
-                    lib = obtenerMonto(datos, ["Libros_PTEEN"]);
+                    lib = obtenerMaterialInfantil(datos, programa);
                     titulo = "Pre-Teens";
+                    break;
+                case 'teens':
+                    mensu = obtenerMonto(datos, ["KPT_SEM"]);
+                    sab = obtenerMonto(datos, ["KPT_SAB"]);
+                    lib = obtenerMaterialInfantil(datos, programa);
+                    titulo = "Teens";
                     break;
             }
 
             if (mensu > 0 || sab > 0) tienePrecio = true;
 
             if (tienePrecio) {
-                html = `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:16px;"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(zona)}</span><div class="grid-2x2">${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}${seg > 0 ? `<div class="data-stack"><span class="data-label">SEG</span><span class="data-val">${formatearMoneda(seg)}</span></div>` : ''}${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}${mensu > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad FF/SEM</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}${sab > 0 ? `<div class="data-stack"><span class="data-label">Mensualidad Sabatina</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}</div></div>`;
+                const esInfantil = ["kids", "pteen", "teens"].includes(programa);
+                const etiquetaSemanal = esInfantil ? "Entre semana · cada 2 meses" : "Mensualidad Free Friday";
+                const etiquetaSabatina = esInfantil ? "Sabatino · cada 2 meses" : "Mensualidad Sabatina";
+                html = `<div class="panel-gris"><span class="data-label" style="display:block; margin-bottom:12px;"><i class="fas fa-tags"></i> ${escaparHTML(titulo)} | ZONA ${escaparHTML(zona)}</span><div class="grid-2x2">${ins > 0 ? `<div class="data-stack"><span class="data-label">Inscripción</span><span class="data-val">${formatearMoneda(ins)}</span></div>` : ''}${seg > 0 ? `<div class="data-stack"><span class="data-label">SEG</span><span class="data-val">${formatearMoneda(seg)}</span></div>` : ''}${lib > 0 ? `<div class="data-stack"><span class="data-label">Libro</span><span class="data-val">${formatearMoneda(lib)}</span></div>` : ''}${mensu > 0 ? `<div class="data-stack"><span class="data-label">${etiquetaSemanal}</span><span class="data-val">${formatearMoneda(mensu)}</span></div>` : ''}${sab > 0 ? `<div class="data-stack"><span class="data-label">${etiquetaSabatina}</span><span class="data-val">${formatearMoneda(sab)}</span></div>` : ''}</div></div>`;
                 texto = [
                     `Programa: ${titulo}`,
                     `Zona: ${zona}`,
@@ -1642,6 +1762,7 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
     function actualizarCotizacion(index, selector) {
         const datos = resultadosActuales[index];
         if (!datos || !selector) return;
+        cerrarMenusCopia();
         const programa = selector.value;
         const tarjeta = selector.closest(".result-card");
         const contenedor = tarjeta && tarjeta.querySelector("[data-role='prices']");
@@ -1650,68 +1771,127 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         reemplazarContenido(contenedor, cotizacion.html);
     }
 
-    function crearResumenAdultos(datos, programa) {
-        const inscripcion = formatearMonedaResumen(obtenerMonto(datos, ["Inscripcion", "Inscripción"]));
-        const seg = formatearMonedaResumen(obtenerMonto(datos, ["SEG"]));
-        const material = formatearMonedaResumen(obtenerMonto(datos, ["Libros_Adults"]));
-        const mensualidadFF = formatearMonedaResumen(obtenerMonto(datos, [
-            programa === 'pro' ? "Adults_PRO_FF" : "Adults_FF"
-        ]));
+    function crearResumenAdultos(datos, programa, horario) {
+        const inscripcion = formatearMonedaPlantilla(obtenerMonto(datos, ["Inscripcion", "Inscripción"]));
+        const seg = formatearMonedaPlantilla(obtenerMonto(datos, ["SEG"]));
+        const material = formatearMonedaPlantilla(obtenerMonto(datos, ["Libros_Adults"]));
 
-        const bloques = [`🕒 ¡Horario Free Friday!
-
-Lunes a Jueves | ⏳1h 30 min por día
-
-💰Inversión: ${mensualidadFF} (Mensual)
-
-📝Inscripción: ${inscripcion} (Pago Único)
-
-📚Material: ${material} (Cada 4 meses)
-🛡️ SEG (Seguro de Educación Garantizada): ${seg} Mensual`];
-
-        if (programa === 'adults') {
-            const mensualidadSabatina = formatearMonedaResumen(obtenerMonto(datos, ["Adults_SAB"]));
-            bloques.push(`🕒 ¡Horario Sabatino!
-
-Sábados | ⏳6 horas
-
-💰Inversión: ${mensualidadSabatina} (Mensual)
-
-📝 Inscripción: ${inscripcion} (Pago Único)
-
-📚 Material: ${material} (Cada 4 meses)
-🛡️ SEG (Seguro de Educación Garantizada): ${seg} Mensual`);
+        if (horario === "sabatino") {
+            const mensualidad = formatearMonedaPlantilla(obtenerMonto(datos, ["Adults_SAB"]));
+            return `🕒 *Horario Sabatino*
+📅 *Sábados*
+⏳ 6 horas
+💰 *Mensualidad:* ${mensualidad}
+📝 *Inscripción:* ${inscripcion} — pago único
+📚 *Material:* ${material} — cada 4 meses
+🛡️ *SEG (Seguro de Educación Garantizada):* ${seg} mensuales
+✨ Ideal si prefieres concentrar tus clases en un solo día y mantener libre el resto de tu semana.`;
         }
 
-        return bloques.join("\n\n\n");
-    }
-
-    function crearResumenKidsPreTeens(datos, programa) {
-        const inscripcion = formatearMonedaResumen(obtenerMonto(datos, ["Inscripcion", "Inscripción"]));
-        const seg = formatearMonedaResumen(obtenerMonto(datos, ["SEG"]));
-        const material = formatearMonedaResumen(obtenerMonto(datos, [
-            programa === 'kids' ? "Libros_KIDS" : "Libros_PTEEN"
+        const mensualidad = formatearMonedaPlantilla(obtenerMonto(datos, [
+            programa === "pro" ? "Adults_PRO_FF" : "Adults_FF"
         ]));
-        const inversionSemanal = formatearMonedaResumen(obtenerMonto(datos, ["KPT_SEM"]));
-        const inversionSabatina = formatearMonedaResumen(obtenerMonto(datos, ["KPT_SAB"]));
-
-        return `🟢 2 días a la semana (LUN Y MIE // MAR Y JUE) – Clases de 1h 30 min por día (pago cada 2 meses).
-📝Inscripción: ${inscripcion} (Pago Único)
-💰Inversión: ${inversionSemanal} (Cada 2 meses)
-📚Material: ${material} (Se adquiere por nivel cada 8 meses)
-
-🛡️ SEG (Seguro de Educación Garantizada): ${seg} Mensual
-
-
-🟣 Sábados Intensivo – Clases de 3 horas (pago cada 2 meses).
-📝Inscripción: ${inscripcion} (Pago Único)
-💰Inversión: ${inversionSabatina} (Cada 2 meses)
-📚Material: ${material} (Se adquiere por nivel cada 8 meses)
-
-🛡️ SEG (Seguro de Educación Garantizada): ${seg} Mensual`;
+        return `🕒 *Horario Free Friday*
+📅 *Lunes a jueves*
+⏳ 1 hora 30 minutos por día
+💰 *Mensualidad:* ${mensualidad}
+📝 *Inscripción:* ${inscripcion} — pago único
+📚 *Material:* ${material} — cada 4 meses
+🛡️ *SEG (Seguro de Educación Garantizada):* ${seg} mensuales
+✨ Una opción ideal si buscas avanzar durante la semana y tener tus viernes libres.`;
     }
 
-    function copiarResumen(index) {
+    function crearResumenKidsPreTeens(datos, programa, horario) {
+        const inscripcion = formatearMonedaPlantilla(obtenerMonto(datos, ["Inscripcion", "Inscripción"]));
+        const seg = formatearMonedaPlantilla(obtenerMonto(datos, ["SEG"]));
+        const material = formatearMonedaPlantilla(obtenerMaterialInfantil(datos, programa));
+
+        if (horario === "sabatino") {
+            const inversion = formatearMonedaPlantilla(obtenerMonto(datos, ["KPT_SAB"]));
+            return `🟣 *Horario Sabatino Intensivo*
+📅 *Sábados*
+⏳ 3 horas de clase
+💰 *Inversión:* ${inversion} — cada 2 meses
+📝 *Inscripción:* ${inscripcion} — pago único
+📚 *Material:* ${material} — por nivel, aproximadamente cada 8 meses
+🛡️ *SEG (Seguro de Educación Garantizada):* ${seg} mensuales`;
+        }
+
+        const inversion = formatearMonedaPlantilla(obtenerMonto(datos, ["KPT_SEM"]));
+        return `🟢 *Horario entre semana*
+📅 *2 días a la semana*
+Lunes y miércoles // Martes y jueves
+⏳ 1 hora 30 minutos por día
+💰 *Inversión:* ${inversion} — cada 2 meses
+📝 *Inscripción:* ${inscripcion} — pago único
+📚 *Material:* ${material} — por nivel, aproximadamente cada 8 meses
+🛡️ *SEG (Seguro de Educación Garantizada):* ${seg} mensuales`;
+    }
+
+    function obtenerOpcionesHorario(datos, programa) {
+        if (programa === "adults") {
+            return [
+                { id: "free-friday", etiqueta: "Free Friday", icono: "fas fa-calendar-week", disponible: obtenerMonto(datos, ["Adults_FF"]) > 0 },
+                { id: "sabatino", etiqueta: "Sabatino", icono: "fas fa-calendar-day", disponible: obtenerMonto(datos, ["Adults_SAB"]) > 0 }
+            ];
+        }
+        if (programa === "pro") {
+            return [
+                { id: "free-friday", etiqueta: "Free Friday", icono: "fas fa-calendar-week", disponible: obtenerMonto(datos, ["Adults_PRO_FF"]) > 0 }
+            ];
+        }
+        if (["kids", "pteen", "teens"].includes(programa)) {
+            return [
+                { id: "entre-semana", etiqueta: "Entre semana", icono: "fas fa-calendar-week", disponible: obtenerMonto(datos, ["KPT_SEM"]) > 0 },
+                { id: "sabatino", etiqueta: "Sabatino intensivo", icono: "fas fa-calendar-day", disponible: obtenerMonto(datos, ["KPT_SAB"]) > 0 }
+            ];
+        }
+        return [];
+    }
+
+    function cerrarMenusCopia(excepto) {
+        dom.resultado.querySelectorAll(".copy-choice-popover:not([hidden])").forEach(popover => {
+            if (popover === excepto) return;
+            popover.hidden = true;
+            const boton = popover.closest(".copy-menu-wrap")?.querySelector("[data-action='copy-summary']");
+            if (boton) boton.setAttribute("aria-expanded", "false");
+        });
+    }
+
+    function abrirMenuCopia(index, boton) {
+        const datos = resultadosActuales[index];
+        const tarjeta = boton.closest("[data-result-index]");
+        const selector = tarjeta && tarjeta.querySelector(".result-program-select");
+        const popover = tarjeta && tarjeta.querySelector(".copy-choice-popover");
+        if (!datos || !selector || !popover) return;
+
+        const tipo = normalizarTexto(obtenerCampo(datos, ["Tipo"]) || datos.Tipo || "");
+        const opciones = obtenerOpcionesHorario(datos, selector.value);
+        if (tipo.includes("franquicia") || !opciones.length) {
+            cerrarMenusCopia();
+            copiarResumen(index);
+            return;
+        }
+
+        const estabaAbierto = !popover.hidden;
+        cerrarMenusCopia();
+        if (estabaAbierto) return;
+
+        if (!opciones.some(opcion => opcion.disponible)) {
+            mostrarNotificacion("No hay precios disponibles para copiar este programa");
+            return;
+        }
+
+        reemplazarContenido(popover, `
+            <p class="copy-choice-title">¿Qué horario deseas copiar?</p>
+            <div class="copy-choice-options ${opciones.length === 1 ? "single" : ""}">
+                ${opciones.map(opcion => `<button class="copy-choice-option" type="button" role="menuitem" data-action="copy-schedule" data-schedule="${opcion.id}" ${opcion.disponible ? "" : "disabled"} title="${opcion.disponible ? opcion.etiqueta : opcion.etiqueta + " no disponible"}"><i class="${opcion.icono}"></i> ${escaparHTML(opcion.etiqueta)}${opcion.disponible ? "" : " · No disponible"}</button>`).join("")}
+            </div>`);
+        popover.hidden = false;
+        boton.setAttribute("aria-expanded", "true");
+    }
+
+    function copiarResumen(index, horario) {
         const datos = resultadosActuales[index];
         const tarjeta = dom.resultado.querySelector(`[data-result-index="${index}"]`);
         const selector = tarjeta && tarjeta.querySelector(".result-program-select");
@@ -1753,9 +1933,11 @@ ${datosContactoFranquicia || "Por el momento no hay datos de contacto visibles p
 
 Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotros sí podemos apoyarte directamente con toda la información: costos, niveles, clases privadas, y promociones vigentes. ¿Te interesa conocer esta opción?`;
         } else if (['adults', 'pro'].includes(programa)) {
-            textoFinal = crearResumenAdultos(datos, programa);
-        } else if (['kids', 'pteen'].includes(programa)) {
-            textoFinal = crearResumenKidsPreTeens(datos, programa);
+            if (!horario) return;
+            textoFinal = crearResumenAdultos(datos, programa, horario);
+        } else if (['kids', 'pteen', 'teens'].includes(programa)) {
+            if (!horario) return;
+            textoFinal = crearResumenKidsPreTeens(datos, programa, horario);
         } else {
             textoFinal = [
                 `Instituto: ${valorLimpio(datos.Nombre) || 'N/D'}`,
@@ -1882,7 +2064,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
                 ].filter(Boolean);
 
                 if (itemsFranquicia.length) {
-                    franquiciaHtml = `<div class="panel-gris panel-franchise"><span class="data-label" style="margin-bottom:16px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span><div class="grid-2x2">${itemsFranquicia.map(item => `<div class="data-stack" ${item.span ? 'style="grid-column: span 2;"' : ''}><span class="data-label"><i class="${item.icono}"></i> ${escaparHTML(item.label)}</span><span class="data-val" style="font-size: ${item.span ? '0.95em' : '1.05em'};">${escaparHTML(item.valor)}</span></div>`).join("")}</div></div>`;
+                    franquiciaHtml = `<div class="panel-gris panel-franchise"><span class="data-label" style="margin-bottom:10px; display:block;"><i class="fas fa-headset"></i> Contacto Franquicia</span><div class="grid-2x2">${itemsFranquicia.map(item => `<div class="data-stack" ${item.span ? 'style="grid-column: span 2;"' : ''}><span class="data-label"><i class="${item.icono}"></i> ${escaparHTML(item.label)}</span><span class="data-val" style="font-size: ${item.span ? '0.95em' : '1.05em'};">${escaparHTML(item.valor)}</span></div>`).join("")}</div></div>`;
                 }
 
                 asesoresHtml = "";
@@ -1901,7 +2083,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             }
 
             const cotizacionInicial = obtenerCotizacion(encontrado, "adults");
-            return `<div class="result-card" data-result-index="${index}"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(nombreInstituto)}</div><span class="type-badge ${classType}">${labelTipo}</span>${zonaBadge}</div><i class="fas fa-school" style="font-size:1.8em;opacity:0.3; padding-top: 4px;"></i></div>${directorHtml}${asesoresHtml}${contactoHtml}${franquiciaHtml}<div style="margin-top: 24px; margin-bottom: 24px;"><label>Selecciona Programa:</label><select class="btn-buscar result-program-select"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div data-role="prices">${cotizacionInicial.html}</div><div class="buttons-wrapper"><button class="btn-copiar" type="button" data-action="copy-summary"><i class="fas fa-copy"></i> COPIAR RESUMEN</button>${enlaceHtml}</div></div>`;
+            return `<div class="result-card" data-result-index="${index}"><div class="instituto-header"><div><div class="instituto-nombre">${escaparHTML(nombreInstituto)}</div><span class="type-badge ${classType}">${labelTipo}</span>${zonaBadge}</div><i class="fas fa-school" style="font-size:1.55em;opacity:0.26; padding-top:4px;"></i></div>${directorHtml}${asesoresHtml}${contactoHtml}${franquiciaHtml}<div class="program-picker"><label class="program-picker-label"><i class="fas fa-graduation-cap"></i> Programa</label><select class="program-select result-program-select"><option value="adults">Adultos (1-20)</option><option value="pro">Adultos Pro (21-24)</option><option value="kids">Kids</option><option value="pteen">Pre-Teens</option><option value="teens">Teens</option><option value="toefl">TOEFL ITP</option><option value="tkt">TKT</option><option value="icc">ICC</option></select></div><div data-role="prices">${cotizacionInicial.html}</div><div class="buttons-wrapper"><div class="copy-menu-wrap"><button class="btn-copiar" type="button" data-action="copy-summary" aria-haspopup="menu" aria-expanded="false"><i class="fas fa-copy"></i> COPIAR RESUMEN</button><div class="copy-choice-popover" role="menu" hidden></div></div>${enlaceHtml}</div></div>`;
         }).join("");
 
         reemplazarContenido(dom.resultado, resultados.length
@@ -2239,10 +2421,18 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
             actualizarCotizacion(Number(tarjeta.dataset.resultIndex), selector);
         });
         dom.resultado.addEventListener("click", e => {
+            const opcionHorario = e.target.closest("[data-action='copy-schedule']");
+            if (opcionHorario) {
+                const tarjeta = opcionHorario.closest("[data-result-index]");
+                copiarResumen(Number(tarjeta.dataset.resultIndex), opcionHorario.dataset.schedule);
+                cerrarMenusCopia();
+                return;
+            }
+
             const boton = e.target.closest("[data-action='copy-summary']");
             if (!boton) return;
             const tarjeta = boton.closest("[data-result-index]");
-            copiarResumen(Number(tarjeta.dataset.resultIndex));
+            abrirMenuCopia(Number(tarjeta.dataset.resultIndex), boton);
         });
         dom.onlineLicenseTabs.addEventListener("click", e => {
             const boton = e.target.closest("[data-license]");
@@ -2261,6 +2451,10 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         document.addEventListener("click", e => {
             if (!dom.busquedaWrap.contains(e.target)) dom.sugerencias.style.display = "none";
             if (!dom.helpWidget.contains(e.target)) dom.helpWidget.classList.remove('open');
+            if (!e.target.closest(".copy-menu-wrap")) cerrarMenusCopia();
+        });
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape") cerrarMenusCopia();
         });
 
         let contadorClicks = 0;

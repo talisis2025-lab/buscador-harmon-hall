@@ -970,9 +970,207 @@
             font-weight: 900;
         }
         body.admin-open { overflow: hidden; }
+
+        /* MAPS PANEL START */
+        body {
+            display: block;
+            padding: 0;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        .maps-app-shell {
+            width: 100%;
+            max-width: 100vw;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(0, 100%) minmax(0, 0%);
+            overflow-x: clip;
+            transition: grid-template-columns 300ms ease;
+        }
+        .maps-main-content {
+            min-width: 0;
+            min-height: 100vh;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .maps-side-panel {
+            position: sticky;
+            top: 0;
+            z-index: 12000;
+            min-width: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--card-bg);
+            border-left: 1px solid var(--border);
+            box-shadow: -14px 0 34px rgba(0,0,0,0.12);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(0);
+            transition: opacity 180ms ease, transform 300ms ease, visibility 0s linear 300ms;
+        }
+        body:not(.maps-panel-open) .maps-side-panel {
+            border-left: 0;
+            box-shadow: none;
+        }
+        body.maps-panel-open .maps-app-shell {
+            grid-template-columns: minmax(0, 65%) minmax(0, 35%);
+        }
+        body.maps-panel-open .maps-side-panel {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(0);
+            transition-delay: 0s;
+        }
+        .maps-panel-header {
+            flex: 0 0 auto;
+            padding: 18px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+        }
+        .maps-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 14px;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+        .maps-panel-title i { color: var(--hh-red); }
+        .maps-search-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 0.76rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .maps-search-row {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            min-width: 0;
+        }
+        .maps-search-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 44px;
+            padding: 0 14px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text);
+            font: inherit;
+        }
+        .maps-search-input:focus {
+            border-color: var(--hh-yellow);
+            box-shadow: 0 0 0 3px rgba(255,234,0,0.28);
+        }
+        .maps-search-button {
+            flex: 0 0 auto;
+            min-width: 44px;
+            height: 44px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--hh-black);
+            color: var(--hh-yellow);
+            cursor: pointer;
+            font-weight: 900;
+        }
+        .maps-search-button:hover { filter: brightness(1.18); }
+        .maps-frame-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            background: #e5e3df;
+        }
+        .maps-frame {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .maps-panel-toggle {
+            position: fixed;
+            top: 50%;
+            right: 18px;
+            z-index: 13000;
+            min-width: 54px;
+            height: 48px;
+            padding: 0 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 999px;
+            background: var(--hh-black);
+            color: var(--hh-yellow);
+            box-shadow: 0 14px 32px rgba(0,0,0,0.28);
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.86rem;
+            font-weight: 900;
+            transform: translateY(-50%);
+            transition: right 300ms ease, top 300ms ease, transform 300ms ease, filter 180ms ease;
+        }
+        .maps-panel-toggle:hover { filter: brightness(1.2); }
+        body.maps-panel-open .maps-panel-toggle { right: calc(35% + 12px); }
+        body.maps-panel-open:not(.online-active) .help-widget { right: calc(35% + 18px); }
+
+        @media (max-width: 1200px) and (min-width: 769px) {
+            body.maps-panel-open .layout-wrapper,
+            body.maps-panel-open .online-layout { flex-direction: column; gap: 0; }
+            body.maps-panel-open .left-panel,
+            body.maps-panel-open .online-controls {
+                width: 100%;
+                min-width: unset;
+                position: relative;
+                top: 0;
+            }
+            body.maps-panel-open .online-results { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .maps-main-content { padding: 16px 12px; }
+            .maps-app-shell,
+            body.maps-panel-open .maps-app-shell {
+                grid-template-columns: minmax(0, 100%) minmax(0, 0%);
+            }
+            .maps-side-panel {
+                position: fixed;
+                inset: 0;
+                width: 100%;
+                height: 100vh;
+                height: 100dvh;
+                border-left: 0;
+                transform: translateX(100%);
+            }
+            body.maps-panel-open .maps-side-panel { transform: translateX(0); }
+            body.maps-panel-open { overflow: hidden; }
+            body.maps-panel-open .maps-panel-toggle {
+                top: 14px;
+                right: 14px;
+                transform: none;
+            }
+            .maps-panel-header { padding-right: 104px; }
+        }
+        /* MAPS PANEL END */
     </style>
 </head>
 <body data-theme="light">
+<!-- /* MAPS PANEL START */ -->
+<div class="maps-app-shell" id="mapsAppShell">
+<div class="maps-main-content" id="mapsMainContent">
+<!-- /* MAPS PANEL END */ -->
 <div class="wave-bg"></div>
 
 <!-- ══ HEADER ══ -->
@@ -1011,7 +1209,7 @@
         <div class="seccion" style="position:relative; z-index:100;">
             <label>Buscador de Institutos</label>
             <div class="busqueda-wrap">
-                <input type="text" id="textoBusqueda" placeholder="Ej: Citadel..." autocomplete="off" onfocus="this.select()">
+                <input type="text" id="textoBusqueda" placeholder="Ej: Santa Catari..." autocomplete="off" onfocus="this.select()">
                 <button id="btnLimpiar" class="btn-limpiar" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">
                     <i class="fas fa-times"></i>
                 </button>
@@ -1127,7 +1325,96 @@
     <button class="help-btn" type="button" onclick="toggleHelp()" aria-label="Abrir ayuda">?</button>
 </div>
 
+<!-- /* MAPS PANEL START */ -->
+</div>
+<aside class="maps-side-panel" id="mapsSidePanel" aria-label="Google Maps" aria-hidden="true" inert>
+    <div class="maps-panel-header">
+        <h2 class="maps-panel-title"><i class="fas fa-map-location-dot"></i> Google Maps</h2>
+        <form class="maps-search-form" id="mapsSearchForm" autocomplete="off">
+            <label for="mapsSearchInput">Buscar ubicación</label>
+            <div class="maps-search-row">
+                <input class="maps-search-input" id="mapsSearchInput" type="search" value="Harmon Hall México" placeholder="Instituto, dirección o ciudad">
+                <button class="maps-search-button" type="submit" title="Buscar en el mapa" aria-label="Buscar en el mapa">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="maps-frame-wrap">
+        <iframe
+            class="maps-frame"
+            id="googleMapsFrame"
+            title="Google Maps"
+            src="https://www.google.com/maps?q=Harmon%20Hall%20Mexico&amp;output=embed"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+</aside>
+</div>
+<button class="maps-panel-toggle" id="mapsPanelToggle" type="button" aria-controls="mapsSidePanel" aria-expanded="false" title="Abrir Google Maps">
+    <i class="fas fa-map-location-dot" id="mapsPanelToggleIcon"></i>
+    <span id="mapsPanelToggleLabel">Mapa</span>
+</button>
+<!-- /* MAPS PANEL END */ -->
+
 <script>
+/* MAPS PANEL START */
+const GOOGLE_MAPS_API_KEY = "";
+const MAPS_DEFAULT_QUERY = "Harmon Hall México";
+const mapsPanelDom = {
+    panel: document.getElementById("mapsSidePanel"),
+    toggle: document.getElementById("mapsPanelToggle"),
+    toggleIcon: document.getElementById("mapsPanelToggleIcon"),
+    toggleLabel: document.getElementById("mapsPanelToggleLabel"),
+    form: document.getElementById("mapsSearchForm"),
+    input: document.getElementById("mapsSearchInput"),
+    frame: document.getElementById("googleMapsFrame")
+};
+
+function construirUrlGoogleMaps(consulta) {
+    const ubicacion = (consulta || MAPS_DEFAULT_QUERY).trim() || MAPS_DEFAULT_QUERY;
+    const clave = GOOGLE_MAPS_API_KEY.trim();
+    if (clave) {
+        return `https://www.google.com/maps/embed/v1/search?key=${encodeURIComponent(clave)}&q=${encodeURIComponent(ubicacion)}`;
+    }
+    return `https://www.google.com/maps?q=${encodeURIComponent(ubicacion)}&output=embed`;
+}
+
+function establecerEstadoPanelMaps(abierto, devolverFoco = false) {
+    document.body.classList.toggle("maps-panel-open", abierto);
+    mapsPanelDom.panel.setAttribute("aria-hidden", String(!abierto));
+    mapsPanelDom.panel.inert = !abierto;
+    mapsPanelDom.toggle.setAttribute("aria-expanded", String(abierto));
+    mapsPanelDom.toggle.title = abierto ? "Cerrar Google Maps" : "Abrir Google Maps";
+    mapsPanelDom.toggleIcon.className = abierto ? "fas fa-chevron-right" : "fas fa-map-location-dot";
+    mapsPanelDom.toggleLabel.textContent = abierto ? "Cerrar" : "Mapa";
+    if (abierto) {
+        window.setTimeout(() => mapsPanelDom.input.focus(), 310);
+    } else if (devolverFoco) {
+        mapsPanelDom.toggle.focus();
+    }
+}
+
+mapsPanelDom.toggle.addEventListener("click", () => {
+    establecerEstadoPanelMaps(!document.body.classList.contains("maps-panel-open"));
+});
+
+mapsPanelDom.form.addEventListener("submit", evento => {
+    evento.preventDefault();
+    const consulta = mapsPanelDom.input.value.trim() || MAPS_DEFAULT_QUERY;
+    mapsPanelDom.input.value = consulta;
+    mapsPanelDom.frame.src = construirUrlGoogleMaps(consulta);
+});
+
+document.addEventListener("keydown", evento => {
+    if (evento.key === "Escape" && document.body.classList.contains("maps-panel-open")) {
+        establecerEstadoPanelMaps(false, true);
+    }
+});
+
+mapsPanelDom.frame.src = construirUrlGoogleMaps(mapsPanelDom.input.value);
+/* MAPS PANEL END */
     let todosLosDatos = [];
     let baseCargada = false;
     /*

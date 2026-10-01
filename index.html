@@ -2908,30 +2908,7 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         dom.adminFrame.classList.add("admin-hidden");
     }
 
-    function activarEasterEgg() {
-        const modoNocheActivo = dom.body.getAttribute('data-theme') === 'dark';
-        let archivoAudio = modoNocheActivo ? 'screamer.mp3' : 'fnaf.mp3';
-        let duracionSegundos = modoNocheActivo ? 2.0 : 2.5;
-        const sonidoEasterEgg = new Audio(archivoAudio);
-        sonidoEasterEgg.volume = 0.6;
-        sonidoEasterEgg.play().catch(err => console.log('Error al reproducir:', err));
-        setTimeout(() => {
-            const fadeOut = setInterval(() => {
-                if (sonidoEasterEgg.volume > 0.1) {
-                    sonidoEasterEgg.volume -= 0.1;
-                } else {
-                    sonidoEasterEgg.pause();
-                    sonidoEasterEgg.currentTime = 0;
-                    clearInterval(fadeOut);
-                }
-            }, 50);
-        }, duracionSegundos * 1000);
-        if (window.confetti) {
-            confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, zIndex: 10000, colors: modoNocheActivo ? ['#cc1e3d', '#000000', '#ffffff'] : ['#FFEA00', '#cc1e3d', '#198754', '#0d6efd', '#ffffff'] });
-        }
-    }
-
-    window.onload = async function () {
+     window.onload = async function () {
         dom.loadingSpinner.style.display = 'block';
         actualizarConfiguracionOnlineDesdeServidor();
 

@@ -1099,55 +1099,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 0 0 14px;
+            margin: 0;
             color: var(--text);
             font-size: 1rem;
             font-weight: 900;
         }
         .maps-panel-title i { color: var(--hh-red); }
-        .maps-search-form label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text);
-            font-size: 0.76rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-        .maps-search-row {
-            display: flex;
-            align-items: stretch;
-            gap: 8px;
-            min-width: 0;
-        }
-        .maps-search-input {
-            flex: 1 1 auto;
-            min-width: 0;
-            height: 44px;
-            padding: 0 14px;
-            border: 1px solid var(--input-border);
-            border-radius: 8px;
-            outline: none;
-            background: var(--input-bg);
-            color: var(--text);
-            font: inherit;
-        }
-        .maps-search-input:focus {
-            border-color: var(--hh-yellow);
-            box-shadow: 0 0 0 3px rgba(255,234,0,0.28);
-        }
-        .maps-search-button {
-            flex: 0 0 auto;
-            min-width: 44px;
-            height: 44px;
-            padding: 0 14px;
-            border: 0;
-            border-radius: 8px;
-            background: var(--hh-black);
-            color: var(--hh-yellow);
-            cursor: pointer;
-            font-weight: 900;
-        }
-        .maps-search-button:hover { filter: brightness(1.18); }
         .maps-frame-wrap {
             flex: 1 1 auto;
             min-height: 0;
@@ -1181,10 +1138,19 @@
             font-size: 0.86rem;
             font-weight: 900;
             transform: translateY(-50%);
-            transition: right 300ms ease, top 300ms ease, transform 300ms ease, filter 180ms ease;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: right 300ms ease, top 300ms ease, transform 300ms ease, filter 180ms ease, opacity 180ms ease, visibility 0s linear 180ms;
         }
         .maps-panel-toggle:hover { filter: brightness(1.2); }
-        body.maps-panel-open .maps-panel-toggle { right: calc(35% + 12px); }
+        body.maps-panel-open .maps-panel-toggle {
+            right: calc(35% + 12px);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s;
+        }
         body.maps-panel-open:not(.online-active) .help-widget { right: calc(35% + 18px); }
 
         @media (max-width: 1200px) and (min-width: 769px) {
@@ -1391,15 +1357,6 @@
 <aside class="maps-side-panel" id="mapsSidePanel" aria-label="Google Maps" aria-hidden="true" inert>
     <div class="maps-panel-header">
         <h2 class="maps-panel-title"><i class="fas fa-map-location-dot"></i> Google Maps</h2>
-        <form class="maps-search-form" id="mapsSearchForm" autocomplete="off">
-            <label for="mapsSearchInput">Buscar ubicación</label>
-            <div class="maps-search-row">
-                <input class="maps-search-input" id="mapsSearchInput" type="search" value="Harmon Hall México" placeholder="Instituto, dirección o ciudad">
-                <button class="maps-search-button" type="submit" title="Buscar en el mapa" aria-label="Buscar en el mapa">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </form>
     </div>
     <div class="maps-frame-wrap">
         <iframe
@@ -1413,9 +1370,9 @@
     </div>
 </aside>
 </div>
-<button class="maps-panel-toggle" id="mapsPanelToggle" type="button" aria-controls="mapsSidePanel" aria-expanded="false" title="Abrir Google Maps">
-    <i class="fas fa-map-location-dot" id="mapsPanelToggleIcon"></i>
-    <span id="mapsPanelToggleLabel">Mapa</span>
+<button class="maps-panel-toggle" id="mapsPanelToggle" type="button" aria-controls="mapsSidePanel" aria-expanded="false" aria-hidden="true" tabindex="-1" title="Cerrar Google Maps">
+    <i class="fas fa-chevron-right" id="mapsPanelToggleIcon"></i>
+    <span id="mapsPanelToggleLabel">Cerrar</span>
 </button>
 <!-- /* MAPS PANEL END */ -->
 
@@ -1430,10 +1387,9 @@ const mapsPanelDom = {
     toggle: document.getElementById("mapsPanelToggle"),
     toggleIcon: document.getElementById("mapsPanelToggleIcon"),
     toggleLabel: document.getElementById("mapsPanelToggleLabel"),
-    form: document.getElementById("mapsSearchForm"),
-    input: document.getElementById("mapsSearchInput"),
     frame: document.getElementById("googleMapsFrame")
 };
+let mapsPanelReturnFocus = null;
 
 function construirUrlGoogleMaps(consulta) {
     const ubicacion = (consulta || MAPS_DEFAULT_QUERY).trim() || MAPS_DEFAULT_QUERY;
@@ -1449,32 +1405,27 @@ function establecerEstadoPanelMaps(abierto, devolverFoco = false) {
     mapsPanelDom.panel.setAttribute("aria-hidden", String(!abierto));
     mapsPanelDom.panel.inert = !abierto;
     mapsPanelDom.toggle.setAttribute("aria-expanded", String(abierto));
-    mapsPanelDom.toggle.title = abierto ? "Cerrar Google Maps" : "Abrir Google Maps";
-    mapsPanelDom.toggleIcon.className = abierto ? "fas fa-chevron-right" : "fas fa-map-location-dot";
-    mapsPanelDom.toggleLabel.textContent = abierto ? "Cerrar" : "Mapa";
+    mapsPanelDom.toggle.setAttribute("aria-hidden", String(!abierto));
+    mapsPanelDom.toggle.tabIndex = abierto ? 0 : -1;
+    mapsPanelDom.toggle.title = "Cerrar Google Maps";
+    mapsPanelDom.toggleIcon.className = "fas fa-chevron-right";
+    mapsPanelDom.toggleLabel.textContent = "Cerrar";
     if (abierto) {
-        window.setTimeout(() => mapsPanelDom.input.focus(), 310);
-    } else if (devolverFoco) {
-        mapsPanelDom.toggle.focus();
+        window.setTimeout(() => mapsPanelDom.toggle.focus(), 310);
+    } else if (devolverFoco && mapsPanelReturnFocus instanceof HTMLElement) {
+        mapsPanelReturnFocus.focus();
     }
 }
 
 function mostrarUbicacionEnMapa(consulta) {
     const ubicacion = (consulta || MAPS_DEFAULT_QUERY).trim() || MAPS_DEFAULT_QUERY;
-    mapsPanelDom.input.value = ubicacion;
+    mapsPanelReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     mapsPanelDom.frame.src = construirUrlGoogleMaps(ubicacion);
     establecerEstadoPanelMaps(true);
 }
 
 mapsPanelDom.toggle.addEventListener("click", () => {
-    establecerEstadoPanelMaps(!document.body.classList.contains("maps-panel-open"));
-});
-
-mapsPanelDom.form.addEventListener("submit", evento => {
-    evento.preventDefault();
-    const consulta = mapsPanelDom.input.value.trim() || MAPS_DEFAULT_QUERY;
-    mapsPanelDom.input.value = consulta;
-    mapsPanelDom.frame.src = construirUrlGoogleMaps(consulta);
+    if (document.body.classList.contains("maps-panel-open")) establecerEstadoPanelMaps(false, true);
 });
 
 document.addEventListener("keydown", evento => {
@@ -1483,7 +1434,7 @@ document.addEventListener("keydown", evento => {
     }
 });
 
-mapsPanelDom.frame.src = construirUrlGoogleMaps(mapsPanelDom.input.value);
+mapsPanelDom.frame.src = construirUrlGoogleMaps(MAPS_DEFAULT_QUERY);
 /* MAPS PANEL END */
     let todosLosDatos = [];
     let baseCargada = false;

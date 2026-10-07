@@ -1215,12 +1215,76 @@
             .maps-panel-header { padding-right: 104px; }
         }
         /* MAPS PANEL END */
+        /* ── Overlay de carga ── */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 30000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.28);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    opacity: 1;
+    transition: opacity 0.35s ease, visibility 0s linear 0s;
+}
+.loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+.loading-card {
+    padding: 32px;
+    border-radius: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lift);
+}
+.loading-tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 40px;
+    height: 40px;
+    animation: tile-gap 2s infinite ease;
+}
+.loading-tiles div { background: var(--hh-black); }
+.loading-tiles div:nth-child(2) { background: var(--hh-yellow); outline: 1px solid var(--hh-black); outline-offset: -1px; }
+[data-theme="dark"] .loading-tiles div { background: #fff; }
+[data-theme="dark"] .loading-tiles div:nth-child(2) { background: var(--hh-yellow); outline: none; }
+@keyframes tile-gap {
+    0%, 100% { gap: 0px; transform: rotate(0deg); }
+    50% { gap: 10px; transform: rotate(90deg); }
+}
+
+/* ── Logo: relleno al hover ── */
+.header-title h1#logoHH {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--header-text);
+    background-image: linear-gradient(var(--hh-red), var(--hh-red));
+    background-repeat: no-repeat;
+    background-size: 100% 0%;
+    background-position: bottom;
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-size 0.4s ease;
+    cursor: pointer;
+}
+.header-title h1#logoHH:hover {
+    background-size: 100% 100%;
+}
     </style>
 </head>
 <body data-theme="light">
+<div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite" aria-label="Cargando base de datos">
+    <div class="loading-card">
+        <div class="loading-tiles"><div></div><div></div><div></div><div></div></div>
+    </div>
+</div>
 <!-- /* MAPS PANEL START */ -->
 <div class="maps-app-shell" id="mapsAppShell">
-<div class="maps-main-content" id="mapsMainContent">
+<div class="maps-main-content" id="mapsMainContent" inert>
 <!-- /* MAPS PANEL END */ -->
 <div class="wave-bg"></div>
 
@@ -2968,9 +3032,13 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
         } catch (e) {
             console.error("Error cargando bases de datos: ", e);
             dom.statusCarga.innerHTML = "❌ Error al cargar algunos datos.";
-        } finally {
+              } finally {
             dom.loadingSpinner.style.display = 'none';
             baseCargada = true;
+            document.getElementById("mapsMainContent").inert = false;
+            const overlayCarga = document.getElementById("loadingOverlay");
+            overlayCarga.classList.add("hidden");
+            setTimeout(() => overlayCarga.remove(), 400);
         }
     };
 

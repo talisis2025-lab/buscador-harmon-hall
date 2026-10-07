@@ -1258,11 +1258,11 @@
     50% { gap: 10px; transform: rotate(90deg); }
 }
 
-/* ── Logo: relleno al hover ── */
+/* ── Logo hover ── */
 .header-title h1#logoHH {
     color: transparent;
-    -webkit-text-stroke: 1.5px var(--header-text);
-    background-image: linear-gradient(var(--hh-red), var(--hh-red));
+    -webkit-text-stroke: 1.5px var(--hh-black);
+    background-image: linear-gradient(var(--hh-white), var(--hh-white));
     background-repeat: no-repeat;
     background-size: 100% 0%;
     background-position: bottom;
@@ -1273,6 +1273,10 @@
 }
 .header-title h1#logoHH:hover {
     background-size: 100% 100%;
+}
+[data-theme="dark"] .header-title h1#logoHH {
+    -webkit-text-stroke-color: var(--hh-white);
+    background-image: linear-gradient(var(--hh-yellow), var(--hh-yellow));
 }
     </style>
 </head>

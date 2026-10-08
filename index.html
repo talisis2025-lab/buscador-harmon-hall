@@ -1290,6 +1290,34 @@
         linear-gradient(var(--hh-white), var(--hh-white)),
         linear-gradient(var(--hh-yellow), var(--hh-yellow));
 }
+        /* ── Pestaña no disponible: se tacha al hover ── */
+.mode-tab.is-disabled {
+    position: relative;
+    overflow: hidden;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+.mode-tab.is-disabled:hover { opacity: 0.4; }
+.mode-tab.is-disabled::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 8%;
+    width: 84%;
+    height: 3px;
+    margin-top: -1.5px;
+    background: var(--hh-red);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+.mode-tab.is-disabled:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
     </style>
 </head>
 <body data-theme="light">
@@ -1320,7 +1348,7 @@
         <button id="tabPresencial" class="mode-tab active" type="button" role="tab" aria-selected="true" aria-controls="presencialView" onclick="cambiarModalidad('presencial')">
             <i class="fas fa-school"></i> Presencial
         </button>
-        <button id="tabOnline" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="onlineView" onclick="cambiarModalidad('online')">
+        <button id="tabOnline" class="mode-tab is-disabled" type="button" role="tab" aria-selected="false" aria-controls="onlineView" aria-disabled="true" title="Temporalmente no disponible" onclick="cambiarModalidad('online')">
             <i class="fas fa-laptop"></i> 100% Online
         </button>
     </div>
@@ -1551,6 +1579,7 @@ mapsPanelDom.frame.src = construirUrlGoogleMaps(MAPS_DEFAULT_QUERY);
 const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.googleusercontent.com";
     const archivosA_Cargar = ['database2.xlsx'];
     const EASTER_EGG_CLICKS = 3;
+    const ONLINE_DESHABILITADO = true;
     const ADMIN_TRIGGER_CLICKS = 5;
     const ONLINE_PLANS = [
         { id: "standard-mensual", licencia: "Standard", plazo: "Mensual", precioLista: 1700, diferido: false, topeDescuento: 0, topePagoHoy: 0 },
@@ -1734,18 +1763,19 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         }) + " MXN";
     }
 
-    function cambiarModalidad(modalidad) {
-        const esOnline = modalidad === "online";
-        dom.body.classList.toggle("online-active", esOnline);
-        dom.presencialView.hidden = esOnline;
-        dom.onlineView.hidden = !esOnline;
-        dom.tabPresencial.classList.toggle("active", !esOnline);
-        dom.tabOnline.classList.toggle("active", esOnline);
-        dom.tabPresencial.setAttribute("aria-selected", String(!esOnline));
-        dom.tabOnline.setAttribute("aria-selected", String(esOnline));
+       function cambiarModalidad(modalidad) {
+    if (ONLINE_DESHABILITADO && modalidad === "online") return;
+    const esOnline = modalidad === "online";
+    dom.body.classList.toggle("online-active", esOnline);
+    dom.presencialView.hidden = esOnline;
+    dom.onlineView.hidden = !esOnline;
+    dom.tabPresencial.classList.toggle("active", !esOnline);
+    dom.tabOnline.classList.toggle("active", esOnline);
+    dom.tabPresencial.setAttribute("aria-selected", String(!esOnline));
+    dom.tabOnline.setAttribute("aria-selected", String(esOnline));
 
-        if (esOnline) renderizarCotizadorOnline();
-    }
+    if (esOnline) renderizarCotizadorOnline();
+}
 
     function seleccionarLicenciaOnline(licencia) {
         if (!ONLINE_PLANS_BY_LICENSE.has(licencia)) return;

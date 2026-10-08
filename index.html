@@ -609,28 +609,37 @@
             transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
         }
         .location-action:hover { border-color: var(--hh-red); color: var(--hh-red); background: var(--card-bg); }
-        .location-action.is-disabled,
-        .location-action.is-disabled:hover {
-            border-color: var(--input-border);
-            background: var(--input-bg);
-            color: var(--text);
-            cursor: not-allowed;
-            opacity: 0.38;
-            filter: grayscale(1);
-        }
-        .location-action.is-disabled::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: -14%;
-            width: 128%;
-            height: 2px;
-            background: currentColor;
-            transform: rotate(-12deg);
-            transform-origin: center;
-            opacity: 0.72;
-            pointer-events: none;
-        }
+       /* ── Botón no disponible: se tacha al hover ── */
+.location-action.is-disabled,
+.location-action.is-disabled:hover {
+    border-color: var(--input-border);
+    background: var(--input-bg);
+    color: var(--text);
+    cursor: not-allowed;
+    opacity: 0.6;
+    filter: none;
+    transition: opacity 0.2s ease;
+}
+.location-action.is-disabled:hover { opacity: 0.4; }
+.location-action.is-disabled::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 8%;
+    width: 84%;
+    height: 3px;
+    margin-top: -1.5px;
+    background: var(--hh-red);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+.location-action.is-disabled:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
         .location-attribution { margin: 2px 0 0; text-align: center; font-size: 0.72rem; font-weight: 600; opacity: 0.66; }
         .location-attribution a { color: inherit; }
 

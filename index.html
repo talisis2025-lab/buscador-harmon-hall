@@ -1563,7 +1563,7 @@
                 </div>
 
                 <div class="online-limit-row">
-                    <span>Tope autorizado: <strong id="onlineMaxDiscountLabel">0%</strong></span>
+                    <span></span>
                     <button class="online-manage-btn" type="button" onclick="abrirAdministrador()" title="Administrar tope de descuento" aria-label="Administrar tope de descuento">
                         <i class="fas fa-gear"></i>
                     </button>
@@ -1813,7 +1813,6 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         onlinePromotionTabs: document.getElementById("onlinePromotionTabs"),
         onlinePromotionButtons: Array.from(document.querySelectorAll(".online-promotion-btn")),
         onlineDiscountInput: document.getElementById("onlineDiscountInput"),
-        onlineMaxDiscountLabel: document.getElementById("onlineMaxDiscountLabel"),
         onlineQuote: document.getElementById("onlineQuote"),
         textoBusqueda: document.getElementById("textoBusqueda"),
         sugerencias: document.getElementById("sugerencias"),
@@ -2068,7 +2067,6 @@ const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.go
         dom.onlineDiscountInput.max = String(tope);
         dom.onlineDiscountInput.value = String(descuento);
         dom.onlineDiscountInput.disabled = tope === 0;
-        dom.onlineMaxDiscountLabel.textContent = tope + "%";
 
         reemplazarContenido(dom.onlineQuote, crearTarjetaOnline(plan));
         onlineQuoteDom = {

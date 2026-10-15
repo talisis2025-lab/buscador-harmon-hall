@@ -3024,7 +3024,10 @@ Por otro lado, si te interesa estudiar inglés en modalidad 100% online, nosotro
     }
 
     async function cargarExcelGitHub(archivo) {
-        const response = await fetch(archivo, { cache: "default" });
+        const revisionGlobal = new URLSearchParams(window.location.search).get("hh_update");
+        const recurso = new URL(archivo, window.location.href);
+        if (revisionGlobal) recurso.searchParams.set("hh_update", revisionGlobal);
+        const response = await fetch(recurso.href, { cache: revisionGlobal ? "no-store" : "default" });
         if (!response.ok) throw new Error(`Error HTTP: ${response.status} en ${archivo}`);
         const arrayBuffer = await response.arrayBuffer();
         const libro = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
@@ -4135,5 +4138,83 @@ document.addEventListener('keydown', event => {
 });
 
 </script>
+
+<script>
+// Señal remota de recarga. No requiere sesión en las páginas públicas.
+(() => {
+  "use strict";
+  let knownRevision = null;
+  let pending = false;
+  let lastCheck = 0;
+  let announced = false;
+  const loadedRevision = new URLSearchParams(location.search).get("hh_update");
+
+  function announceReload(revision) {
+    if (announced) return;
+    announced = true;
+    const banner = document.createElement("div");
+    banner.setAttribute("role", "status");
+    banner.setAttribute("aria-live", "polite");
+    banner.style.cssText = "position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:2147483647;width:min(92vw,620px);padding:18px 22px;border:2px solid #151515;border-radius:12px;background:#ffea00;color:#151515;font:700 16px/1.5 Arial,sans-serif;box-shadow:0 8px 32px #0004;text-align:center";
+    document.body.appendChild(banner);
+    const deadline = Date.now() + 10000;
+    const tick = () => {
+      const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      banner.textContent = "Hay una actualización. La página se recargará en " + seconds + " segundos. Guarda cualquier cambio pendiente.";
+      if (seconds === 0) {
+        const url = new URL(location.href);
+        url.searchParams.set("hh_update", revision);
+        location.replace(url.href);
+      } else {
+        setTimeout(tick, 250);
+      }
+    };
+    tick();
+  }
+
+  function checkUpdate(force = false) {
+    if (pending || announced || !navigator.onLine || document.hidden) return;
+    if (!force && Date.now() - lastCheck < 15000) return;
+    if (!apiGoogleSheetsConfigurada()) return;
+    pending = true;
+    lastCheck = Date.now();
+    const name = "hhSiteUpdate_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    let timer;
+    const cleanup = () => {
+      clearTimeout(timer);
+      script.remove();
+      delete window[name];
+      pending = false;
+    };
+    window[name] = response => {
+      cleanup();
+      const revision = response && response.ok && response.data && response.data.revision;
+      if (typeof revision !== "string" || !revision || revision.length > 160) return;
+      if (knownRevision === null) {
+        // Una señal anterior al ingreso no obliga a recargar al nuevo visitante.
+        // La revisión en URL permite recuperar órdenes perdidas durante una desconexión.
+        knownRevision = revision;
+        if (loadedRevision && revision !== loadedRevision && revision !== "initial") announceReload(revision);
+        return;
+      }
+      if (revision !== knownRevision) {
+        knownRevision = revision;
+        announceReload(revision);
+      }
+    };
+    script.onerror = cleanup;
+    timer = setTimeout(cleanup, 18000);
+    script.src = construirUrlAppsScript({ action: "siteUpdate", callback: name, _: Date.now() });
+    document.body.appendChild(script);
+  }
+  checkUpdate(true);
+  setInterval(() => checkUpdate(), 60000);
+  document.addEventListener("visibilitychange", () => checkUpdate());
+  window.addEventListener("focus", () => checkUpdate());
+  window.addEventListener("online", () => checkUpdate(true));
+})();
+</script>
+
 </body>
 </html>

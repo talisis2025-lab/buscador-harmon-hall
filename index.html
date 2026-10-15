@@ -1490,7 +1490,7 @@
         <button id="tabPresencial" class="mode-tab active" type="button" role="tab" aria-selected="true" aria-controls="presencialView" onclick="cambiarModalidad('presencial')">
             <i class="fas fa-school"></i> Presencial
         </button>
-        <button id="tabOnline" class="mode-tab is-disabled" type="button" role="tab" aria-selected="false" aria-controls="onlineView" aria-disabled="true" title="Temporalmente no disponible" onclick="cambiarModalidad('online')">
+        <button id="tabOnline" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="onlineView" onclick="cambiarModalidad('online')">
             <i class="fas fa-laptop"></i> 100% Online
         </button>
     </div>
@@ -1734,7 +1734,7 @@ mapsPanelDom.frame.src = construirUrlGoogleMaps(MAPS_DEFAULT_QUERY);
 const GOOGLE_CLIENT_ID = "1004564895555-e1ju8lud4fa6ppms895rahbef764k9pm.apps.googleusercontent.com";
     const archivosA_Cargar = ['database2.xlsx'];
     const EASTER_EGG_CLICKS = 3;
-    const ONLINE_DESHABILITADO = true;
+    const ONLINE_DESHABILITADO = false;
     const ADMIN_TRIGGER_CLICKS = 5;
     const ONLINE_PLANS = [
         { id: "standard-mensual", licencia: "Standard", plazo: "Mensual", precioLista: 1700, diferido: false, topeDescuento: 0, topePagoHoy: 0 },
